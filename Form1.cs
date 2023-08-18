@@ -17,9 +17,10 @@ namespace LogixForms
         public static ushort[] B3 = new ushort[70];
         public static List<(int, int)> BST = new List<(int, int)>();
         public static List<(int, int)> NXB = new List<(int, int)>();
-        public string[] File_MB = File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
+        public string[] File_MB = File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd - copy", Encoding.UTF8);
 
-        public Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT;
+        public Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
+            OTE = NodEn.OTE, OTL = NodEn.OTE;
         public Pen pen_line = new Pen(Brushes.Black);
         private Font text = new Font("Arial", 10);
         private Font Rangs = new Font("Arial", 12);
@@ -100,7 +101,8 @@ namespace LogixForms
         private void timer1_Tick(object sender, EventArgs e)
         {
             Refresh();
-            top_indent_rang = (Height * File_MB.Length) / 150;
+            if ((Height * File_MB.Length) / 150 >= 150)
+                top_indent_rang = (Height * File_MB.Length) / 150;
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -108,21 +110,7 @@ namespace LogixForms
             Graphics g = e.Graphics;
             PointF Scroll= new PointF(79, 50);
             scroll_y = vScrollBar1.Value *(((File_MB.Length+2) * top_indent_rang)/100);//прокрутка
-            g.DrawString((Height).ToString()+"/", Rangs, Brushes.Black, Scroll);
-
-            /*g.DrawImage(XIC, new Rectangle(0, 0 - x, 54, 50));
-            g.DrawImage(XIO, new Rectangle(0, 50 - x, 54, 50));
-            g.DrawImage(Timer_Move, new Rectangle(125, 0 - x, 75 * 2, 50 * 2));
-            // текст
-            
-            g.DrawString("test", text, Brushes.Black, 127, 4 - x);
-            string text = "Text";
-            SizeF textSize = e.Graphics.MeasureString(text, Font);
-            
-            e.Graphics.DrawString(text, Font, Brushes.Black, locationToDraw);
-
-            //линия ранга
-            g.DrawLine(pen_line, 0, 50 - x, Width, 50 - x);*/
+            //g.DrawString(scroll_y.ToString(), Rangs, Brushes.Black, Scroll);
 
             //вертикаль
             g.DrawLine(pen_line, left_indent_rang_x, 0, left_indent_rang_x, Height);
@@ -136,6 +124,88 @@ namespace LogixForms
                 locationToDrawRangs.Y = ((top_indent_rang * i) - 10) - scroll_y;
                 g.DrawString((i - 1).ToString(), Rangs, Brushes.Black, locationToDrawRangs);
                 g.DrawLine(pen_line, left_indent_rang_x, (top_indent_rang * i) - scroll_y, Width - left_indent_rang_x + 5, (top_indent_rang * i) - scroll_y);
+                
+                string[] element = File_MB[i - 1].Trim().Split(' ');
+                if (element.Contains("BST"))
+                {
+                    int max_count_el_sap = 0;
+                    int count_sap = 0;
+                    int count_st = 0;
+                    int count_nx = 0;
+                    int count_end = 0;
+                    string s;
+                    int buf = 0;
+                    for (int k = 0; k<element.Length; k++)
+                    {
+                        s = element[k];
+                        if (s == "BST")
+                        {
+                            count_st++;
+                            count_sap++;
+                            if (count_sap > 1)
+                            {
+                                int[] mas_max_count_el_sap = new int[count_sap];
+                            }
+                        }
+                        else if (s == "NXB")
+                        {
+                            count_nx++;
+                            for (int l = k; k < element.Length; l++)
+                            {
+                                if (element[l] != "NXB" || element[l] != "END" || element[l] != "BST")
+                                {
+                                    if (!element[l].Contains(':'))
+                                        max_count_el_sap++;
+                                }
+                                else if (element[l] == "NXB")
+                                {
+                                    max_count_el_sap = 0;
+                                    count_nx++;
+                                    break;
+                                }
+                                else
+                                {
+                                    count_end++;
+                                    buf = l;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (k < buf) continue;
+                    }
+                    max_count_el_sap /= 2;
+                }
+                else
+                {
+                    for (int j = 0; j < element.Length; j++)
+                    {
+                        string el = element[j];
+                        int step = j * (Width - left_indent_rang_x + 5) / element.Length;
+                        if (el == "XIO")
+                        {
+                            g.DrawImage(XIO, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
+                        }
+                        else if (el == "XIC")
+                        {
+                            g.DrawImage(XIC, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
+                        }
+                        else if (el == "OTU")
+                        {
+                            g.DrawImage(OTU, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 63, 50));
+                        }
+                        else if (el == "OTE")
+                        {
+                            g.DrawImage(OTE, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 63, 50));
+                        }
+                        else if (el == "OTL")
+                        {
+                            g.DrawImage(OTL, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 63, 50));
+                        }
+                        else
+                            continue;
+                    }
+                }
+
             }
         }
     }

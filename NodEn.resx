@@ -121,6 +121,15 @@
   <data name="EN_DN_TT" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\EN-DN-TT.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="OTE" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\OTE.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OTL" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\OTL.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OTU" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\OTU.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Timer___Move" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Timer - Move.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
