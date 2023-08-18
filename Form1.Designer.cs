@@ -36,9 +36,9 @@
             // vScrollBar1
             // 
             this.vScrollBar1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.vScrollBar1.Location = new System.Drawing.Point(774, 0);
+            this.vScrollBar1.Location = new System.Drawing.Point(1134, 0);
             this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(26, 450);
+            this.vScrollBar1.Size = new System.Drawing.Size(26, 512);
             this.vScrollBar1.TabIndex = 0;
             // 
             // timer1
@@ -51,7 +51,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1160, 512);
             this.Controls.Add(this.vScrollBar1);
             this.Name = "Form1";
             this.Text = "Form1";
