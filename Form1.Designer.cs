@@ -51,11 +51,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(1191, 537);
             this.Controls.Add(this.vScrollBar1);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.Scroll += new System.Windows.Forms.ScrollEventHandler(this.Form1_Scroll);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.ResumeLayout(false);
 
