@@ -108,13 +108,13 @@ namespace LogixForms
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            PointF Scroll = new PointF(79, 50);
-            scroll_y = vScrollBar1.Value * (((File_MB.Length + 2) * top_indent_rang) / 100);//прокрутка
+            PointF Scroll= new PointF(79, 50);
+            scroll_y = vScrollBar1.Value *(((File_MB.Length+2) * top_indent_rang)/100);//прокрутка
             //g.DrawString(scroll_y.ToString(), Rangs, Brushes.Black, Scroll);
 
             //вертикаль
             g.DrawLine(pen_line, left_indent_rang_x, 0, left_indent_rang_x, Height);
-            g.DrawLine(pen_line, Width - right_indent_rang_x - 2, 0, Width - right_indent_rang_x - 2, Height);
+            g.DrawLine(pen_line, Width - right_indent_rang_x-2, 0, Width - right_indent_rang_x-2, Height);
 
             PointF locationToDrawRangs = new PointF();
             locationToDrawRangs.X = 20;
@@ -124,7 +124,7 @@ namespace LogixForms
                 locationToDrawRangs.Y = ((top_indent_rang * i) - 10) - scroll_y;
                 g.DrawString((i - 1).ToString(), Rangs, Brushes.Black, locationToDrawRangs);
                 g.DrawLine(pen_line, left_indent_rang_x, (top_indent_rang * i) - scroll_y, Width - left_indent_rang_x + 5, (top_indent_rang * i) - scroll_y);
-
+                
                 string[] element = File_MB[i - 1].Trim().Split(' ');
                 if (element.Contains("BST"))
                 {
@@ -135,7 +135,7 @@ namespace LogixForms
                     int count_end = 0;
                     string s;
                     int buf = 0;
-                    for (int k = 0; k < element.Length; k++)
+                    for (int k = 0; k<element.Length; k++)
                     {
                         s = element[k];
                         if (s == "BST")
