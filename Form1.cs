@@ -26,6 +26,7 @@ namespace LogixForms
         private int left_indent_rang_x = 50;
         private int right_indent_rang_x = 45;
         private int top_indent_rang = 150;
+        int scroll_y = 0;
 
         public Form1()
         {
@@ -33,9 +34,14 @@ namespace LogixForms
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
             ControlStyles.AllPaintingInWmPaint |
             ControlStyles.UserPaint, true);
-
             UpdateStyles();
             pen_line.Width = 3;
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+
         }
 
         private static int Adres(string st, ushort[] mas) //выдает значение бита в массиве
@@ -94,13 +100,15 @@ namespace LogixForms
         private void timer1_Tick(object sender, EventArgs e)
         {
             Refresh();
+            top_indent_rang = (Height * File_MB.Length) / 150;
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            
-            int scroll_y = vScrollBar1.Value * (int)(File_MB.Length * 1.55);//прокрутка
+            PointF Scroll = new PointF(79, 50);
+            scroll_y = vScrollBar1.Value * (((File_MB.Length + 2) * top_indent_rang) / 100);//прокрутка
+            g.DrawString((Height).ToString() + "/", Rangs, Brushes.Black, Scroll);
 
             /*g.DrawImage(XIC, new Rectangle(0, 0 - x, 54, 50));
             g.DrawImage(XIO, new Rectangle(0, 50 - x, 54, 50));
@@ -118,18 +126,16 @@ namespace LogixForms
 
             //вертикаль
             g.DrawLine(pen_line, left_indent_rang_x, 0, left_indent_rang_x, Height);
-            g.DrawLine(pen_line, Width - right_indent_rang_x, 0, Width - right_indent_rang_x, Height);
+            g.DrawLine(pen_line, Width - right_indent_rang_x - 2, 0, Width - right_indent_rang_x - 2, Height);
 
             PointF locationToDrawRangs = new PointF();
             locationToDrawRangs.X = 20;
-            string rang = "";
             //горизонталь + номер ранга
-            for (int i = 1; i < File_MB.Length+1; i++)
+            for (int i = 1; i < File_MB.Length + 1; i++)
             {
-                rang = "" + (i - 1);
-                locationToDrawRangs.Y = ((top_indent_rang * i) -10 ) - scroll_y;
-                g.DrawString(rang, Rangs, Brushes.Black, locationToDrawRangs);
-                g.DrawLine(pen_line, left_indent_rang_x, (top_indent_rang * i) - scroll_y, Width - left_indent_rang_x+5, (top_indent_rang * i) - scroll_y);
+                locationToDrawRangs.Y = ((top_indent_rang * i) - 10) - scroll_y;
+                g.DrawString((i - 1).ToString(), Rangs, Brushes.Black, locationToDrawRangs);
+                g.DrawLine(pen_line, left_indent_rang_x, (top_indent_rang * i) - scroll_y, Width - left_indent_rang_x + 5, (top_indent_rang * i) - scroll_y);
             }
         }
     }
