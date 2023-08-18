@@ -150,7 +150,7 @@ namespace LogixForms
                         else if (s == "NXB")
                         {
                             count_nx++;
-                            for (int l = k; k < element.Length; l++)
+                            for (int l = k; l < element.Length; l++)
                             {
                                 if (element[l] != "NXB" || element[l] != "END" || element[l] != "BST")
                                 {
