@@ -17,7 +17,7 @@ namespace LogixForms
         public static ushort[] B3 = new ushort[70];
         public static List<(int, int)> BST = new List<(int, int)>();
         public static List<(int, int)> NXB = new List<(int, int)>();
-        public string[] File_MB = File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd - copy", Encoding.UTF8);
+        public string[] File_MB = File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
 
         public Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
             OTE = NodEn.OTE, OTL = NodEn.OTE;
@@ -39,11 +39,11 @@ namespace LogixForms
             pen_line.Width = 3;
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
+        /*private void panel1_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
 
-        }
+        }*/
 
         private static int Adres(string st, ushort[] mas) //выдает значение бита в массиве
         {
@@ -107,6 +107,13 @@ namespace LogixForms
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            int sap_x = 0;
+            int sap_y = 0;
+            int sap_x_bst = 0;
+            int sap_y_bst = 0;
+            int buf = -1;
+            int count_el = 0;
+
             Graphics g = e.Graphics;
             PointF Scroll= new PointF(79, 50);
             scroll_y = vScrollBar1.Value *(((File_MB.Length+2) * top_indent_rang)/100);//прокрутка
@@ -126,7 +133,13 @@ namespace LogixForms
                 g.DrawLine(pen_line, left_indent_rang_x, (top_indent_rang * i) - scroll_y, Width - left_indent_rang_x + 5, (top_indent_rang * i) - scroll_y);
                 
                 string[] element = File_MB[i - 1].Trim().Split(' ');
-                if (element.Contains("BST"))
+
+                foreach(string el in element)
+                {
+                    if (!el.Contains(':')) count_el++;
+                }
+
+                if (element.Contains("BST"))//информация по рангу
                 {
                     int max_count_el_sap = 0;
                     int count_sap = 0;
@@ -134,7 +147,7 @@ namespace LogixForms
                     int count_nx = 0;
                     int count_end = 0;
                     string s;
-                    int buf = 0;
+                    
                     for (int k = 0; k<element.Length; k++)
                     {
                         s = element[k];
@@ -175,12 +188,13 @@ namespace LogixForms
                     }
                     max_count_el_sap /= 2;
                 }
-                else
+                for (int j = 0; j < element.Length; j++)
                 {
-                    for (int j = 0; j < element.Length; j++)
+                    string el = element[j];
+                    int step = j * ((Width - right_indent_rang_x - 2) - left_indent_rang_x + 5) / count_el;
+
+                    if (j > buf)
                     {
-                        string el = element[j];
-                        int step = j * (Width - left_indent_rang_x + 5) / element.Length;
                         if (el == "XIO")
                         {
                             g.DrawImage(XIO, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
@@ -201,9 +215,58 @@ namespace LogixForms
                         {
                             g.DrawImage(OTL, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 63, 50));
                         }
+                        else if (el == "BST")
+                        {
+                            sap_x = left_indent_rang_x + step+20;
+                            sap_y = ((top_indent_rang * i)) - scroll_y;
+
+                            g.DrawLine(pen_line, sap_x + 20, sap_y, sap_x + 20, sap_y + top_indent_rang / 2);//вертикаль
+                            sap_x_bst = sap_x;
+                            sap_y_bst = sap_y + top_indent_rang / 2;
+                        }
+                        else if (el == "NXB")
+                        {
+                            sap_x = left_indent_rang_x + step +20;
+                            sap_y = ((top_indent_rang * i)) - scroll_y;
+                            g.DrawLine(pen_line, sap_x_bst+20, sap_y_bst, sap_x + 20, sap_y + top_indent_rang / 2);//горизонталь
+                            g.DrawLine(pen_line, sap_x+20, sap_y, sap_x + 20, sap_y + top_indent_rang / 2);//вертикаль
+                            for (int k = j; k < element.Length; k++)
+                            {
+                                step = (k - j) * ((Width - right_indent_rang_x - 2) - left_indent_rang_x + 5) / count_el;
+                                if (element[k] != "BND")
+                                {
+                                    if (element[k] == "XIO")
+                                    {
+                                        g.DrawImage(XIO, new Rectangle(sap_x_bst + 20 + step, sap_y_bst - 20, 54, 50));
+                                    }
+                                    else if (element[k] == "XIC")
+                                    {
+                                        g.DrawImage(XIC, new Rectangle(sap_x_bst + 20 + step, sap_y_bst - 20, 54, 50));
+                                    }
+                                    else if (element[k] == "OTU")
+                                    {
+                                        g.DrawImage(OTU, new Rectangle(sap_x_bst + 20 + step, sap_y_bst - 20, 63, 50));
+                                    }
+                                    else if (element[k] == "OTE")
+                                    {
+                                        g.DrawImage(OTE, new Rectangle(sap_x_bst + 20 + step, sap_y_bst - 20, 63, 50));
+                                    }
+                                    else if (element[k] == "OTL")
+                                    {
+                                        g.DrawImage(OTL, new Rectangle(sap_x_bst + 20 + step, sap_y_bst - 20, 63, 50));
+                                    }
+                                }
+                                else
+                                {
+                                    buf = k;
+                                    break;
+                                }
+                            }
+                        }
                         else
                             continue;
                     }
+                    
                 }
 
             }
