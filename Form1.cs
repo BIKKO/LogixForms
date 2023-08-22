@@ -9,7 +9,6 @@ namespace LogixForms
         public static ushort[] T4_c = new ushort[24];
         public static ushort[] T4_b = new ushort[24];
         public static int[] Timer_control = new int[32];
-        //public static ConsoleKeyInfo cki;
         public static ushort[] N13 = new ushort[70];
         public static ushort[] N15 = new ushort[70];
         public static ushort[] N18 = new ushort[70];
@@ -105,7 +104,7 @@ namespace LogixForms
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void UpdateImage_Tick(object sender, EventArgs e)
         {
             Refresh();
             if ((midpanel.Height * File_MB.Length) / 150 >= 150)
@@ -123,7 +122,7 @@ namespace LogixForms
             int sap = 1;
             int max_count_el_sap = 0;
             int count_nxb = 0;
-
+            
             Graphics g = e.Graphics;
             PointF Scroll= new PointF(79, 50);
             scroll_y = vScrollBar1.Value *(((File_MB.Length+2) * top_indent_rang)/100);//прокрутка

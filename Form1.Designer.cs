@@ -31,8 +31,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.UpdateImage = new System.Windows.Forms.Timer(this.components);
             this.menu = new System.Windows.Forms.Panel();
             this.midpanel = new System.Windows.Forms.MyPanel();
             this.SuspendLayout();
@@ -45,11 +46,11 @@
             this.vScrollBar1.Size = new System.Drawing.Size(25, 537);
             this.vScrollBar1.TabIndex = 0;
             // 
-            // timer1
+            // UpdateImage
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 25;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.UpdateImage.Enabled = true;
+            this.UpdateImage.Interval = 25;
+            this.UpdateImage.Tick += new System.EventHandler(this.UpdateImage_Tick);
             // 
             // menu
             // 
@@ -79,8 +80,9 @@
             this.Controls.Add(this.midpanel);
             this.Controls.Add(this.menu);
             this.Controls.Add(this.vScrollBar1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Logix";
             this.ResumeLayout(false);
 
         }
@@ -88,7 +90,7 @@
         #endregion
 
         private VScrollBar vScrollBar1;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer UpdateImage;
         private MyPanel midpanel;
         private Panel menu;
     }
