@@ -1,5 +1,7 @@
 ﻿namespace LogixForms
 {
+
+
     partial class Form1
     {
         /// <summary>
@@ -31,6 +33,8 @@
             this.components = new System.ComponentModel.Container();
             this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.menu = new System.Windows.Forms.Panel();
+            this.midpanel = new System.Windows.Forms.MyPanel();
             this.SuspendLayout();
             // 
             // vScrollBar1
@@ -47,16 +51,36 @@
             this.timer1.Interval = 25;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // menu
+            // 
+            this.menu.BackColor = System.Drawing.SystemColors.Menu;
+            this.menu.Dock = System.Windows.Forms.DockStyle.Top;
+            this.menu.ForeColor = System.Drawing.SystemColors.Menu;
+            this.menu.Location = new System.Drawing.Point(0, 0);
+            this.menu.Name = "menu";
+            this.menu.Size = new System.Drawing.Size(1166, 27);
+            this.menu.TabIndex = 1;
+            // 
+            // midpanel
+            // 
+            this.midpanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.midpanel.Location = new System.Drawing.Point(0, 27);
+            this.midpanel.Name = "midpanel";
+            this.midpanel.Size = new System.Drawing.Size(1166, 510);
+            this.midpanel.TabIndex = 2;
+            this.midpanel.Paint += new System.Windows.Forms.PaintEventHandler(this.midpanel_Paint);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(1191, 537);
+            this.Controls.Add(this.midpanel);
+            this.Controls.Add(this.menu);
             this.Controls.Add(this.vScrollBar1);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.ResumeLayout(false);
 
         }
@@ -65,5 +89,21 @@
 
         private VScrollBar vScrollBar1;
         private System.Windows.Forms.Timer timer1;
+        private MyPanel midpanel;
+        private Panel menu;
+    }
+
+}
+
+namespace System.Windows.Forms
+{
+    class MyPanel : Panel
+    {
+        public MyPanel()
+        {
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+        }
+
     }
 }
