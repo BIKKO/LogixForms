@@ -30,61 +30,59 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
-            this.UpdateImage = new System.Windows.Forms.Timer(this.components);
-            this.menu = new System.Windows.Forms.Panel();
-            this.midpanel = new System.Windows.Forms.MyPanel();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            vScrollBar1 = new VScrollBar();
+            UpdateImage = new System.Windows.Forms.Timer(components);
+            menu = new Panel();
+            midpanel = new MyPanel();
+            SuspendLayout();
             // 
             // vScrollBar1
             // 
-            this.vScrollBar1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.vScrollBar1.Location = new System.Drawing.Point(1166, 0);
-            this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(25, 537);
-            this.vScrollBar1.TabIndex = 0;
+            vScrollBar1.Dock = DockStyle.Right;
+            vScrollBar1.LargeChange = 1;
+            vScrollBar1.Location = new Point(1166, 0);
+            vScrollBar1.Name = "vScrollBar1";
+            vScrollBar1.Size = new Size(25, 537);
+            vScrollBar1.TabIndex = 0;
             // 
             // UpdateImage
             // 
-            this.UpdateImage.Enabled = true;
-            this.UpdateImage.Interval = 25;
-            this.UpdateImage.Tick += new System.EventHandler(this.UpdateImage_Tick);
+            UpdateImage.Enabled = true;
+            UpdateImage.Interval = 25;
+            UpdateImage.Tick += UpdateImage_Tick;
             // 
             // menu
             // 
-            this.menu.BackColor = System.Drawing.SystemColors.Menu;
-            this.menu.Dock = System.Windows.Forms.DockStyle.Top;
-            this.menu.ForeColor = System.Drawing.SystemColors.Menu;
-            this.menu.Location = new System.Drawing.Point(0, 0);
-            this.menu.Name = "menu";
-            this.menu.Size = new System.Drawing.Size(1166, 27);
-            this.menu.TabIndex = 1;
+            menu.BackColor = SystemColors.Menu;
+            menu.Dock = DockStyle.Top;
+            menu.ForeColor = SystemColors.Menu;
+            menu.Location = new Point(0, 0);
+            menu.Name = "menu";
+            menu.Size = new Size(1166, 27);
+            menu.TabIndex = 1;
             // 
             // midpanel
             // 
-            this.midpanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.midpanel.Location = new System.Drawing.Point(0, 27);
-            this.midpanel.Name = "midpanel";
-            this.midpanel.Size = new System.Drawing.Size(1166, 510);
-            this.midpanel.TabIndex = 2;
-            this.midpanel.Paint += new System.Windows.Forms.PaintEventHandler(this.midpanel_Paint);
+            midpanel.Dock = DockStyle.Fill;
+            midpanel.Location = new Point(0, 27);
+            midpanel.Name = "midpanel";
+            midpanel.Size = new Size(1166, 510);
+            midpanel.TabIndex = 2;
+            midpanel.Paint += midpanel_Paint;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(1191, 537);
-            this.Controls.Add(this.midpanel);
-            this.Controls.Add(this.menu);
-            this.Controls.Add(this.vScrollBar1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "Form1";
-            this.Text = "Logix";
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.Window;
+            ClientSize = new Size(1191, 537);
+            Controls.Add(midpanel);
+            Controls.Add(menu);
+            Controls.Add(vScrollBar1);
+            Name = "Form1";
+            Text = "Logix";
+            ResumeLayout(false);
         }
 
         #endregion

@@ -14,37 +14,39 @@ namespace LogixForms
         public static ushort[] N18 = new ushort[70];
         public static ushort[] N40 = new ushort[70];
         public static ushort[] B3 = new ushort[70];
+
         public static List<(int, int)> BST = new List<(int, int)>();
         public static List<(int, int)> NXB = new List<(int, int)>();
-        public string[] File_MB = File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd - copy", Encoding.UTF8);
-
+        public static string[] File_MB = File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
+        public static int[,] info = new int[File_MB.Length, 3]; //0:SAP_EL_MAX 1:NXB 2:EL
         public Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
             OTE = NodEn.OTE, OTL = NodEn.OTE;
         public Pen pen_line = new Pen(Brushes.Black);
         private Font text = new Font("Arial", 10);
-        private Font Rangs = new Font("Arial", 12);
+        private Font RangsFont = new Font("Arial", 12);
         private int left_indent_rang_x = 50;
-        private int right_indent_rang_x = 45;
         private int top_indent_rang = 150;
         int scroll_y = 0;
 
         public Form1()
         {
             InitializeComponent();
-            this.MouseWheel += new MouseEventHandler(this_MouseWheel);
+            this.MouseWheel += new MouseEventHandler(This_MouseWheel);
             pen_line.Width = 3;
+            
+            RangsInfo();
         }
 
-        void this_MouseWheel(object sender, MouseEventArgs e)
+        private void This_MouseWheel(object sender, MouseEventArgs e)
         {
             int wheel = 0;
             if (e.Delta > 0)
             {
-                wheel = -1;
+                wheel = File_MB.Length%10!=0? -1:-10;
             }
             else
             {
-                wheel = 1;
+                wheel = File_MB.Length % 10 != 0 ? 1 : -10; ;
             }
             if (vScrollBar1.Maximum >= vScrollBar1.Value + wheel && vScrollBar1.Minimum <= vScrollBar1.Value + wheel)
                 vScrollBar1.Value += wheel;
@@ -107,63 +109,53 @@ namespace LogixForms
         private void UpdateImage_Tick(object sender, EventArgs e)
         {
             Refresh();
-            if ((midpanel.Height * File_MB.Length) / 150 >= 150)
+            if (midpanel.Height * File_MB.Length / 150 >= 150)
                 top_indent_rang = (midpanel.Height * File_MB.Length) / 150;
+            else top_indent_rang = 150;
         }
 
-        private void midpanel_Paint(object sender, PaintEventArgs e)
+        private void RangsInfo()
         {
-            int sap_x = 0;
-            int sap_y = 0;
-            int sap_x_bst = 0;
-            int sap_y_bst = 0;
-            int buf = -1;
-            int count_el = 0;
-            int sap = 1;
-            int max_count_el_sap = 0;
-            int count_nxb = 0;
-            
-            Graphics g = e.Graphics;
-            PointF Scroll= new PointF(79, 50);
-            scroll_y = vScrollBar1.Value *(((File_MB.Length+2) * top_indent_rang)/100);//прокрутка
-            //g.DrawString(scroll_y.ToString(), Rangs, Brushes.Black, Scroll);
-
-            //вертикаль
-            g.DrawLine(pen_line, left_indent_rang_x, 0, left_indent_rang_x, midpanel.Height);
-            g.DrawLine(pen_line,midpanel.Width - right_indent_rang_x-2, 0, midpanel.Width - right_indent_rang_x-2, midpanel.Height);
-
-            PointF locationToDrawRangs = new PointF();
-            locationToDrawRangs.X = 20;
-            //горизонталь + номер ранга
-            for (int i = 1; i < File_MB.Length + 1; i++)
+            for (int line = 0; line < File_MB.Length; line++)
             {
-                locationToDrawRangs.Y = ((top_indent_rang * i) - 10) - scroll_y;
-                g.DrawString((i - 1).ToString(), Rangs, Brushes.Black, locationToDrawRangs);
-                g.DrawLine(pen_line, left_indent_rang_x, (top_indent_rang * i) - scroll_y, midpanel.Width - left_indent_rang_x + 5, (top_indent_rang * i) - scroll_y);
-                
-                string[] element = File_MB[i - 1].Trim().Split(' ');
 
-                foreach(string el in element)
+                string[] rang = File_MB[line].Trim().Split(' ');
+                int count_el = 0;
+                int count_sap_el = 0;
+                int count_nxb = 0;
+
+                foreach (string s in rang)//3
                 {
-                    if (!el.Contains(':')) count_el++;
+                    if (!s.Contains(':') && (s != "BST" || s != "BND" || s != "NXB"))
+                    {
+                        try
+                        {
+                            int.Parse(s);
+                        }
+                        catch
+                        {
+                            count_el++;
+                        }
+                    }
+                    else if (s == "NXB") count_nxb++;
                 }
 
-                if (element.Contains("BST"))//информация по рангу
+                if (rang.Contains("BST"))//информация по рангу
                 {
                     int count_el_sap = 0;
                     int buf_sap = -1;
 
-                    for (int s = 0; s < element.Length; s++)
+                    for (int s = 0; s < rang.Length; s++)
                     {
                         if (s > buf_sap)
                         {
-                            if (element[s] == "BST")
+                            if (rang[s] == "BST")
                             {
-                                for (int b = s + 1; b < element.Length; b++)
+                                for (int b = s + 1; b < rang.Length; b++)
                                 {
-                                    if (!element[b].Contains(':'))
+                                    if (!rang[b].Contains(':'))
                                     {
-                                        if (element[b] != "NXB" && element[b] != "BND") count_el_sap++;
+                                        if (rang[b] != "NXB" && rang[b] != "BND") count_el_sap++;
                                         else
                                         {
                                             buf_sap = b - 1;
@@ -172,14 +164,14 @@ namespace LogixForms
                                     }
                                 }
                             }
-                            else if (element[s] == "NXB")
+                            else if (rang[s] == "NXB")
                             {
                                 count_nxb++;
-                                for (int b = s + 1; b < element.Length; b++)
+                                for (int b = s + 1; b < rang.Length; b++)
                                 {
-                                    if (!element[b].Contains(':'))
+                                    if (!rang[b].Contains(':'))
                                     {
-                                        if (element[b] != "NXB" && element[b] != "BND") count_el_sap++;
+                                        if (rang[b] != "NXB" && rang[b] != "BND") count_el_sap++;
                                         else
                                         {
                                             buf_sap = b - 1;
@@ -188,119 +180,60 @@ namespace LogixForms
                                     }
                                 }
                             }
-                            if (max_count_el_sap < count_el_sap)
+                            if (count_sap_el < count_el_sap)
                             {
-                                max_count_el_sap = count_el_sap;
+                                count_sap_el = count_el_sap;
                                 count_el_sap = 0;
                             }
                             else count_el_sap = 0;
-                            if (element[s] == "BND") break;
+                            if (rang[s] == "BND") break;
                         }
                     }
                 }
                 else
                 {
-                    max_count_el_sap = 1;
+                    count_sap_el = 1;
                 }
 
-                PointF test = new PointF();
-                test.X = 50;
-                test.Y = 10;
-                g.DrawString(max_count_el_sap.ToString(), Rangs, Brushes.Black, test);
-
-                int sapX = (25 + 54) * max_count_el_sap * max_count_el_sap;
-                for (int j = 0; j < element.Length; j++)
-                {
-                    string el = element[j];
-                    int step = j * ((midpanel.Width - right_indent_rang_x - 2) - left_indent_rang_x + 5) / count_el;
-
-                    if (j > buf)
-                    {
-                        if (el == "XIO")
-                        {
-                            g.DrawImage(XIO, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
-                        }
-                        else if (el == "XIC")
-                        {
-                            g.DrawImage(XIC, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
-                        }
-                        else if (el == "OTU")
-                        {
-                            g.DrawImage(OTU, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
-                        }
-                        else if (el == "OTE")
-                        {
-                            g.DrawImage(OTE, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
-                        }
-                        else if (el == "OTL")
-                        {
-                            g.DrawImage(OTL, new Rectangle(left_indent_rang_x + 20 + step, ((top_indent_rang * i)) - 20 - scroll_y, 54, 50));
-                        }
-                        else if (el == "BST")
-                        {
-                            sap_x = left_indent_rang_x + step;
-                            sap_y = ((top_indent_rang * i)) - scroll_y;
-
-                            g.DrawLine(pen_line, sap_x + 20, sap_y, sap_x + 20, sap_y + (top_indent_rang / 2)*count_nxb);//вертикаль
-                            sap_x_bst = sap_x;
-                            sap_y_bst = sap_y + (top_indent_rang / 2);
-                        }
-                        else if (el == "NXB") 
-                        {
-                            //int old_k = 0;
-
-                            sap_x = left_indent_rang_x + step +20 - sapX;
-                            sap_y = ((top_indent_rang * i)) - scroll_y;
-                            new_NXB:
-                            if(sap > 1) g.DrawLine(pen_line, sap_x_bst + 20, sap_y_bst, sap_x_bst + 20, sap_y_bst + (top_indent_rang / 2)*count_nxb);//вертикаль
-                            g.DrawLine(pen_line, sap_x_bst + 20, sap_y_bst, sapX, sap_y + (top_indent_rang / 2));//горизонталь
-                            g.DrawLine(pen_line, sapX, sap_y, sapX, sap_y + (top_indent_rang / 2) * count_nxb);//вертикаль
-                            for (int k = j+1; k < element.Length; k++)
-                            {
-                                step = (k - j) * ((midpanel.Width - right_indent_rang_x - 2) - left_indent_rang_x + 5) / count_el;
-                                if (element[k] != "BND")
-                                {
-                                    if (element[k] == "XIO")
-                                    {
-                                        g.DrawImage(XIO, new Rectangle(sap_x + step, sap_y_bst - 20, 54, 50));
-                                    }
-                                    else if (element[k] == "XIC")
-                                    {
-                                        g.DrawImage(XIC, new Rectangle(sap_x + step, sap_y_bst - 20, 54, 50));
-                                    }
-                                    else if (element[k] == "OTU")
-                                    {
-                                        g.DrawImage(OTU, new Rectangle(sap_x + step, sap_y_bst  - 20, 63, 50));
-                                    }
-                                    else if (element[k] == "OTE")
-                                    {
-                                        g.DrawImage(OTE, new Rectangle(sap_x + step, sap_y_bst - 20, 63, 50));
-                                    }
-                                    else if (element[k] == "OTL")
-                                    {
-                                        g.DrawImage(OTL, new Rectangle(sap_x + step, sap_y_bst - 20, 63, 50));
-                                    }
-                                }
-                                else if (element[k] == "NXB")
-                                {
-                                    sap++;
-                                    //old_k = k;
-                                    goto new_NXB;
-                                }
-                                else
-                                {
-                                    buf = k - 1;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                            continue;
-                    }
-                    
-                }
-
+                info[line, 0] = count_sap_el;
+                info[line, 1] = count_nxb;
+                info[line, 2] = count_el;
             }
+        }
+
+        private void midpanel_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+
+            int maxY = top_indent_rang * (File_MB.Length-2);
+            for (int i = 1; i < File_MB.Length; i++)
+                maxY += (top_indent_rang / 2) * info[i - 1, 1];
+            PointF Scroll = new PointF(79, 50);
+            PointF MaxY = new PointF(79, 70);
+
+            scroll_y = vScrollBar1.Value * (maxY / 100);//прокрутка
+            g.DrawString(vScrollBar1.Value.ToString() + '/' + scroll_y.ToString(), RangsFont, Brushes.Black, Scroll);
+            //g.DrawString(maxY.ToString(), RangsFont, Brushes.Black, MaxY);
+
+            //вертикаль
+            g.DrawLine(pen_line, left_indent_rang_x, 0, left_indent_rang_x, midpanel.Height);
+            g.DrawLine(pen_line, midpanel.Width - 2, 0, midpanel.Width - 2, midpanel.Height);
+
+            PointF locationToDrawRangs = new PointF();
+            locationToDrawRangs.X = 20;
+            locationToDrawRangs.Y = top_indent_rang - scroll_y - 10;
+            //горизонталь + номер ранга
+            g.DrawString("0", RangsFont, Brushes.Black, locationToDrawRangs);
+            g.DrawLine(pen_line, left_indent_rang_x, top_indent_rang - scroll_y, midpanel.Width, top_indent_rang - scroll_y);
+            int top_step = top_indent_rang;
+            for (int i = 1; i < File_MB.Length; i++)
+            {
+                top_step += top_indent_rang + ((top_indent_rang / 2) * info[i - 1, 1]);
+                locationToDrawRangs.Y = top_step-10 - scroll_y;
+                g.DrawString(i.ToString(), RangsFont, Brushes.Black, locationToDrawRangs);
+                g.DrawLine(pen_line, left_indent_rang_x, top_step - scroll_y, midpanel.Width, top_step - scroll_y);
+            }
+            g.DrawString(maxY.ToString()+'/'+top_step.ToString(), RangsFont, Brushes.Black, MaxY);
         }
     }
 }
