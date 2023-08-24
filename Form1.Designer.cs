@@ -94,7 +94,7 @@
     }
 
 }
-
+//изменения для нейтролизации мерцания при перерисовке
 namespace System.Windows.Forms
 {
     class MyPanel : Panel
