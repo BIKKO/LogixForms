@@ -40,12 +40,11 @@ namespace LogixForms
         private int scroll_y = 0;//смещение
         private int[] rang_y = new int[TextRangs.Length];
 
-        private Dictionary<int, int[]> IndexSap = new Dictionary<int, int[]>();
         private Dictionary<int, int[,]> Info = new Dictionary<int, int[,]>();
         private Dictionary<int, int[]> Start = new Dictionary<int, int[]>();
         private Dictionary<int, int[]> Stop = new Dictionary<int, int[]>();
         private Dictionary<int, string[]> ElementsRang = new Dictionary<int, string[]>();
-        private List<int[]> BIGN = new List<int[]>();
+        private List<int[]> BIGM = new List<int[]>();
         private int isnumber;
 
         private int CountElInRang = 13;
@@ -56,8 +55,6 @@ namespace LogixForms
             InitializeComponent();//инициализация формы
             this.MouseWheel += new MouseEventHandler(This_MouseWheel);//подключения колёсика мыши
             pen_line_sap.Width = pen_line.Width = 3;//толщина линий
-            
-            
         }
 
         private void This_MouseWheel(object sender, MouseEventArgs e)
@@ -158,106 +155,9 @@ namespace LogixForms
                 ElementsRang.Add(line, element.Where(x => !string.IsNullOrEmpty(x)).ToArray());//удаление пустых значений
             }
 
-            for(int line = 0; line < TextRangs.Length; line++)//массив из индексов старта и конца
-            {
-                var element = new int[ElementsRang[line].Length];
-                for (int j = 0;j < ElementsRang[line].Length;j++)
-                {
-                    if (ElementsRang[line][j] == "BST" || ElementsRang[line][j] == "BND")
-                    {
-                        element[j] = j;
-                    }
-                    else element[j] = 0;
-                }
-                IndexSap.Add(line, element);
-            }
-
             for (int line = 0; line < TextRangs.Length; line++)
             {
-
-                string[] rang = ElementsRang[line];//ранг
-                int count_el = 0;//кол-во ел в ранге
-                int count_sap_el = 0;//макс кол-во ел. ветки
-                int count_nxb = 0;// макс. длинна ветки вниз
                 int count_sap = 0;//кол-во веток
-                int logic_grup = 0;//кол-во групп веток
-
-                foreach (var s in rang)//2
-                {
-                    if (s != "BST" || s != "BND" || s != "NXB")
-                    {
-                        if (!int.TryParse(s, out isnumber)) count_el++;
-                    }
-                    else if (s == "NXB") count_nxb++;//1
-                }
-
-                if (rang.Contains("BST"))//информация по рангу
-                {
-                    int count_el_sap = 0;
-                    int buf_sap = -1;
-
-                    for (int s = 0; s < rang.Length; s++)
-                    {
-                        if (s > buf_sap)
-                        {
-                            if (rang[s] == "BST")
-                            {
-                                for (int b = s + 1; b < rang.Length; b++)
-                                {
-                                    if (!rang[b].Contains(':'))
-                                    {
-                                        if (rang[b] != "NXB" && rang[b] != "BND") count_el_sap++;
-                                        else
-                                        {
-                                            buf_sap = b - 1;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            else if (rang[s] == "NXB")
-                            {
-                                count_nxb++;
-                                for (int b = s + 1; b < rang.Length; b++)
-                                {
-                                    if (!rang[b].Contains(':'))
-                                    {
-                                        if (rang[b] != "NXB" && rang[b] != "BND") count_el_sap++;
-                                        else
-                                        {
-                                            buf_sap = b - 1;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            if (count_sap_el < count_el_sap)
-                            {
-                                count_sap_el = count_el_sap;
-                                count_el_sap = 0;
-                            }
-                            else count_el_sap = 0;//0
-                            if (rang[s] == "BND") break;
-                        }
-                    }
-                }
-                else
-                {
-                    count_sap_el = 1;
-                }
-                /*
-                if (rang.Contains("BST"))
-                {
-                    if (Array.IndexOf(rang, "BST") != Array.LastIndexOf(rang, "BST"))
-                    {
-                        if (Array.IndexOf(rang, "BND") < Array.LastIndexOf(rang, "BST")) count_sap = 2;
-                        else count_sap = 1;
-                    }
-                    else
-                        count_sap = 1;
-                }
-                else 
-                    count_sap = 0;*/
 
                 int BranchInGropeCount = 0;
                 int LogicGropeNum = 0;
@@ -338,7 +238,7 @@ namespace LogixForms
                 Info.Add(line, BranchInGropeNumbers);
                 Start.Add(line, BranchStart);
                 Stop.Add(line, BranchEnd);
-                BIGN.Add(BranchInGropeMax);
+                BIGM.Add(BranchInGropeMax);
             }
         }
 
@@ -384,6 +284,7 @@ namespace LogixForms
                 var LGN = info[rang, 1];
                 var lgnRANG = new int[LGN];
                 int start = 0;
+                int stop = 0;
                 var GrupMaxCountEl = new int[LGN+1];
                 
                 top_step += top_indent_rang + ((top_indent_rang / 2) * info[rang-1, 0]);//отступ от 0,0
@@ -395,18 +296,19 @@ namespace LogixForms
                 for(int grup = 0; grup < LGN;  grup++)
                 {
                     int max = 0;
-                    int buf;
+                    int buf = 0;
                     for(int k = 0; k < 8; k++)
                     {
                         if(BIGN[grup, k] != -256)
                         {
                             var BN = BIGN[grup, k];
-                            buf = Math.Abs(Stop[rang][BN] - Start[rang][BN]);
+                            buf = Math.Abs(Stop[rang][BN] - Start[rang][BN])+1;
                             max = max>buf? max : buf;
                         }
                         else
                         {
-                            BIGN[grup, k] = 0;
+                            break;
+                            //BIGN[grup, k] = 0;
                         }
                     }
                     GrupMaxCountEl[grup] = max!=0? max: 1;
@@ -414,81 +316,36 @@ namespace LogixForms
                 
                 for(int lgn = 0; lgn < LGN; lgn++)
                 {
-                    int s = 0;
-                    for (int i = 0; i < 8; i++)
+                    for (int lg = 1; lg < BIGM[rang][lgn] + 1; lg++)
                     {
-                        if (BIGN[lgn, i] != 0) s++;
+                        start = Math.Abs(Stop[rang][BIGN[lgn, lg - 1]] - Start[rang][BIGN[lgn, lg - 1]]) + GrupMaxCountEl[lgn - 1] - 1  + stop;
+                        //горизонталь
+                        g.DrawLine(pen_line_sap,
+                            left_indent_rang_x + PointOfElemetts[start + stop],
+                            top_step + lg * (top_indent_rang / 2) - scroll_y,
+                            left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn] + 1 + stop],
+                            top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
+                                                                              //вертикаль
+                        g.DrawLine(pen_line_sap,
+                            left_indent_rang_x + PointOfElemetts[start + stop],
+                            top_step - scroll_y,
+                            left_indent_rang_x + PointOfElemetts[start + stop],
+                            top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
+                        g.DrawLine(pen_line_sap,
+                            left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn] + 1 + stop],
+                            top_step - scroll_y,
+                            left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn] + 1 + stop],
+                            top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
+                                                                              //точки
+                        for (int i = start + stop; i < start + GrupMaxCountEl[lgn] + 2 + stop; i++)
+                            g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i], top_step + lg * (top_indent_rang / 2) - scroll_y - 2, 4, 4);
                     }
-                    
-                    for (int j = 0; j < info[rang, 2]; j++)
-                    {
-                        if (BIGN[lgn, j] != -256)
-                        {
-
-                        }
-                            start = Math.Abs(Stop[rang][0] - Start[rang][0]);
-                        for(int lg = 0;lg < s; lg++)
-                        {
-                            //горизонталь
-                            g.DrawLine(pen_line_sap,
-                                left_indent_rang_x + PointOfElemetts[start],
-                                top_step + lg * (top_indent_rang / 2) - scroll_y,
-                                left_indent_rang_x + PointOfElemetts[start+GrupMaxCountEl[lgn+1]+2],
-                                top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
-                            //вертикаль
-                            g.DrawLine(pen_line_sap,
-                                left_indent_rang_x + PointOfElemetts[start],
-                                top_step - scroll_y,
-                                left_indent_rang_x + PointOfElemetts[start],
-                                top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
-                            g.DrawLine(pen_line_sap,
-                                left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn + 1] + 2],
-                                top_step - scroll_y,
-                                left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn + 1] + 2],
-                                top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
-                                                                                  //точки
-                            for (int i = start; i < start+GrupMaxCountEl[lgn+1]+2 + 1; i++)
-                            g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i], top_step + (lg) * (top_indent_rang / 2) - scroll_y - 2, 4, 4);
-                        }
-                    }
+                    stop = start;
+                    if (0 == BIGM[rang][lgn] && stop > 0) stop++;
                 }
-
             }
             //вспомогательная информация (выводится)
             //g.DrawString(info[15,3].ToString(), RangsFont, Brushes.Black, MaxY);
-
-            /*for (int rang = 0;rang < TextRangs.Length; rang++)
-            {
-                //отрисовка веток
-                if (ElementsRang[rang].Contains("BST"))
-                {
-                    int xstep = left_indent_rang_x;
-                    string[] elRang = TextRangs[rang].Trim().Split(' ');
-
-                    foreach(string el in elRang)
-                    {
-                        if (el == "BST")
-                        {
-                            for(int sap = 0; sap< info[rang, 3]; sap++)
-                            {
-                                int ystep = top_indent_rang / 2;
-                                for (int y = 0; y < info[rang, 1]; y++)
-                                {
-                                    g.DrawLine(pen_line_sap, xstep, rang_y[rang] + ystep - scroll_y, xstep + (info[rang, 0] * 54) + 40, rang_y[rang] + ystep - scroll_y);//горизонталь
-                                    ystep += top_indent_rang / 2;
-                                }
-                                xstep += ((midpanel.Width - left_indent_rang_x) / (info[rang, 2] - info[rang, 0])) + 27;
-                            }
-                            
-                        }
-                        else
-                        {
-                            xstep += ((midpanel.Width - left_indent_rang_x) / (info[rang,2] - info[rang,0]))+27;
-                        }
-                    }
-                }
-                else continue;
-            }*/
         }
 
         private void midpanel_Paint(object sender, PaintEventArgs e)
