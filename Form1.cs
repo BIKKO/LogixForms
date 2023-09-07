@@ -1,5 +1,7 @@
+using Modbus.Device;
 using System;
 using System.Diagnostics.Metrics;
+using System.Net.Sockets;
 using System.Text;
 using System.Xml.Linq;
 
@@ -28,6 +30,9 @@ namespace LogixForms
         private Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
             OTE = NodEn.OTE, OTL = NodEn.OTE; // загрузка изображений
 
+        
+        public int step;
+        public int slave;
         private Pen pen_line = new Pen(Brushes.Black); // для отрисовки линий
         private Pen pen_line_sap = new Pen(Brushes.Blue); // для отрисовки линий
         private Pen PenOfPoint = new Pen(Brushes.Red, 7);
@@ -50,6 +55,8 @@ namespace LogixForms
         private List<int[]> BIGM = new List<int[]>();
         private int isnumber;
         private bool OpenFile = false;
+        private bool ModbusCl = false;
+        private ModbusIpMaster master;
 
 
         public Form1()
@@ -149,7 +156,7 @@ namespace LogixForms
 
         private void ModBusUpdate_Tick(object sender, EventArgs e)
         {
-
+            
         }
 
         private void FileUpdate_Tick(object sender, EventArgs e)
@@ -474,27 +481,85 @@ namespace LogixForms
             vScrollBar1.Value = 0;
             FileUpdate.Enabled = true;
             RangsInfo();
+            ModBusUpdate.Enabled = false;
             OpenFile = true;
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("Временно ничего нет!");
+        }
 
+        public void con(string ip, int step)
+        {
+            try
+            {
+                TcpClient client = new TcpClient(ip, 502);
+                master = ModbusIpMaster.CreateIp(client);
+                ModBusUpdate.Enabled = true;
+                ElementsRang.Clear();
+                Info.Clear();
+                Start.Clear();
+                Stop.Clear();
+                BIGM.Clear();
+
+                ushort[] inputs;
+
+                for (int j = 0; j < 100; j++)
+                {
+                    inputs = master.ReadHoldingRegisters((byte)slave, (ushort)(step * j + 8000), 120);
+                    string g = "";
+                    int len = 0;
+                    int buf;
+
+
+                    for (int i = 0; i < 240; i++)
+                    {
+                        if (inputs[i] != 0)
+                        {
+                            buf = (inputs[i] & 0xff);
+                            if (buf != 0)
+                            {
+                                g += (char)((char)inputs[i] & 0xff);
+                                len++;
+                            }
+                            buf = (inputs[i] >> 8);
+                            if (buf != 0)
+                            {
+                                g += (char)((char)inputs[i] >> 8);
+                                len++;
+                            }
+                        }
+                        else break;
+                    }
+                    if (len != 0) TextRangs.Append(g);
+                    else break;
+                }
+
+                RangsInfo();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.\n{ex}");
+            }
         }
 
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            FileUpdate.Enabled = false;
+            if (Application.OpenForms["ConnectForms"] == null)
+                new ConnectForms(this).Show();
+            //MessageBox.Show("Временно ничего нет!");
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Временно ничего нет!");
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Временно ничего нет!");
         }
     }
 }

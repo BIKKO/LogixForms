@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NModbus4" Version="3.0.0-alpha2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="NodEn.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
