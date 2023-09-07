@@ -34,7 +34,20 @@
             vScrollBar1 = new VScrollBar();
             UpdateImage = new System.Windows.Forms.Timer(components);
             menu = new Panel();
+            menuStrip1 = new MenuStrip();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            openToolStripMenuItem = new ToolStripMenuItem();
+            saveToolStripMenuItem = new ToolStripMenuItem();
+            connectToolStripMenuItem = new ToolStripMenuItem();
+            settingsToolStripMenuItem = new ToolStripMenuItem();
+            aboutToolStripMenuItem = new ToolStripMenuItem();
             midpanel = new MyPanel();
+            ModBusUpdate = new System.Windows.Forms.Timer(components);
+            FileUpdate = new System.Windows.Forms.Timer(components);
+            openFileDialog2 = new OpenFileDialog();
+            saveFileDialog1 = new SaveFileDialog();
+            menu.SuspendLayout();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // vScrollBar1
@@ -55,12 +68,65 @@
             // menu
             // 
             menu.BackColor = SystemColors.Menu;
+            menu.Controls.Add(menuStrip1);
             menu.Dock = DockStyle.Top;
             menu.ForeColor = SystemColors.Menu;
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
             menu.Size = new Size(1166, 27);
             menu.TabIndex = 1;
+            // 
+            // menuStrip1
+            // 
+            menuStrip1.ImageScalingSize = new Size(20, 20);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(1166, 28);
+            menuStrip1.TabIndex = 0;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new Size(46, 24);
+            fileToolStripMenuItem.Text = "File";
+            // 
+            // openToolStripMenuItem
+            // 
+            openToolStripMenuItem.Name = "openToolStripMenuItem";
+            openToolStripMenuItem.Size = new Size(146, 26);
+            openToolStripMenuItem.Text = "Open";
+            openToolStripMenuItem.Click += openToolStripMenuItem_Click;
+            // 
+            // saveToolStripMenuItem
+            // 
+            saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            saveToolStripMenuItem.Size = new Size(146, 26);
+            saveToolStripMenuItem.Text = "Save";
+            saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
+            // 
+            // connectToolStripMenuItem
+            // 
+            connectToolStripMenuItem.Name = "connectToolStripMenuItem";
+            connectToolStripMenuItem.Size = new Size(146, 26);
+            connectToolStripMenuItem.Text = "Connect";
+            connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
+            // 
+            // settingsToolStripMenuItem
+            // 
+            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            settingsToolStripMenuItem.Size = new Size(76, 24);
+            settingsToolStripMenuItem.Text = "Settings";
+            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+            // 
+            // aboutToolStripMenuItem
+            // 
+            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            aboutToolStripMenuItem.Size = new Size(64, 24);
+            aboutToolStripMenuItem.Text = "About";
+            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
             // midpanel
             // 
@@ -71,6 +137,20 @@
             midpanel.TabIndex = 2;
             midpanel.Paint += midpanel_Paint;
             // 
+            // ModBusUpdate
+            // 
+            ModBusUpdate.Interval = 500;
+            ModBusUpdate.Tick += ModBusUpdate_Tick;
+            // 
+            // FileUpdate
+            // 
+            FileUpdate.Interval = 1000;
+            FileUpdate.Tick += FileUpdate_Tick;
+            // 
+            // openFileDialog2
+            // 
+            openFileDialog2.FileName = "openFileDialog1";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -80,8 +160,13 @@
             Controls.Add(midpanel);
             Controls.Add(menu);
             Controls.Add(vScrollBar1);
+            MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Logix";
+            menu.ResumeLayout(false);
+            menu.PerformLayout();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -91,6 +176,17 @@
         private System.Windows.Forms.Timer UpdateImage;
         private MyPanel midpanel;
         private Panel menu;
+        private System.Windows.Forms.Timer ModBusUpdate;
+        private System.Windows.Forms.Timer FileUpdate;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem fileToolStripMenuItem;
+        private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem openToolStripMenuItem;
+        private ToolStripMenuItem saveToolStripMenuItem;
+        private ToolStripMenuItem connectToolStripMenuItem;
+        private ToolStripMenuItem aboutToolStripMenuItem;
+        private OpenFileDialog openFileDialog2;
+        private SaveFileDialog saveFileDialog1;
     }
 
 }
