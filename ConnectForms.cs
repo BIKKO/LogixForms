@@ -14,6 +14,7 @@ namespace LogixForms
     {
         Form1 form1;
         private int isnumber;
+        private int slave;
         public ConnectForms(Form1 owner)
         {
             form1 = owner;
@@ -29,8 +30,9 @@ namespace LogixForms
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            slave = Slave.SelectedIndex + 1;
 
-            form1.slave = Slave.SelectedIndex + 1;
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -44,6 +46,7 @@ namespace LogixForms
                     {
                         if (!int.TryParse(ip, out isnumber)) ;
                     }
+                    
                 }
                 else
                 {
@@ -66,8 +69,9 @@ namespace LogixForms
             }
 
             comboBox1_SelectedIndexChanged(sender, e);
-            //form1.con(IP.Text.Trim(), int.Parse(Step.Text.Trim()));
-            MessageBox.Show("Временно не работает!!");
+            form1.con(IP.Text, int.Parse(Step.Text), (byte) slave);
+            Close();
+            //MessageBox.Show("Временно не работает!!");
         }
     }
 }

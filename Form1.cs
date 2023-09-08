@@ -25,14 +25,11 @@ namespace LogixForms
         public static List<(int, int)> NXB = new List<(int, int)>();*/
 
         //файл(ddd | ddd - copy)
-        private static string[] TextRangs;//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
+        private static List<string> TextRangs = new List<string>();//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
         private static int[,] info; //
         private Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
             OTE = NodEn.OTE, OTL = NodEn.OTE; // загрузка изображений
 
-        
-        public int step;
-        public int slave;
         private Pen pen_line = new Pen(Brushes.Black); // дл€ отрисовки линий
         private Pen pen_line_sap = new Pen(Brushes.Blue); // дл€ отрисовки линий
         private Pen PenOfPoint = new Pen(Brushes.Red, 7);
@@ -68,23 +65,20 @@ namespace LogixForms
 
         private void This_MouseWheel(object sender, MouseEventArgs e)
         {
-            if (OpenFile)
+            int wheel = 0;//прокрутка вверх или вниз
+            if (e.Delta > 0)
             {
-                int wheel = 0;//прокрутка вверх или вниз
-                if (e.Delta > 0)
-                {
-                    //вверх
-                    wheel = TextRangs.Length % 10 != 0 ? -1 : -10;//если рангов > 10 то -1 иначе -10
-                }
-                else
-                {
-                    //вниз
-                    wheel = TextRangs.Length % 10 != 0 ? 1 : -10;//если рангов > 10 то 1 иначе 10
-                }
-                if (vScrollBar1.Maximum >= vScrollBar1.Value + wheel && vScrollBar1.Minimum <= vScrollBar1.Value + wheel)
-                    vScrollBar1.Value += wheel;//не выходим ли за приделы scrollbar
-                wheel = 0;//одиночное сробатование
+                //вверх
+                wheel = TextRangs.Count % 10 != 0 ? -1 : -10;//если рангов > 10 то -1 иначе -10
             }
+            else
+            {
+                //вниз
+                wheel = TextRangs.Count % 10 != 0 ? 1 : -10;//если рангов > 10 то 1 иначе 10
+            }
+            if (vScrollBar1.Maximum >= vScrollBar1.Value + wheel && vScrollBar1.Minimum <= vScrollBar1.Value + wheel)
+                vScrollBar1.Value += wheel;//не выходим ли за приделы scrollbar
+            wheel = 0;//одиночное сробатование
         }
 
         private int Adres(string st, ushort[] mas) //выдает значение бита в массиве
@@ -142,16 +136,12 @@ namespace LogixForms
 
         private void UpdateImage_Tick(object sender, EventArgs e)
         {
-            if (OpenFile)
+            Refresh();
+            if (midpanel.Height * TextRangs.Count / 150 >= 150)
             {
-
-                Refresh();
-                if (midpanel.Height * TextRangs.Length / 150 >= 150)
-                {
-                    top_indent_rang = (midpanel.Height * TextRangs.Length) / 150;
-                }
-                else top_indent_rang = 150;
+                top_indent_rang = (midpanel.Height * TextRangs.Count) / 150;
             }
+            else top_indent_rang = 150;
         }//интервал отрисовки и динамическое изменение верхнего отступа
 
         private void ModBusUpdate_Tick(object sender, EventArgs e)
@@ -161,14 +151,15 @@ namespace LogixForms
 
         private void FileUpdate_Tick(object sender, EventArgs e)
         {
-            TextRangs = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8);
+            TextRangs.Clear();
+            foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) TextRangs.Add(el);
         }
 
         private void RangsInfo()
         {
-            info = new int[TextRangs.Length, 3];
-            rang_y = new int[TextRangs.Length];
-            for (int line = 0; line < TextRangs.Length; line++)//создание массива из элементов
+            info = new int[TextRangs.Count, 3];
+            rang_y = new int[TextRangs.Count];
+            for (int line = 0; line < TextRangs.Count; line++)//создание массива из элементов
             {
                 string[] rang = TextRangs[line].Trim().Split(' ');
                 var element = new string[rang.Length];
@@ -183,7 +174,7 @@ namespace LogixForms
                 ElementsRang.Add(line, element.Where(x => !string.IsNullOrEmpty(x)).ToArray());//удаление пустых значений
             }
 
-            for (int line = 0; line < TextRangs.Length; line++)
+            for (int line = 0; line < TextRangs.Count; line++)
             {
                 int count_sap = 0;//кол-во веток
 
@@ -278,8 +269,8 @@ namespace LogixForms
                 PointOfElemetts[i] = ((midpanel.Width) / CountElInRang + 1) * (i + 1) - left_indent_rang_x / 2;
             }
 
-            int maxY = top_indent_rang * (TextRangs.Length - 2);//макс кол-во пикселей дл€ scroll_y
-            for (int i = 1; i < TextRangs.Length; i++)
+            int maxY = top_indent_rang * (TextRangs.Count - 2);//макс кол-во пикселей дл€ scroll_y
+            for (int i = 1; i < TextRangs.Count; i++)
                 maxY += (top_indent_rang / 2) * info[i - 1, 0];
             //точки дл€ текста
             PointF Scroll = new PointF(79, 50);
@@ -304,7 +295,7 @@ namespace LogixForms
                 g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i], top_indent_rang - scroll_y - 2, 4, 4);
             int top_step = top_indent_rang;//верхний отступ отрисовки
             rang_y[0] = top_step;
-            for (int rang = 1; rang < TextRangs.Length; rang++)
+            for (int rang = 1; rang < TextRangs.Count; rang++)
             {
                 var BIGN = Info[rang];
                 var LGN = info[rang, 1];
@@ -380,12 +371,12 @@ namespace LogixForms
 
         private void midpanel_Paint(object sender, PaintEventArgs e)
         {
-            if(OpenFile)
+            if (OpenFile || ModbusCl)
             {
                 Graphics g = e.Graphics;
                 g.Clear(Color.White);
                 PaintLines(e);
-                for (int rang = 0; rang < TextRangs.Length; rang++)
+                for (int rang = 0; rang < TextRangs.Count; rang++)
                 {
                     int nxb = 0;
                     int ind = 0;
@@ -472,7 +463,8 @@ namespace LogixForms
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog2.ShowDialog();
-            TextRangs = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8);
+            TextRangs.Clear();
+            foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) TextRangs.Add(el);
             ElementsRang.Clear();
             Info.Clear();
             Start.Clear();
@@ -487,13 +479,26 @@ namespace LogixForms
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("¬ременно ничего нет!");
+            saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.DefaultExt = "RandsSave";
+            saveFileDialog1.Filter = "txt files (*.txt) | *.txt";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Stream file = saveFileDialog1.OpenFile();
+                StreamWriter sw = new StreamWriter(file);
+                foreach (string rang in TextRangs)
+                    sw.WriteLine(rang);
+                sw.Close();
+                file.Close();
+            }
         }
 
-        public void con(string ip, int step)
+        public void con(string ip, int step, byte slave)
         {
             try
             {
+                TextRangs.Clear();
                 TcpClient client = new TcpClient(ip, 502);
                 master = ModbusIpMaster.CreateIp(client);
                 ModBusUpdate.Enabled = true;
@@ -502,12 +507,13 @@ namespace LogixForms
                 Start.Clear();
                 Stop.Clear();
                 BIGM.Clear();
+                vScrollBar1.Value = 0;
 
                 ushort[] inputs;
 
                 for (int j = 0; j < 100; j++)
                 {
-                    inputs = master.ReadHoldingRegisters((byte)slave, (ushort)(step * j + 8000), 120);
+                    inputs = master.ReadHoldingRegisters(slave, (ushort)(step * j + 8000), 120);
                     string g = "";
                     int len = 0;
                     int buf;
@@ -532,24 +538,34 @@ namespace LogixForms
                         }
                         else break;
                     }
-                    if (len != 0) TextRangs.Append(g);
+                    if (len != 0) TextRangs.Add(g);
                     else break;
                 }
-
-                RangsInfo();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"ќшибка подключени€. ѕроверте подключение и повторите попытку.\n{ex}");
             }
+            ModbusCl = true;
+            RangsInfo();
         }
 
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FileUpdate.Enabled = false;
+            //ModBusUpdate.Enabled = true;
+            
             if (Application.OpenForms["ConnectForms"] == null)
                 new ConnectForms(this).Show();
-            //MessageBox.Show("¬ременно ничего нет!");
+            OpenFile = false;
+            TextRangs.Clear();
+            ElementsRang.Clear();
+            Info.Clear();
+            Start.Clear();
+            Stop.Clear();
+            BIGM.Clear();
+            vScrollBar1.Value = 0;
+            //con();
         }
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)

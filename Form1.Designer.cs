@@ -139,7 +139,7 @@
             // 
             // ModBusUpdate
             // 
-            ModBusUpdate.Interval = 500;
+            ModBusUpdate.Interval = 1000;
             ModBusUpdate.Tick += ModBusUpdate_Tick;
             // 
             // FileUpdate
