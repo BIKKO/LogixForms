@@ -46,6 +46,7 @@
             FileUpdate = new System.Windows.Forms.Timer(components);
             openFileDialog2 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
+            AdresUpdate = new System.Windows.Forms.Timer(components);
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -151,6 +152,12 @@
             // 
             openFileDialog2.FileName = "openFileDialog1";
             // 
+            // AdresUpdate
+            // 
+            AdresUpdate.Enabled = true;
+            AdresUpdate.Interval = 500;
+            AdresUpdate.Tick += AdresUpdate_Tick;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -187,6 +194,7 @@
         private ToolStripMenuItem aboutToolStripMenuItem;
         private OpenFileDialog openFileDialog2;
         private SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.Timer AdresUpdate;
     }
 
 }

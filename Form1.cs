@@ -1,9 +1,7 @@
 using Modbus.Device;
 using System;
-using System.Diagnostics.Metrics;
 using System.Net.Sockets;
 using System.Text;
-using System.Xml.Linq;
 
 namespace LogixForms
 {
@@ -20,15 +18,11 @@ namespace LogixForms
         private static ushort[] N40 = new ushort[70];
         private static ushort[] B3 = new ushort[70];
 
-        /* пока не нужно(возможно вообще не нужно)
-        public static List<(int, int)> BST = new List<(int, int)>();
-        public static List<(int, int)> NXB = new List<(int, int)>();*/
-
         //файл(ddd | ddd - copy)
         private static List<string> TextRangs = new List<string>();//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
         private static int[,] info; //
         private Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
-            OTE = NodEn.OTE, OTL = NodEn.OTE; // загрузка изображений
+            OTE = NodEn.OTE, OTL = NodEn.OTE, XICD = NodDis.XICdis, XIOD = NodDis.XIOdis; // загрузка изображений
 
         private Pen pen_line = new Pen(Brushes.Black); // для отрисовки линий
         private Pen pen_line_sap = new Pen(Brushes.Blue); // для отрисовки линий
@@ -49,11 +43,14 @@ namespace LogixForms
         //private Dictionary<int, int[]> PointInRangs = new Dictionary<int, int[]>();
         private Dictionary<int, int[]> Stop = new Dictionary<int, int[]>();
         private Dictionary<int, string[]> ElementsRang = new Dictionary<int, string[]>();
+        private Dictionary<int, string[]> AdresRang = new Dictionary<int, string[]>();
         private List<int[]> BIGM = new List<int[]>();
         private int isnumber;
+        private double Dis;
         private bool OpenFile = false;
         private bool ModbusCl = false;
         private ModbusIpMaster master;
+        private Random random = new Random();
 
 
         public Form1()
@@ -134,6 +131,25 @@ namespace LogixForms
             }
         }
 
+        private void AdresUpdate_Tick(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 24; i++)
+            {
+                T4[i] = (ushort)random.Next(0, 100);
+                T4_c[i] = (ushort)random.Next(0, 65530);
+                Timer_control[i] = 2;
+            }
+
+            for (int i = 0; i < 70; i++)
+            {
+                N13[i] = (ushort)random.Next(0, 65530);
+                N15[i] = (ushort)random.Next(0, 65530);
+                N18[i] = (ushort)random.Next(0, 65530);
+                N40[i] = (ushort)random.Next(0, 65530);
+                B3[i] = (ushort)random.Next(0, 65530);
+            }
+        }
+
         private void UpdateImage_Tick(object sender, EventArgs e)
         {
             Refresh();
@@ -141,12 +157,12 @@ namespace LogixForms
             {
                 top_indent_rang = (midpanel.Height * TextRangs.Count) / 150;
             }
-            else top_indent_rang = 150;
+            else top_indent_rang = 150;            
         }//интервал отрисовки и динамическое изменение верхнего отступа
 
         private void ModBusUpdate_Tick(object sender, EventArgs e)
         {
-            
+
         }
 
         private void FileUpdate_Tick(object sender, EventArgs e)
@@ -163,15 +179,18 @@ namespace LogixForms
             {
                 string[] rang = TextRangs[line].Trim().Split(' ');
                 var element = new string[rang.Length];
+                var adres = new string[rang.Length];
                 for (var i = 0; i < rang.Length; i++)
                 {
                     var el = rang[i];
-                    if (!el.Contains(':') && !int.TryParse(el, out isnumber))
+                    if (!el.Contains(':') && !int.TryParse(el, out isnumber) && !el.Contains('.'))
                     {
                         element[i] = el;
                     }
+                    else if (el.Contains(':')) adres[i] = el;
                 }
                 ElementsRang.Add(line, element.Where(x => !string.IsNullOrEmpty(x)).ToArray());//удаление пустых значений
+                AdresRang.Add(line, adres.Where(x => !string.IsNullOrEmpty(x)).ToArray());
             }
 
             for (int line = 0; line < TextRangs.Count; line++)
@@ -271,7 +290,7 @@ namespace LogixForms
 
             int maxY = top_indent_rang * (TextRangs.Count - 2);//макс кол-во пикселей для scroll_y
             for (int i = 1; i < TextRangs.Count; i++)
-                maxY += (top_indent_rang / 2) * info[i - 1, 0];
+                maxY += ((3 * top_indent_rang) / 4) * info[i - 1, 0];
             //точки для текста
             PointF Scroll = new PointF(79, 50);
             PointF MaxY = new PointF(79, 70);
@@ -304,7 +323,7 @@ namespace LogixForms
                 int stop = 0;
                 var GrupMaxCountEl = new int[LGN + 1];
 
-                top_step += top_indent_rang + ((top_indent_rang / 2) * info[rang - 1, 0]);//отступ от 0,0
+                top_step += top_indent_rang + (((3 * top_indent_rang) / 4) * info[rang - 1, 0]);//отступ от 0,0
                 rang_y[rang] = top_step;
                 locationToDrawRangs.Y = top_step - 10 - scroll_y;
                 g.DrawString((rang + 1).ToString(), RangsFont, Brushes.Black, locationToDrawRangs);//номер ранга от 1 до *
@@ -340,25 +359,25 @@ namespace LogixForms
                     {
                         start = Math.Abs(Stop[rang][BIGN[lgn, lg - 1]] - Start[rang][BIGN[lgn, lg - 1]]) + GrupMaxCountEl[lgn - 1] - 1 + (stop != 0 ? stop - 1 : stop);
                         //горизонталь
-                        g.DrawLine(pen_line_sap,
+                        g.DrawLine(pen_line,
                             left_indent_rang_x + PointOfElemetts[start + stop],
-                            top_step + lg * (top_indent_rang / 2) - scroll_y,
+                            top_step + lg * ((3 * top_indent_rang) / 4) - scroll_y,
                             left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn] + 1 + stop],
-                            top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
-                                                                              //вертикаль
-                        g.DrawLine(pen_line_sap,
+                            top_step + lg * ((3 * top_indent_rang) / 4) - scroll_y);//основная ветка ранга от 1 до *
+                                                                                    //вертикаль
+                        g.DrawLine(pen_line,
                             left_indent_rang_x + PointOfElemetts[start + stop],
                             top_step - scroll_y,
                             left_indent_rang_x + PointOfElemetts[start + stop],
-                            top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
-                        g.DrawLine(pen_line_sap,
+                            top_step + lg * ((3 * top_indent_rang) / 4) - scroll_y);//основная ветка ранга от 1 до *
+                        g.DrawLine(pen_line,
                             left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn] + 1 + stop],
                             top_step - scroll_y,
                             left_indent_rang_x + PointOfElemetts[start + GrupMaxCountEl[lgn] + 1 + stop],
-                            top_step + lg * (top_indent_rang / 2) - scroll_y);//основная ветка ранга от 1 до *
-                                                                              //точки
+                            top_step + lg * ((3 * top_indent_rang) / 4) - scroll_y);//основная ветка ранга от 1 до *
+                                                                                    //точки
                         for (int i = start + stop; i < start + GrupMaxCountEl[lgn] + 2 + stop; i++)
-                            g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i], top_step + lg * (top_indent_rang / 2) - scroll_y - 2, 4, 4);
+                            g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i], top_step + lg * ((3 * top_indent_rang) / 4) - scroll_y - 2, 4, 4);
                     }
                     stop = start;
                     if (0 == BIGM[rang][lgn] && stop > 0) stop++;
@@ -380,45 +399,90 @@ namespace LogixForms
                 {
                     int nxb = 0;
                     int ind = 0;
+                    int num = 0;
+                    ushort[] mas = new ushort[70];
                     for (var bn = 0; bn < ElementsRang[rang].Length; bn++)
                     {
                         var el = ElementsRang[rang][bn];
+                        var adres = AdresRang[rang][num < AdresRang[rang].Length ? num : 0];
+                        if (adres.Contains("N13"))
+                        {
+                            N13.CopyTo(mas, 0);
+                        }
+                        else if (adres.Contains("N15"))
+                        {
+                            N15.CopyTo(mas, 0);
+                        }
+                        else if (adres.Contains("N18"))
+                        {
+                            N18.CopyTo(mas, 0);
+                        }
+                        else if (adres.Contains("N40"))
+                        {
+                            N40.CopyTo(mas, 0);
+                        }
+                        else if (adres.Contains("B3"))
+                        {
+                            B3.CopyTo(mas, 0);
+                        }
+                        var point = new PointF(left_indent_rang_x + PointOfElemetts[ind] - 40, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 50);
                         switch (el)
                         {
                             case "XIO":
                                 {
-                                    g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + (top_indent_rang / 2) * nxb - scroll_y - 25, 54, 50));
+                                    if (Adres(adres, mas) == 0)
+                                        g.DrawImage(XIOD, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 25, 54, 50));
+                                    else
+                                        g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 25, 54, 50));
+                                    g.DrawString(adres, RangsFont, Brushes.Black, point);
                                     ind++;
+                                    num++;
                                     break;
                                 }
                             case "XIC":
                                 {
-                                    g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + (top_indent_rang / 2) * nxb - scroll_y - 25, 54, 50));
+                                    if (Adres(adres, mas) == 1)
+                                        g.DrawImage(XICD, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 25, 54, 50));
+                                    else
+                                        g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 25, 54, 50));
+                                    g.DrawString(adres, RangsFont, Brushes.Black, point);
                                     ind++;
+                                    num++;
                                     break;
                                 }
                             case "OTE":
                                 {
-                                    g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + (top_indent_rang / 2) * nxb - scroll_y - 25, 54, 50));
+                                    //if (Adres(adres, mas) == 1)
+                                    g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 25, 54, 50));
+                                    g.DrawString(adres, RangsFont, Brushes.Black, point);
                                     ind++;
+                                    num++;
                                     break;
                                 }
                             case "OTL":
                                 {
-                                    g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + (top_indent_rang / 2) * nxb - scroll_y - 25, 54, 50));
+                                    //if (Adres(adres, mas) == 1)
+                                    g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 25, 54, 50));
+                                    g.DrawString(adres, RangsFont, Brushes.Black, point);
                                     ind++;
+                                    num++;
                                     break;
                                 }
                             case "OTU":
                                 {
-                                    g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + (top_indent_rang / 2) * nxb - scroll_y - 25, 54, 50));
+                                    //if (Adres(adres, mas) == 1)
+                                    g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 25, 54, 50));
+                                    g.DrawString(adres, RangsFont, Brushes.Black, point);
                                     ind++;
+                                    num++;
                                     break;
                                 }
                             case "ONS":
                                 {
-                                    //g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + (top_indent_rang / 2) * nxb - scroll_y - 25, 54, 50));
+                                    //g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[ind] - 27, rang_y[rang] + ((3*top_indent_rang )/ 4) * nxb - scroll_y - 25, 54, 50));
+                                    g.DrawString(adres, RangsFont, Brushes.Black, point);
                                     ind++;
+                                    num++;
                                     break;
                                 }
                             case "TON":
@@ -554,7 +618,7 @@ namespace LogixForms
         {
             FileUpdate.Enabled = false;
             //ModBusUpdate.Enabled = true;
-            
+
             if (Application.OpenForms["ConnectForms"] == null)
                 new ConnectForms(this).Show();
             OpenFile = false;
@@ -577,5 +641,6 @@ namespace LogixForms
         {
             MessageBox.Show("Временно ничего нет!");
         }
+
     }
 }
