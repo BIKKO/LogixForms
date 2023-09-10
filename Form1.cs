@@ -19,13 +19,13 @@ namespace LogixForms
         private static ushort[] B3 = new ushort[70];
 
         //файл(ddd | ddd - copy)
+        private static List<List<string>> OpenFileOrCon = new List<List<string>>();
         private static List<string> TextRangs = new List<string>();//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
         private static int[,] info; //
         private Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
             OTE = NodEn.OTE, OTL = NodEn.OTE, XICD = NodDis.XICdis, XIOD = NodDis.XIOdis; // загрузка изображений
 
         private Pen pen_line = new Pen(Brushes.Black); // для отрисовки линий
-        private Pen pen_line_sap = new Pen(Brushes.Blue); // для отрисовки линий
         private Pen PenOfPoint = new Pen(Brushes.Red, 7);
 
         private Font text = new Font("Arial", 10); // текст информации
@@ -42,22 +42,27 @@ namespace LogixForms
         private Dictionary<int, int[]> Start = new Dictionary<int, int[]>();
         //private Dictionary<int, int[]> PointInRangs = new Dictionary<int, int[]>();
         private Dictionary<int, int[]> Stop = new Dictionary<int, int[]>();
+        private List<Dictionary<int, string[]>> OpenOrCon_Elements = new List<Dictionary<int, string[]>>();
+        private List<Dictionary<int, string[]>> OpenOrCon_Adres = new List<Dictionary<int, string[]>>();
         private Dictionary<int, string[]> ElementsRang = new Dictionary<int, string[]>();
         private Dictionary<int, string[]> AdresRang = new Dictionary<int, string[]>();
         private List<int[]> BIGM = new List<int[]>();
+        private List<int[]> TabPanel = new List<int[]>();
         private int isnumber;
         private double Dis;
         private bool OpenFile = false;
         private bool ModbusCl = false;
         private ModbusIpMaster master;
         private Random random = new Random();
+        private bool NotFount = false;
 
 
         public Form1()
         {
+            //Files.Visible = false;
             InitializeComponent();//инициализация формы
             this.MouseWheel += new MouseEventHandler(This_MouseWheel);//подключения колёсика мыши
-            pen_line_sap.Width = pen_line.Width = 3;//толщина линий
+            pen_line.Width = 3;//толщина линий
         }
 
         private void This_MouseWheel(object sender, MouseEventArgs e)
@@ -152,12 +157,17 @@ namespace LogixForms
 
         private void UpdateImage_Tick(object sender, EventArgs e)
         {
-            Refresh();
-            if (midpanel.Height * TextRangs.Count / 150 >= 150)
+            if (NotFount)
             {
-                top_indent_rang = (midpanel.Height * TextRangs.Count) / 150;
+                Refresh();
+                TabPanel[Files.SelectedIndex][0] = this.Height - 20;
+                TabPanel[Files.SelectedIndex][1] = this.Width - 50;
+                if (TabPanel[Files.SelectedIndex][0] * OpenFileOrCon[Files.SelectedIndex].Count / 150 >= 150)
+                {
+                    top_indent_rang = (TabPanel[Files.SelectedIndex][0] * OpenFileOrCon[Files.SelectedIndex].Count) / 150;
+                }
+                else top_indent_rang = 150;
             }
-            else top_indent_rang = 150;            
         }//интервал отрисовки и динамическое изменение верхнего отступа
 
         private void ModBusUpdate_Tick(object sender, EventArgs e)
@@ -167,17 +177,18 @@ namespace LogixForms
 
         private void FileUpdate_Tick(object sender, EventArgs e)
         {
-            TextRangs.Clear();
-            foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) TextRangs.Add(el);
+            FileUpdate.Enabled = false;
+            OpenFileOrCon[Files.SelectedIndex].Clear();
+            foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) OpenFileOrCon[Files.SelectedIndex].Add(el);
         }
 
         private void RangsInfo()
         {
-            info = new int[TextRangs.Count, 3];
-            rang_y = new int[TextRangs.Count];
-            for (int line = 0; line < TextRangs.Count; line++)//создание массива из элементов
+            info = new int[OpenFileOrCon[Files.SelectedIndex].Count, 3];
+            rang_y = new int[OpenFileOrCon[Files.SelectedIndex].Count];
+            for (int line = 0; line < OpenFileOrCon[Files.SelectedIndex].Count; line++)//создание массива из элементов
             {
-                string[] rang = TextRangs[line].Trim().Split(' ');
+                string[] rang = OpenFileOrCon[Files.SelectedIndex][line].Trim().Split(' ');
                 var element = new string[rang.Length];
                 var adres = new string[rang.Length];
                 for (var i = 0; i < rang.Length; i++)
@@ -191,9 +202,11 @@ namespace LogixForms
                 }
                 ElementsRang.Add(line, element.Where(x => !string.IsNullOrEmpty(x)).ToArray());//удаление пустых значений
                 AdresRang.Add(line, adres.Where(x => !string.IsNullOrEmpty(x)).ToArray());
+                OpenOrCon_Elements.Add(ElementsRang);
+                OpenOrCon_Adres.Add(AdresRang);
             }
 
-            for (int line = 0; line < TextRangs.Count; line++)
+            for (int line = 0; line < OpenFileOrCon[Files.SelectedIndex].Count; line++)
             {
                 int count_sap = 0;//кол-во веток
 
@@ -216,9 +229,9 @@ namespace LogixForms
                     }
                 }
 
-                for (var bn = 0; bn < ElementsRang[line].Length; bn++)
+                for (var bn = 0; bn < OpenOrCon_Elements[Files.SelectedIndex][line].Length; bn++)
                 {
-                    var el = ElementsRang[line][bn];
+                    var el = OpenOrCon_Elements[Files.SelectedIndex][line][bn];
                     switch (el)
                     {
                         case "BST":
@@ -285,11 +298,11 @@ namespace LogixForms
 
             for (int i = 0; i < PointOfElemetts.Length; i++)
             {
-                PointOfElemetts[i] = ((midpanel.Width) / CountElInRang + 1) * (i + 1) - left_indent_rang_x / 2;
+                PointOfElemetts[i] = ((TabPanel[Files.SelectedIndex][1]) / CountElInRang + 1) * (i + 1) - left_indent_rang_x / 2;
             }
 
-            int maxY = top_indent_rang * (TextRangs.Count - 2);//макс кол-во пикселей для scroll_y
-            for (int i = 1; i < TextRangs.Count; i++)
+            int maxY = top_indent_rang * (OpenFileOrCon[Files.SelectedIndex].Count - 2);//макс кол-во пикселей для scroll_y
+            for (int i = 1; i < OpenFileOrCon[Files.SelectedIndex].Count; i++)
                 maxY += ((3 * top_indent_rang) / 4) * info[i - 1, 0];
             //точки для текста
             PointF Scroll = new PointF(79, 50);
@@ -301,20 +314,20 @@ namespace LogixForms
             //g.DrawString(maxY.ToString(), RangsFont, Brushes.Black, MaxY);
 
             //вертикаль (статична)
-            g.DrawLine(pen_line, left_indent_rang_x, 0, left_indent_rang_x, midpanel.Height);
-            g.DrawLine(pen_line, midpanel.Width - 2, 0, midpanel.Width - 2, midpanel.Height);
+            g.DrawLine(pen_line, left_indent_rang_x, 0, left_indent_rang_x, TabPanel[Files.SelectedIndex][0]);
+            g.DrawLine(pen_line, TabPanel[Files.SelectedIndex][1] - 2, 0, TabPanel[Files.SelectedIndex][1] - 2, TabPanel[Files.SelectedIndex][0]);
 
             PointF locationToDrawRangs = new PointF();//позиция  номера ранга
             locationToDrawRangs.X = 20;
             locationToDrawRangs.Y = top_indent_rang - scroll_y - 10;
             //отрисовка первого ранга
             g.DrawString("1", RangsFont, Brushes.Black, locationToDrawRangs);
-            g.DrawLine(pen_line, left_indent_rang_x, top_indent_rang - scroll_y, midpanel.Width, top_indent_rang - scroll_y);
+            g.DrawLine(pen_line, left_indent_rang_x, top_indent_rang - scroll_y, TabPanel[Files.SelectedIndex][1], top_indent_rang - scroll_y);
             for (int i = 0; i < PointOfElemetts.Length - 1; i++)
                 g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i], top_indent_rang - scroll_y - 2, 4, 4);
             int top_step = top_indent_rang;//верхний отступ отрисовки
             rang_y[0] = top_step;
-            for (int rang = 1; rang < TextRangs.Count; rang++)
+            for (int rang = 1; rang < OpenFileOrCon[Files.SelectedIndex].Count; rang++)
             {
                 var BIGN = Info[rang];
                 var LGN = info[rang, 1];
@@ -327,7 +340,7 @@ namespace LogixForms
                 rang_y[rang] = top_step;
                 locationToDrawRangs.Y = top_step - 10 - scroll_y;
                 g.DrawString((rang + 1).ToString(), RangsFont, Brushes.Black, locationToDrawRangs);//номер ранга от 1 до *
-                g.DrawLine(pen_line, left_indent_rang_x, top_step - scroll_y, midpanel.Width, top_step - scroll_y);//основная ветка ранга от 1 до *
+                g.DrawLine(pen_line, left_indent_rang_x, top_step - scroll_y, TabPanel[Files.SelectedIndex][1], top_step - scroll_y);//основная ветка ранга от 1 до *
 
                 for (int i = 0; i < CountElInRang + 1; i++)
                     g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i], top_step - scroll_y - 2, 4, 4);
@@ -395,7 +408,7 @@ namespace LogixForms
                 Graphics g = e.Graphics;
                 g.Clear(Color.White);
                 PaintLines(e);
-                for (int rang = 0; rang < TextRangs.Count; rang++)
+                for (int rang = 0; rang < OpenFileOrCon[Files.SelectedIndex].Count; rang++)
                 {
                     int nxb = 0;
                     int ind = 0;
@@ -403,8 +416,8 @@ namespace LogixForms
                     ushort[] mas = new ushort[70];
                     for (var bn = 0; bn < ElementsRang[rang].Length; bn++)
                     {
-                        var el = ElementsRang[rang][bn];
-                        var adres = AdresRang[rang][num < AdresRang[rang].Length ? num : 0];
+                        var el = OpenOrCon_Elements[Files.SelectedIndex][rang][bn];
+                        var adres = OpenOrCon_Adres[Files.SelectedIndex][rang][num < AdresRang[rang].Length ? num : 0];
                         if (adres.Contains("N13"))
                         {
                             N13.CopyTo(mas, 0);
@@ -527,8 +540,24 @@ namespace LogixForms
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog2.ShowDialog();
+            var tb = new TabPage();
+            var wh = new int[2];
+            tb.Text = openFileDialog2.FileName;
+            MyPanel pan = new()
+            {
+                Dock = DockStyle.Fill,
+                Height = this.Height-20,
+                Width = this.Width-50,
+            };
+            wh[0] = pan.Height;
+            wh[1] = pan.Width;
+            TabPanel.Add(wh);
+            pan.Paint += midpanel_Paint;
+            tb.Controls.Add(pan);
+            Files.TabPages.Add(tb);
             TextRangs.Clear();
             foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) TextRangs.Add(el);
+            OpenFileOrCon.Add(TextRangs);
             ElementsRang.Clear();
             Info.Clear();
             Start.Clear();
@@ -539,6 +568,9 @@ namespace LogixForms
             RangsInfo();
             ModBusUpdate.Enabled = false;
             OpenFile = true;
+            Files.SelectTab(Files.TabCount - 1);
+            NotFount = true;
+            //Files.Visible = true;
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -551,7 +583,7 @@ namespace LogixForms
             {
                 Stream file = saveFileDialog1.OpenFile();
                 StreamWriter sw = new StreamWriter(file);
-                foreach (string rang in TextRangs)
+                foreach (string rang in OpenFileOrCon[Files.SelectedIndex])
                     sw.WriteLine(rang);
                 sw.Close();
                 file.Close();
@@ -642,5 +674,9 @@ namespace LogixForms
             MessageBox.Show("Временно ничего нет!");
         }
 
+        private void tabPage2_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
