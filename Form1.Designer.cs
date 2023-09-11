@@ -31,8 +31,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            vScrollBar1 = new VScrollBar();
-            UpdateImage = new System.Windows.Forms.Timer(components);
+            Update = new System.Windows.Forms.Timer(components);
             menu = new Panel();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
@@ -42,7 +41,7 @@
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             midpanel = new MyPanel();
-            Files = new TabControl();
+            Files = new MyTabControl();
             ModBusUpdate = new System.Windows.Forms.Timer(components);
             FileUpdate = new System.Windows.Forms.Timer(components);
             openFileDialog2 = new OpenFileDialog();
@@ -53,20 +52,11 @@
             midpanel.SuspendLayout();
             SuspendLayout();
             // 
-            // vScrollBar1
+            // Update
             // 
-            vScrollBar1.Dock = DockStyle.Right;
-            vScrollBar1.LargeChange = 1;
-            vScrollBar1.Location = new Point(934, 0);
-            vScrollBar1.Name = "vScrollBar1";
-            vScrollBar1.Size = new Size(25, 482);
-            vScrollBar1.TabIndex = 0;
-            // 
-            // UpdateImage
-            // 
-            UpdateImage.Enabled = true;
-            UpdateImage.Interval = 25;
-            UpdateImage.Tick += UpdateImage_Tick;
+            Update.Enabled = true;
+            Update.Interval = 25;
+            Update.Tick += Update_Tick;
             // 
             // menu
             // 
@@ -76,7 +66,7 @@
             menu.ForeColor = SystemColors.Menu;
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
-            menu.Size = new Size(934, 27);
+            menu.Size = new Size(959, 27);
             menu.TabIndex = 1;
             // 
             // menuStrip1
@@ -85,7 +75,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(934, 28);
+            menuStrip1.Size = new Size(959, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -137,7 +127,7 @@
             midpanel.Dock = DockStyle.Fill;
             midpanel.Location = new Point(0, 27);
             midpanel.Name = "midpanel";
-            midpanel.Size = new Size(934, 455);
+            midpanel.Size = new Size(959, 455);
             midpanel.TabIndex = 2;
             // 
             // Files
@@ -146,7 +136,7 @@
             Files.Location = new Point(0, 0);
             Files.Name = "Files";
             Files.SelectedIndex = 0;
-            Files.Size = new Size(934, 455);
+            Files.Size = new Size(959, 455);
             Files.TabIndex = 0;
             // 
             // ModBusUpdate
@@ -177,7 +167,6 @@
             ClientSize = new Size(959, 482);
             Controls.Add(midpanel);
             Controls.Add(menu);
-            Controls.Add(vScrollBar1);
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Logix";
@@ -190,9 +179,7 @@
         }
 
         #endregion
-
-        private VScrollBar vScrollBar1;
-        private System.Windows.Forms.Timer UpdateImage;
+        private System.Windows.Forms.Timer Update;
         private MyPanel midpanel;
         private Panel menu;
         private System.Windows.Forms.Timer ModBusUpdate;
@@ -207,8 +194,8 @@
         private OpenFileDialog openFileDialog2;
         private SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Timer AdresUpdate;
-        private TabControl Files;
-        private TabPage tabPage1;
+        private MyTabControl Files;
+        private MyTabPage tabPage1;
         private Panel panel1;
     }
 
@@ -224,5 +211,23 @@ namespace System.Windows.Forms
             this.ResizeRedraw = true;
         }
 
+    }
+
+    class MyTabControl : TabControl
+    {
+        public MyTabControl()
+        {
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+        }
+    }
+
+    class MyTabPage : TabPage
+    {
+        public MyTabPage()
+        {
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+        }
     }
 }
