@@ -328,9 +328,9 @@ namespace LogixForms
             PointF Scroll = new PointF(79, 50);
             PointF MaxY = new PointF(79, 70);
             VScrollBarList[Files.SelectedIndex].Maximum = maxY - top_indent_rang / 2;
-            HScrollBarList[Files.SelectedIndex].Maximum = TabPanel[Files.SelectedIndex][1] - Files.Width+36;
+            HScrollBarList[Files.SelectedIndex].Maximum = TabPanel[Files.SelectedIndex][1] - Files.Width + 36;
             HScrollBarList[Files.SelectedIndex].Minimum = 0;
-            scroll_x = TabPanel[Files.SelectedIndex][1]>1300? HScrollBarList[Files.SelectedIndex].Value=0 : -HScrollBarList[Files.SelectedIndex].Value;
+            scroll_x = TabPanel[Files.SelectedIndex][1] > 1300 ? HScrollBarList[Files.SelectedIndex].Value = 0 : -HScrollBarList[Files.SelectedIndex].Value;
             scroll_y = VScrollBarList[Files.SelectedIndex].Value;//прокрутка
             //вспом. вывод информации
             //g.DrawString((TabPanel[Files.SelectedIndex][1] > 1300 ? 0 : -HScrollBarList[Files.SelectedIndex].Value).ToString(), RangsFont, Brushes.Black, Scroll);
@@ -362,7 +362,7 @@ namespace LogixForms
                 rang_y[rang] = top_step;
                 locationToDrawRangs.Y = top_step - 10 - scroll_y;
                 g.DrawString((rang + 1).ToString(), RangsFont, Brushes.Black, locationToDrawRangs);//номер ранга от 1 до *
-                g.DrawLine(pen_line, left_indent_rang_x + scroll_x, top_step - scroll_y, TabPanel[Files.SelectedIndex][1]-4, top_step - scroll_y);//основна€ ветка ранга от 1 до *
+                g.DrawLine(pen_line, left_indent_rang_x + scroll_x, top_step - scroll_y, TabPanel[Files.SelectedIndex][1] - 4, top_step - scroll_y);//основна€ ветка ранга от 1 до *
 
                 for (int i = 0; i < CountElInRang + 1; i++)
                     g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i] + scroll_x, top_step - scroll_y - 2, 4, 4);
@@ -559,6 +559,29 @@ namespace LogixForms
             }
         }
 
+        private void close_Click(object sender, EventArgs e)
+        {
+            TabPanel.Remove(TabPanel[Files.SelectedIndex]);
+            PanelsList.Remove(PanelsList[Files.SelectedIndex]);
+            VScrollBarList.Remove(VScrollBarList[Files.SelectedIndex]);
+            HScrollBarList.Remove(HScrollBarList[Files.SelectedIndex]);
+            OpenFileOrCon.Remove(OpenFileOrCon[Files.SelectedIndex]);
+            OpenOrCon_Adres.Remove(OpenOrCon_Adres[Files.SelectedIndex]);
+            if (PanelsList.Count == 0)
+            {
+                NotFount = false;
+                Start.Clear();
+                Stop.Clear();
+                ElementsRang.Clear();
+                Info.Clear();
+                AdresRang.Clear();
+                BIGM.Clear();
+                TextRangs.Clear();
+            }
+            Files.TabPages.Remove(Files.SelectedTab);
+
+        }
+
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog2.ShowDialog();
@@ -587,6 +610,11 @@ namespace LogixForms
                 Maximum = pan.Width,
                 Minimum = 0,
             };
+            ContextMenuStrip contextMenu = new ContextMenuStrip();
+            var close = new ToolStripMenuItem("«акрыть");
+            contextMenu.Items.Add(close);
+            tb.ContextMenuStrip = contextMenu;
+            close.Click += close_Click;
             HScrollBarList.Add(hScrollBar);
             wh[0] = pan.Height;
             wh[1] = pan.Width;
@@ -722,6 +750,11 @@ namespace LogixForms
             OpenFileOrCon.Add(TextRangs.ToList());
             Files.SelectTab(Files.TabCount - 1);
             NotFount = true;
+            ContextMenuStrip contextMenu = new ContextMenuStrip();
+            var close = new ToolStripMenuItem("«акрыть");
+            contextMenu.Items.Add(close);
+            tb.ContextMenuStrip = contextMenu;
+            close.Click += close_Click;
             RangsInfo();
         }
 
