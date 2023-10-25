@@ -1,9 +1,6 @@
 using Modbus.Device;
-using System;
 using System.Net.Sockets;
 using System.Text;
-using System.Windows.Forms;
-using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace LogixForms
 {
@@ -67,7 +64,7 @@ namespace LogixForms
         {
             //Files.Visible = false;
             InitializeComponent();//инициализация формы
-            this.MouseWheel += new MouseEventHandler(This_MouseWheel);//подключения колёсика мыши
+            this.MouseWheel += This_MouseWheel;//подключения колёсика мыши
             pen_line.Width = 3;//толщина линий
         }
 
@@ -82,7 +79,7 @@ namespace LogixForms
             else
             {
                 //вниз
-                wheel = TextRangs.Count % 10 != 0 ? 25 : -250;//если рангов > 10 то 1 иначе 10
+                wheel = TextRangs.Count % 10 != 0 ? 25 : 250;//если рангов > 10 то 1 иначе 10
             }
             if (VScrollBarList[Files.SelectedIndex].Maximum >= VScrollBarList[Files.SelectedIndex].Value + wheel && VScrollBarList[Files.SelectedIndex].Minimum <= VScrollBarList[Files.SelectedIndex].Value + wheel)
                 VScrollBarList[Files.SelectedIndex].Value += wheel;//не выходим ли за приделы scrollbar
@@ -561,6 +558,7 @@ namespace LogixForms
 
         private void close_Click(object sender, EventArgs e)
         {
+            PanelsList[Files.SelectedIndex].Paint -= midpanel_Paint;
             TabPanel.Remove(TabPanel[Files.SelectedIndex]);
             PanelsList.Remove(PanelsList[Files.SelectedIndex]);
             VScrollBarList.Remove(VScrollBarList[Files.SelectedIndex]);
@@ -579,15 +577,221 @@ namespace LogixForms
                 TextRangs.Clear();
             }
             Files.TabPages.Remove(Files.SelectedTab);
-
+            GC.Collect();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            openFileDialog2.ShowDialog();
+            if (openFileDialog2.ShowDialog() == DialogResult.OK)
+            {
+                var tb = new MyTabPage();
+                var wh = new int[2];
+                tb.Text = openFileDialog2.FileName;
+                VScrollBar scrol = new()
+                {
+                    Dock = DockStyle.Right,
+                    Width = 20,
+                    Maximum = 100,
+                    Minimum = 0,
+                    Value = 0
+                };
+                VScrollBarList.Add(scrol);
+                MyPanel pan = new()
+                {
+                    Dock = DockStyle.Fill,
+                    Height = this.Height - 20,
+                    Width = 1300 - 50,
+                };
+                HScrollBar hScrollBar = new()
+                {
+                    Dock = DockStyle.Bottom,
+                    Height = 20,
+                    Maximum = pan.Width,
+                    Minimum = 0,
+                };
+                ContextMenuStrip contextMenu = new ContextMenuStrip();
+                var close = new ToolStripMenuItem("Закрыть");
+                contextMenu.Items.Add(close);
+                tb.ContextMenuStrip = contextMenu;
+                close.Click += close_Click;
+                HScrollBarList.Add(hScrollBar);
+                wh[0] = pan.Height;
+                wh[1] = pan.Width;
+                TabPanel.Add(wh);
+                pan.Paint += midpanel_Paint;
+                PanelsList.Add(pan);
+                pan.Controls.Add(scrol);
+                pan.Controls.Add(hScrollBar);
+                tb.Controls.Add(pan);
+                Files.TabPages.Add(tb);
+                TextRangs.Clear();
+                foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) TextRangs.Add(el);
+                ElementsRang.Clear();
+                OpenFileOrCon.Add(TextRangs.ToList());
+                AdresRang.Clear();
+                Info.Clear();
+                Start.Clear();
+                Stop.Clear();
+                BIGM.Clear();
+                FileUpdate.Enabled = true;
+                RangsInfo();
+                ModBusUpdate.Enabled = false;
+                OpenFile = true;
+                Files.SelectTab(Files.TabCount - 1);
+                NotFount = true;
+                //Files.Visible = true;
+            }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.DefaultExt = "RandsSave";
+            saveFileDialog1.Filter = "txt files (*.txt) | *.txt";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Stream file = saveFileDialog1.OpenFile();
+                StreamWriter sw = new StreamWriter(file);
+                foreach (string rang in OpenFileOrCon[Files.SelectedIndex])
+                    sw.WriteLine(rang);
+                sw.Close();
+                file.Close();
+            }
+        }
+
+        public void con(string ip, int step, byte slave)
+        {
+            try
+            {
+                TextRangs.Clear();
+                TcpClient client = new TcpClient(ip, 502);
+                master = ModbusIpMaster.CreateIp(client);
+                ModBusUpdate.Enabled = true;
+
+                ushort[] inputs;
+
+                for (int j = 0; j < 100; j++)
+                {
+                    inputs = master.ReadHoldingRegisters(slave, (ushort)(step * j + 8000), 120);
+                    string g = "";
+                    int len = 0;
+                    int buf;
+
+
+                    for (int i = 0; i < 240; i++)
+                    {
+                        if (inputs[i] != 0)
+                        {
+                            buf = (inputs[i] & 0xff);
+                            if (buf != 0)
+                            {
+                                g += (char)((char)inputs[i] & 0xff);
+                                len++;
+                            }
+                            buf = (inputs[i] >> 8);
+                            if (buf != 0)
+                            {
+                                g += (char)((char)inputs[i] >> 8);
+                                len++;
+                            }
+                        }
+                        else break;
+                    }
+                    if (len != 0) TextRangs.Add(g);
+                    else break;
+                }
+                ModbusCl = true;
+                var tb = new TabPage();
+                var wh = new int[2];
+                tb.Text = ip + ":502";
+                VScrollBar scrol = new()
+                {
+                    Dock = DockStyle.Right,
+                    Width = 20,
+                    Maximum = 100,
+                    Minimum = 0,
+                    Value = 0
+                };
+                VScrollBarList.Add(scrol);
+                MyPanel pan = new()
+                {
+                    Dock = DockStyle.Fill,
+                    Height = this.Height - 20,
+                    Width = 1300,
+                };
+                HScrollBar hScrollBar = new()
+                {
+                    Dock = DockStyle.Bottom,
+                    Height = 20,
+                    Maximum = pan.Width,
+                    Minimum = 0,
+                };
+                HScrollBarList.Add(hScrollBar);
+                wh[0] = pan.Height;
+                wh[1] = pan.Width;
+                TabPanel.Add(wh);
+                pan.Controls.Add(scrol);
+                pan.Controls.Add(hScrollBar);
+                pan.Paint += midpanel_Paint;
+                PanelsList.Add(pan);
+                tb.Controls.Add(pan);
+                Files.TabPages.Add(tb);
+                OpenFileOrCon.Add(TextRangs.ToList());
+                Files.SelectTab(Files.TabCount - 1);
+                NotFount = true;
+                ContextMenuStrip contextMenu = new ContextMenuStrip();
+                var close = new ToolStripMenuItem("Закрыть");
+                contextMenu.Items.Add(close);
+                tb.ContextMenuStrip = contextMenu;
+                close.Click += close_Click;
+                TextRangs.Clear();
+                ElementsRang.Clear();
+                Info.Clear();
+                Start.Clear();
+                Stop.Clear();
+                BIGM.Clear();
+                RangsInfo();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.");
+            }
+        }
+
+        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FileUpdate.Enabled = false;
+            //ModBusUpdate.Enabled = true;
+
+            if (Application.OpenForms["ConnectForms"] == null)
+            {
+                new ConnectForms(this).Show();
+                OpenFile = false;
+                //con();
+            }
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Временно ничего нет!");
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Временно ничего нет!");
+        }
+
+        private void tabPage2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             var tb = new MyTabPage();
             var wh = new int[2];
-            tb.Text = openFileDialog2.FileName;
+            tb.Text = "New *";
             VScrollBar scrol = new()
             {
                 Dock = DockStyle.Right,
@@ -626,7 +830,7 @@ namespace LogixForms
             tb.Controls.Add(pan);
             Files.TabPages.Add(tb);
             TextRangs.Clear();
-            foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) TextRangs.Add(el);
+            TextRangs.Add("");
             ElementsRang.Clear();
             OpenFileOrCon.Add(TextRangs.ToList());
             AdresRang.Clear();
@@ -634,160 +838,10 @@ namespace LogixForms
             Start.Clear();
             Stop.Clear();
             BIGM.Clear();
-            FileUpdate.Enabled = true;
             RangsInfo();
-            ModBusUpdate.Enabled = false;
             OpenFile = true;
             Files.SelectTab(Files.TabCount - 1);
             NotFount = true;
-            //Files.Visible = true;
-        }
-
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
-            saveFileDialog1.RestoreDirectory = true;
-            saveFileDialog1.DefaultExt = "RandsSave";
-            saveFileDialog1.Filter = "txt files (*.txt) | *.txt";
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                Stream file = saveFileDialog1.OpenFile();
-                StreamWriter sw = new StreamWriter(file);
-                foreach (string rang in OpenFileOrCon[Files.SelectedIndex])
-                    sw.WriteLine(rang);
-                sw.Close();
-                file.Close();
-            }
-        }
-
-        public void con(string ip, int step, byte slave)
-        {
-            try
-            {
-                TextRangs.Clear();
-                TcpClient client = new TcpClient(ip, 502);
-                master = ModbusIpMaster.CreateIp(client);
-                ModBusUpdate.Enabled = true;
-                ElementsRang.Clear();
-                Info.Clear();
-                Start.Clear();
-                Stop.Clear();
-                BIGM.Clear();
-
-                ushort[] inputs;
-
-                for (int j = 0; j < 100; j++)
-                {
-                    inputs = master.ReadHoldingRegisters(slave, (ushort)(step * j + 8000), 120);
-                    string g = "";
-                    int len = 0;
-                    int buf;
-
-
-                    for (int i = 0; i < 240; i++)
-                    {
-                        if (inputs[i] != 0)
-                        {
-                            buf = (inputs[i] & 0xff);
-                            if (buf != 0)
-                            {
-                                g += (char)((char)inputs[i] & 0xff);
-                                len++;
-                            }
-                            buf = (inputs[i] >> 8);
-                            if (buf != 0)
-                            {
-                                g += (char)((char)inputs[i] >> 8);
-                                len++;
-                            }
-                        }
-                        else break;
-                    }
-                    if (len != 0) TextRangs.Add(g);
-                    else break;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.");
-            }
-            ModbusCl = true;
-            var tb = new TabPage();
-            var wh = new int[2];
-            tb.Text = ip + ":502";
-            VScrollBar scrol = new()
-            {
-                Dock = DockStyle.Right,
-                Width = 20,
-                Maximum = 100,
-                Minimum = 0,
-                Value = 0
-            };
-            VScrollBarList.Add(scrol);
-            MyPanel pan = new()
-            {
-                Dock = DockStyle.Fill,
-                Height = this.Height - 20,
-                Width = 1300,
-            };
-            HScrollBar hScrollBar = new()
-            {
-                Dock = DockStyle.Bottom,
-                Height = 20,
-                Maximum = pan.Width,
-                Minimum = 0,
-            };
-            HScrollBarList.Add(hScrollBar);
-            wh[0] = pan.Height;
-            wh[1] = pan.Width;
-            TabPanel.Add(wh);
-            pan.Controls.Add(scrol);
-            pan.Controls.Add(hScrollBar);
-            pan.Paint += midpanel_Paint;
-            PanelsList.Add(pan);
-            tb.Controls.Add(pan);
-            Files.TabPages.Add(tb);
-            OpenFileOrCon.Add(TextRangs.ToList());
-            Files.SelectTab(Files.TabCount - 1);
-            NotFount = true;
-            ContextMenuStrip contextMenu = new ContextMenuStrip();
-            var close = new ToolStripMenuItem("Закрыть");
-            contextMenu.Items.Add(close);
-            tb.ContextMenuStrip = contextMenu;
-            close.Click += close_Click;
-            RangsInfo();
-        }
-
-        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FileUpdate.Enabled = false;
-            //ModBusUpdate.Enabled = true;
-
-            if (Application.OpenForms["ConnectForms"] == null)
-                new ConnectForms(this).Show();
-            OpenFile = false;
-            TextRangs.Clear();
-            ElementsRang.Clear();
-            Info.Clear();
-            Start.Clear();
-            Stop.Clear();
-            BIGM.Clear();
-            //con();
-        }
-
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Временно ничего нет!");
-        }
-
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Временно ничего нет!");
-        }
-
-        private void tabPage2_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

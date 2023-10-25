@@ -31,25 +31,27 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             Update = new System.Windows.Forms.Timer(components);
             menu = new Panel();
+            XIO_el = new Button();
+            XIC_el = new Button();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             openToolStripMenuItem = new ToolStripMenuItem();
+            newToolStripMenuItem = new ToolStripMenuItem();
             saveToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
-            midpanel = new MyPanel();
-            Files = new MyTabControl();
             ModBusUpdate = new System.Windows.Forms.Timer(components);
             FileUpdate = new System.Windows.Forms.Timer(components);
             openFileDialog2 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
             AdresUpdate = new System.Windows.Forms.Timer(components);
+            Files = new MyTabControl();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
-            midpanel.SuspendLayout();
             SuspendLayout();
             // 
             // Update
@@ -61,13 +63,33 @@
             // menu
             // 
             menu.BackColor = SystemColors.Menu;
+            menu.Controls.Add(XIO_el);
+            menu.Controls.Add(XIC_el);
             menu.Controls.Add(menuStrip1);
             menu.Dock = DockStyle.Top;
             menu.ForeColor = SystemColors.Menu;
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
-            menu.Size = new Size(959, 27);
+            menu.Size = new Size(959, 41);
             menu.TabIndex = 1;
+            // 
+            // XIO_el
+            // 
+            XIO_el.Image = NodEn.XIC;
+            XIO_el.Location = new Point(114, 51);
+            XIO_el.Name = "XIO_el";
+            XIO_el.Size = new Size(70, 46);
+            XIO_el.TabIndex = 2;
+            XIO_el.UseVisualStyleBackColor = true;
+            // 
+            // XIC_el
+            // 
+            XIC_el.Image = NodEn.XIO;
+            XIC_el.Location = new Point(54, 51);
+            XIC_el.Name = "XIC_el";
+            XIC_el.Size = new Size(63, 46);
+            XIC_el.TabIndex = 1;
+            XIC_el.UseVisualStyleBackColor = true;
             // 
             // menuStrip1
             // 
@@ -81,7 +103,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, newToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(46, 24);
             fileToolStripMenuItem.Text = "File";
@@ -92,6 +114,13 @@
             openToolStripMenuItem.Size = new Size(146, 26);
             openToolStripMenuItem.Text = "Open";
             openToolStripMenuItem.Click += openToolStripMenuItem_Click;
+            // 
+            // newToolStripMenuItem
+            // 
+            newToolStripMenuItem.Name = "newToolStripMenuItem";
+            newToolStripMenuItem.Size = new Size(146, 26);
+            newToolStripMenuItem.Text = "New";
+            newToolStripMenuItem.Click += newToolStripMenuItem_Click;
             // 
             // saveToolStripMenuItem
             // 
@@ -121,24 +150,6 @@
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
-            // midpanel
-            // 
-            midpanel.Controls.Add(Files);
-            midpanel.Dock = DockStyle.Fill;
-            midpanel.Location = new Point(0, 27);
-            midpanel.Name = "midpanel";
-            midpanel.Size = new Size(959, 455);
-            midpanel.TabIndex = 2;
-            // 
-            // Files
-            // 
-            Files.Dock = DockStyle.Fill;
-            Files.Location = new Point(0, 0);
-            Files.Name = "Files";
-            Files.SelectedIndex = 0;
-            Files.Size = new Size(959, 455);
-            Files.TabIndex = 0;
-            // 
             // ModBusUpdate
             // 
             ModBusUpdate.Interval = 1000;
@@ -159,14 +170,24 @@
             AdresUpdate.Interval = 500;
             AdresUpdate.Tick += AdresUpdate_Tick;
             // 
+            // Files
+            // 
+            Files.Dock = DockStyle.Fill;
+            Files.Location = new Point(0, 41);
+            Files.Name = "Files";
+            Files.SelectedIndex = 0;
+            Files.Size = new Size(959, 441);
+            Files.TabIndex = 2;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Window;
             ClientSize = new Size(959, 482);
-            Controls.Add(midpanel);
+            Controls.Add(Files);
             Controls.Add(menu);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Logix";
@@ -174,12 +195,11 @@
             menu.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
-            midpanel.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-        private System.Windows.Forms.Timer Update;
+        private new System.Windows.Forms.Timer Update;
         private MyPanel midpanel;
         private Panel menu;
         private System.Windows.Forms.Timer ModBusUpdate;
@@ -194,9 +214,13 @@
         private OpenFileDialog openFileDialog2;
         private SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Timer AdresUpdate;
-        private MyTabControl Files;
+        //private MyTabControl Files;
         private MyTabPage tabPage1;
         private Panel panel1;
+        private MyTabControl Files;
+        private ToolStripMenuItem newToolStripMenuItem;
+        private Button XIO_el;
+        private Button XIC_el;
     }
 
 }

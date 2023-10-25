@@ -2,11 +2,25 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Version>0.9.12</Version>
+    <PackageIcon></PackageIcon>
+    <UseWPF>False</UseWPF>
+    <ApplicationIcon>XIO.ico</ApplicationIcon>
+    <StartupObject></StartupObject>
+    <BaseOutputPath>C:\Users\njnji\Desktop\проеты\LogixForms\bin</BaseOutputPath>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="XIO.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NModbus4" Version="3.0.0-alpha2" />
@@ -23,6 +37,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>NodDis.resx</DependentUpon>
     </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +53,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>NodDis.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

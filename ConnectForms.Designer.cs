@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConnectForms));
             button1 = new Button();
             button2 = new Button();
             IP = new TextBox();
@@ -124,6 +125,7 @@
             Controls.Add(button2);
             Controls.Add(button1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "ConnectForms";
             Text = "Connect";
