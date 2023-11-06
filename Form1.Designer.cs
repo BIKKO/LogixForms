@@ -70,7 +70,7 @@
             menu.ForeColor = SystemColors.Menu;
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
-            menu.Size = new Size(959, 41);
+            menu.Size = new Size(982, 41);
             menu.TabIndex = 1;
             // 
             // XIO_el
@@ -97,7 +97,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(959, 28);
+            menuStrip1.Size = new Size(982, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -176,7 +176,7 @@
             Files.Location = new Point(0, 41);
             Files.Name = "Files";
             Files.SelectedIndex = 0;
-            Files.Size = new Size(959, 441);
+            Files.Size = new Size(982, 412);
             Files.TabIndex = 2;
             // 
             // Form1
@@ -184,13 +184,14 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(959, 482);
+            ClientSize = new Size(982, 453);
             Controls.Add(Files);
             Controls.Add(menu);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "Logix";
+            FormClosing += Form1_FormClosing;
             menu.ResumeLayout(false);
             menu.PerformLayout();
             menuStrip1.ResumeLayout(false);
@@ -237,7 +238,7 @@ namespace System.Windows.Forms
 
     }
 
-    class MyTabControl : TabControl
+    public class MyTabControl : TabControl
     {
         public MyTabControl()
         {

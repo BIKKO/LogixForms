@@ -11,11 +11,15 @@
     <UseWPF>False</UseWPF>
     <ApplicationIcon>XIO.ico</ApplicationIcon>
     <StartupObject></StartupObject>
-    <BaseOutputPath>C:\Users\njnji\Desktop\проеты\LogixForms\bin</BaseOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>True</Optimize>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

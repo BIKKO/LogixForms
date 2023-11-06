@@ -36,7 +36,7 @@ namespace LogixForms.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
         public int W {
             get {
                 return ((int)(this["W"]));
@@ -48,13 +48,28 @@ namespace LogixForms.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
         public int H {
             get {
                 return ((int)(this["H"]));
             }
             set {
                 this["H"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public global::System.Windows.Forms.MyTabControl MyTab
+        {
+            get
+            {
+                return ((global::System.Windows.Forms.MyTabControl)(this["MyTab"]));
+            }
+            set
+            {
+                this["MyTab"] = value;
             }
         }
     }

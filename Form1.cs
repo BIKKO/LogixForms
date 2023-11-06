@@ -1,6 +1,7 @@
 using Modbus.Device;
 using System.Net.Sockets;
 using System.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace LogixForms
 {
@@ -64,8 +65,10 @@ namespace LogixForms
         {
             //Files.Visible = false;
             InitializeComponent();//инициализация формы
-            this.MouseWheel += This_MouseWheel;//подключения колёсика мыши
+            MouseWheel += This_MouseWheel;//подключения колёсика мыши
             pen_line.Width = 3;//толщина линий
+            Height = int.Parse(Properties.Settings.Default["H"].ToString());
+            Width = int.Parse(Properties.Settings.Default["W"].ToString());
         }
 
         private void This_MouseWheel(object sender, MouseEventArgs e)
@@ -81,8 +84,11 @@ namespace LogixForms
                 //вниз
                 wheel = TextRangs.Count % 10 != 0 ? 25 : 250;//если рангов > 10 то 1 иначе 10
             }
-            if (VScrollBarList[Files.SelectedIndex].Maximum >= VScrollBarList[Files.SelectedIndex].Value + wheel && VScrollBarList[Files.SelectedIndex].Minimum <= VScrollBarList[Files.SelectedIndex].Value + wheel)
-                VScrollBarList[Files.SelectedIndex].Value += wheel;//не выходим ли за приделы scrollbar
+            if(Files.TabCount > 0)
+            {
+                if (VScrollBarList[Files.SelectedIndex].Maximum >= VScrollBarList[Files.SelectedIndex].Value + wheel && VScrollBarList[Files.SelectedIndex].Minimum <= VScrollBarList[Files.SelectedIndex].Value + wheel)
+                    VScrollBarList[Files.SelectedIndex].Value += wheel;//не выходим ли за приделы scrollbar
+            }
             wheel = 0;//одиночное сробатование
         }
 
@@ -163,7 +169,7 @@ namespace LogixForms
             if (NotFount)
             {
                 PanelsList[Files.SelectedIndex].Refresh();
-                TabPanel[Files.SelectedIndex][0] = this.Height - 20;
+                TabPanel[Files.SelectedIndex][0] = Height - 20;
 
 
                 if (TabPanel[Files.SelectedIndex][0] * OpenFileOrCon[Files.SelectedIndex].Count / 150 >= 150)
@@ -172,9 +178,9 @@ namespace LogixForms
                 }
                 else top_indent_rang = 150;
 
-                if (this.Width - 50 >= 1300)
+                if (Width - 50 >= 1300)
                 {
-                    TabPanel[Files.SelectedIndex][1] = this.Width - 50;
+                    TabPanel[Files.SelectedIndex][1] = Width - 50;
                     HScrollBarList[Files.SelectedIndex].Visible = false;
                 }
                 else
@@ -599,7 +605,7 @@ namespace LogixForms
                 MyPanel pan = new()
                 {
                     Dock = DockStyle.Fill,
-                    Height = this.Height - 20,
+                    Height = Height - 20,
                     Width = 1300 - 50,
                 };
                 HScrollBar hScrollBar = new()
@@ -717,7 +723,7 @@ namespace LogixForms
                 MyPanel pan = new()
                 {
                     Dock = DockStyle.Fill,
-                    Height = this.Height - 20,
+                    Height = Height - 20,
                     Width = 1300,
                 };
                 HScrollBar hScrollBar = new()
@@ -804,7 +810,7 @@ namespace LogixForms
             MyPanel pan = new()
             {
                 Dock = DockStyle.Fill,
-                Height = this.Height - 20,
+                Height = Height - 20,
                 Width = 1300 - 50,
             };
             HScrollBar hScrollBar = new()
@@ -842,6 +848,13 @@ namespace LogixForms
             OpenFile = true;
             Files.SelectTab(Files.TabCount - 1);
             NotFount = true;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Properties.Settings.Default["H"] = Height;
+            Properties.Settings.Default["W"] = Width;
+            Properties.Settings.Default.Save();
         }
     }
 }
