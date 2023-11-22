@@ -50,6 +50,7 @@
             saveFileDialog1 = new SaveFileDialog();
             AdresUpdate = new System.Windows.Forms.Timer(components);
             Files = new MyTabControl();
+            adresesValuesToolStripMenuItem = new ToolStripMenuItem();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -103,7 +104,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, newToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, newToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem, adresesValuesToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(46, 24);
             fileToolStripMenuItem.Text = "File";
@@ -111,28 +112,33 @@
             // openToolStripMenuItem
             // 
             openToolStripMenuItem.Name = "openToolStripMenuItem";
-            openToolStripMenuItem.Size = new Size(146, 26);
+            openToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+O";
+            openToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.O;
+            openToolStripMenuItem.Size = new Size(242, 26);
             openToolStripMenuItem.Text = "Open";
             openToolStripMenuItem.Click += openToolStripMenuItem_Click;
             // 
             // newToolStripMenuItem
             // 
             newToolStripMenuItem.Name = "newToolStripMenuItem";
-            newToolStripMenuItem.Size = new Size(146, 26);
+            newToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.N;
+            newToolStripMenuItem.Size = new Size(242, 26);
             newToolStripMenuItem.Text = "New";
             newToolStripMenuItem.Click += newToolStripMenuItem_Click;
             // 
             // saveToolStripMenuItem
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            saveToolStripMenuItem.Size = new Size(146, 26);
+            saveToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
+            saveToolStripMenuItem.Size = new Size(242, 26);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
             // 
             // connectToolStripMenuItem
             // 
             connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            connectToolStripMenuItem.Size = new Size(146, 26);
+            connectToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.C;
+            connectToolStripMenuItem.Size = new Size(242, 26);
             connectToolStripMenuItem.Text = "Connect";
             connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
             // 
@@ -179,6 +185,14 @@
             Files.Size = new Size(982, 412);
             Files.TabIndex = 2;
             // 
+            // adresesValuesToolStripMenuItem
+            // 
+            adresesValuesToolStripMenuItem.Name = "adresesValuesToolStripMenuItem";
+            adresesValuesToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D;
+            adresesValuesToolStripMenuItem.Size = new Size(242, 26);
+            adresesValuesToolStripMenuItem.Text = "Adreses values";
+            adresesValuesToolStripMenuItem.Click += adresesValuesToolStripMenuItem_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -222,6 +236,7 @@
         private ToolStripMenuItem newToolStripMenuItem;
         private Button XIO_el;
         private Button XIC_el;
+        private ToolStripMenuItem adresesValuesToolStripMenuItem;
     }
 
 }

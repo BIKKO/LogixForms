@@ -8,6 +8,7 @@ namespace LogixForms
     public partial class Form1 : Form
     {
         // значения адресов
+        public static Dictionary<string, ushort[]> Adr = new Dictionary<string, ushort[]>();
         private static ushort[] T4 = new ushort[24];
         private static ushort[] T4_c = new ushort[24];
         private static ushort[] T4_b = new ushort[24];
@@ -69,6 +70,16 @@ namespace LogixForms
             pen_line.Width = 3;//толщина линий
             Height = int.Parse(Properties.Settings.Default["H"].ToString());
             Width = int.Parse(Properties.Settings.Default["W"].ToString());
+            //Adr = (Dictionary<string, ushort[]>)Properties.Settings.Default["Adres"];
+            Adr.Add("T4", new ushort[24]);
+            Adr.Add("T4_c", new ushort[24]);
+            Adr.Add("T4_b", new ushort[24]);
+            Adr.Add("Timer_control", new ushort[32]);
+            Adr.Add("N13", new ushort[70]);
+            Adr.Add("N15", new ushort[70]);
+            Adr.Add("N18", new ushort[70]);
+            Adr.Add("N40", new ushort[70]);
+            Adr.Add("B3", new ushort[70]);
         }
 
         private void This_MouseWheel(object sender, MouseEventArgs e)
@@ -84,7 +95,7 @@ namespace LogixForms
                 //вниз
                 wheel = TextRangs.Count % 10 != 0 ? 25 : 250;//если рангов > 10 то 1 иначе 10
             }
-            if(Files.TabCount > 0)
+            if (Files.TabCount > 0)
             {
                 if (VScrollBarList[Files.SelectedIndex].Maximum >= VScrollBarList[Files.SelectedIndex].Value + wheel && VScrollBarList[Files.SelectedIndex].Minimum <= VScrollBarList[Files.SelectedIndex].Value + wheel)
                     VScrollBarList[Files.SelectedIndex].Value += wheel;//не выходим ли за приделы scrollbar
@@ -92,55 +103,63 @@ namespace LogixForms
             wheel = 0;//одиночное сробатование
         }
 
-        private int Adres(string st, ushort[] mas) //выдает значение бита в массиве
+        private int Adres(string st, string mas) //выдает значение бита в массиве
         {
-            string[] k = new string[2];
-            int Bitmask = 0;
-            int ind_1;
-            int adr;
-
-            if (st.Contains("N13")) k = st.Replace("N13:", "").Split('/');
-            if (st.Contains("N15")) k = st.Replace("N15:", "").Split('/');
-            if (st.Contains("N18")) k = st.Replace("N18:", "").Split('/');
-            if (st.Contains("N40")) k = st.Replace("N40:", "").Split('/');
-            if (st.Contains("B3")) k = st.Replace("B3:", "").Split('/');
-            if (st.Contains("T4")) k = st.Replace("T4:", "").Split('/');
-
-            if (k.Contains("EN"))
+            try
             {
-                Bitmask = 1;
-                ind_1 = int.Parse(k[0]);
-                adr = Timer_control[ind_1];
+                if (mas == "") return 0;
+                string[] k = new string[2];
+                int Bitmask = 0;
+                int ind_1;
+                int adr;
 
-                if ((adr & Bitmask) == Bitmask) return 1;
-                return 0;
+                if (st.Contains("N13")) k = st.Replace("N13:", "").Split('/');
+                if (st.Contains("N15")) k = st.Replace("N15:", "").Split('/');
+                if (st.Contains("N18")) k = st.Replace("N18:", "").Split('/');
+                if (st.Contains("N40")) k = st.Replace("N40:", "").Split('/');
+                if (st.Contains("B3")) k = st.Replace("B3:", "").Split('/');
+                if (st.Contains("T4")) k = st.Replace("T4:", "").Split('/');
+
+                if (k.Contains("EN"))
+                {
+                    Bitmask = 1;
+                    ind_1 = int.Parse(k[0]);
+                    adr = Timer_control[ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return 1;
+                    return 0;
+                }
+                else if (k.Contains("DN"))
+                {
+                    Bitmask = 2;
+                    ind_1 = int.Parse(k[0]);
+                    adr = Timer_control[ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return 1;
+                    return 0;
+                }
+                else if (k.Contains("TT"))
+                {
+                    Bitmask = 4;
+                    ind_1 = int.Parse(k[0]);
+                    adr = Timer_control[ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return 1;
+                    return 0;
+                }
+                else
+                {
+                    Bitmask = 1 << int.Parse(k[1]);
+
+                    ind_1 = int.Parse(k[0]);
+                    adr = Adr[mas][ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return 1;
+                    return 0;
+                }
             }
-            else if (k.Contains("DN"))
+            catch (Exception ex)
             {
-                Bitmask = 2;
-                ind_1 = int.Parse(k[0]);
-                adr = Timer_control[ind_1];
-
-                if ((adr & Bitmask) == Bitmask) return 1;
-                return 0;
-            }
-            else if (k.Contains("TT"))
-            {
-                Bitmask = 4;
-                ind_1 = int.Parse(k[0]);
-                adr = Timer_control[ind_1];
-
-                if ((adr & Bitmask) == Bitmask) return 1;
-                return 0;
-            }
-            else
-            {
-                Bitmask = 1 << int.Parse(k[1]);
-
-                ind_1 = int.Parse(k[0]);
-                adr = mas[ind_1];
-
-                if ((adr & Bitmask) == Bitmask) return 1;
                 return 0;
             }
         }
@@ -149,18 +168,17 @@ namespace LogixForms
         {
             for (int i = 0; i < 24; i++)
             {
-                T4[i] = (ushort)random.Next(0, 100);
-                T4_c[i] = (ushort)random.Next(0, 65530);
-                Timer_control[i] = 2;
+                Adr["T4"][i] = (ushort)random.Next(0, 100);
+                Adr["T4_c"][i] = (ushort)random.Next(0, 65530);
             }
 
             for (int i = 0; i < 70; i++)
             {
-                N13[i] = (ushort)random.Next(0, 65530);
-                N15[i] = (ushort)random.Next(0, 65530);
-                N18[i] = (ushort)random.Next(0, 65530);
-                N40[i] = (ushort)random.Next(0, 65530);
-                B3[i] = (ushort)random.Next(0, 65530);
+                //Adr["N13"][i] = (ushort)random.Next(0, 65530);
+                Adr["N15"][i] = (ushort)random.Next(0, 65530);
+                Adr["N18"][i] = (ushort)random.Next(0, 65530);
+                Adr["N40"][i] = (ushort)random.Next(0, 65530);
+                Adr["B3"][i] = (ushort)random.Next(0, 65530);
             }
         }
 
@@ -438,30 +456,30 @@ namespace LogixForms
                     int nxb = 0;
                     int ind = 0;
                     int num = 0;
-                    ushort[] mas = new ushort[70];
+                    var mas = "";
                     for (var bn = 0; bn < ElementsRang[rang].Length; bn++)
                     {
                         var el = OpenOrCon_Elements[Files.SelectedIndex][rang][bn];
                         var adres = OpenOrCon_Adres[Files.SelectedIndex][rang][num < AdresRang[rang].Length ? num : 0];
                         if (adres.Contains("N13"))
                         {
-                            N13.CopyTo(mas, 0);
+                            mas = "N13";
                         }
                         else if (adres.Contains("N15"))
                         {
-                            N15.CopyTo(mas, 0);
+                            mas = "N15";
                         }
                         else if (adres.Contains("N18"))
                         {
-                            N18.CopyTo(mas, 0);
+                            mas = "N18";
                         }
                         else if (adres.Contains("N40"))
                         {
-                            N40.CopyTo(mas, 0);
+                            mas = "N40";
                         }
                         else if (adres.Contains("B3"))
                         {
-                            B3.CopyTo(mas, 0);
+                            mas = "B3";
                         }
                         var point = new PointF(left_indent_rang_x + PointOfElemetts[ind] - 40 + scroll_x, rang_y[rang] + ((3 * top_indent_rang) / 4) * nxb - scroll_y - 50);
                         switch (el)
@@ -788,11 +806,6 @@ namespace LogixForms
             MessageBox.Show("Временно ничего нет!");
         }
 
-        private void tabPage2_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var tb = new MyTabPage();
@@ -854,7 +867,18 @@ namespace LogixForms
         {
             Properties.Settings.Default["H"] = Height;
             Properties.Settings.Default["W"] = Width;
+            Properties.Settings.Default["Adres"] = Adr;
             Properties.Settings.Default.Save();
+        }
+
+        private void adresesValuesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms["ValueAdre"] == null)
+            {
+                new ValueAdres(Adr).Show();
+                OpenFile = false;
+                //con();
+            }
         }
     }
 }

@@ -25,9 +25,9 @@ namespace LogixForms.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection Adres {
+        public global::System.Collections.Generic.Dictionary<string, ushort[]> Adres {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Adres"]));
+                return ((global::System.Collections.Generic.Dictionary<string, ushort[]>)(this["Adres"]));
             }
             set {
                 this["Adres"] = value;
@@ -57,18 +57,14 @@ namespace LogixForms.Properties {
                 this["H"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public global::System.Windows.Forms.MyTabControl MyTab
-        {
-            get
-            {
+        public global::System.Windows.Forms.MyTabControl MyTab {
+            get {
                 return ((global::System.Windows.Forms.MyTabControl)(this["MyTab"]));
             }
-            set
-            {
+            set {
                 this["MyTab"] = value;
             }
         }
