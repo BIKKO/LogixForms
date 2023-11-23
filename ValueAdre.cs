@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,16 @@ namespace LogixForms
             h = Height;
             w = Width;
             Value_type.SelectedIndex = 0;
+        }
+
+        static private int ContvertDec(string Binari)
+        {
+            int dec = 0;
+            for(int i = 0; i < Binari.Length; i++)
+            {
+                dec +=(int)(Math.Pow(2, i) * int.Parse(Binari[15-i].ToString()));
+            }
+            return dec;
         }
 
         private void Value_type_SelectedIndexChanged(object sender, EventArgs e)
@@ -106,13 +117,14 @@ namespace LogixForms
                         {
                             s += dataGridView1.Rows[cel.Y].Cells[i].Value.ToString();
                         }
-                        Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(s);
+                        //MessageBox.Show(ContvertDec(s).ToString());
+                        Adr[Adres_name.SelectedItem.ToString()][cel.Y] = (ushort)ContvertDec(s);
                         break;
                     }
                 case "HEX":
                     {
                         var cel = dataGridView1.CurrentCellAddress;
-                        Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString());
+                        Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString(),System.Globalization.NumberStyles.HexNumber);
                         break;
                     }
                 default: break;

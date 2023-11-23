@@ -798,7 +798,10 @@ namespace LogixForms
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Временно ничего нет!");
+            if (Application.OpenForms["SettingsLogix"] == null)
+            {
+                new SettingsLogix(Adr).Show();
+            }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -876,8 +879,6 @@ namespace LogixForms
             if (Application.OpenForms["ValueAdre"] == null)
             {
                 new ValueAdres(Adr).Show();
-                OpenFile = false;
-                //con();
             }
         }
     }
