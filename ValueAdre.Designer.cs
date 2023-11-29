@@ -77,6 +77,7 @@
             // timer1
             // 
             timer1.Enabled = true;
+            timer1.Interval = 500;
             timer1.Tick += timer1_Tick;
             // 
             // ValueAdres
@@ -90,6 +91,7 @@
             MinimumSize = new Size(360, 500);
             Name = "ValueAdres";
             Text = "ValueAdre";
+            FormClosing += ValueAdres_FormClosing;
             Load += ValueAdres_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);

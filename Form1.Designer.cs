@@ -42,6 +42,7 @@
             newToolStripMenuItem = new ToolStripMenuItem();
             saveToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
+            adresesValuesToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             ModBusUpdate = new System.Windows.Forms.Timer(components);
@@ -50,7 +51,6 @@
             saveFileDialog1 = new SaveFileDialog();
             AdresUpdate = new System.Windows.Forms.Timer(components);
             Files = new MyTabControl();
-            adresesValuesToolStripMenuItem = new ToolStripMenuItem();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -142,6 +142,14 @@
             connectToolStripMenuItem.Text = "Connect";
             connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
             // 
+            // adresesValuesToolStripMenuItem
+            // 
+            adresesValuesToolStripMenuItem.Name = "adresesValuesToolStripMenuItem";
+            adresesValuesToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D;
+            adresesValuesToolStripMenuItem.Size = new Size(242, 26);
+            adresesValuesToolStripMenuItem.Text = "Adreses values";
+            adresesValuesToolStripMenuItem.Click += adresesValuesToolStripMenuItem_Click;
+            // 
             // settingsToolStripMenuItem
             // 
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
@@ -185,14 +193,6 @@
             Files.Size = new Size(982, 412);
             Files.TabIndex = 2;
             // 
-            // adresesValuesToolStripMenuItem
-            // 
-            adresesValuesToolStripMenuItem.Name = "adresesValuesToolStripMenuItem";
-            adresesValuesToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D;
-            adresesValuesToolStripMenuItem.Size = new Size(242, 26);
-            adresesValuesToolStripMenuItem.Text = "Adreses values";
-            adresesValuesToolStripMenuItem.Click += adresesValuesToolStripMenuItem_Click;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -215,7 +215,6 @@
 
         #endregion
         private new System.Windows.Forms.Timer Update;
-        private MyPanel midpanel;
         private Panel menu;
         private System.Windows.Forms.Timer ModBusUpdate;
         private System.Windows.Forms.Timer FileUpdate;

@@ -54,7 +54,6 @@ namespace LogixForms
         private List<VScrollBar> VScrollBarList = new List<VScrollBar>();
         private List<HScrollBar> HScrollBarList = new List<HScrollBar>();
         private int isnumber;
-        private double Dis;
         private bool OpenFile = false;
         private bool ModbusCl = false;
         private ModbusIpMaster master;

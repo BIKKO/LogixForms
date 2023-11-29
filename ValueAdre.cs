@@ -13,25 +13,81 @@ namespace LogixForms
 {
     public partial class ValueAdres : Form
     {
-        private int h;
-        private int w;
         private Dictionary<string, ushort[]> Adr;
         private int select_type_index = 0;
+
         public ValueAdres(Dictionary<string, ushort[]> adreses)
         {
             Adr = adreses;
             InitializeComponent();
-            h = Height;
-            w = Width;
             Value_type.SelectedIndex = 0;
+        }
+
+        private void CreateTabl()
+        {
+            switch (Value_type.Items[select_type_index].ToString())
+            {
+                case "Целочисленный":
+                    {
+                        string? s = Adres_name.SelectedItem as string;
+                        if (s is null) break;
+                        dataGridView1.RowCount = Adr[s].Length;
+                        dataGridView1.ColumnCount = 2;
+                        dataGridView1.ColumnHeadersVisible = false;
+                        for (int i = 0; i < Adr[s].Length; i++)
+                        {
+                            if (dataGridView1.Rows[i].Cells[1].Value != Adr[s][i].ToString())
+                                dataGridView1.Rows[i].Cells[1].Value = Adr[s][i];
+                            dataGridView1.Rows[i].Cells[0].Value = s + ':' + i;
+                        }
+                        break;
+                    }
+                case "Бинарный":
+                    {
+                        string? s = Adres_name.SelectedItem as string;
+                        if (s is null) break;
+                        dataGridView1.RowCount = Adr[s].Length;
+                        dataGridView1.ColumnCount = 17;
+                        dataGridView1.ColumnHeadersVisible = true;
+                        for (int i = 0; i < Adr[s].Length; i++)
+                        {
+                            dataGridView1.Rows[i].Cells[0].Value = s + ':' + i + '/';
+                            string bin = Convert.ToString(Adr[s][i], 2);
+                            bin = new string('0', 16 - bin.Length) + bin;
+                            for (int j = 1; j < 17; j++)
+                            {
+                                dataGridView1.Columns[j].HeaderText = (16 - j).ToString();
+                                if (dataGridView1.Rows[i].Cells[j].Value != bin[j - 1].ToString())
+                                    dataGridView1.Rows[i].Cells[j].Value = bin[j - 1];
+                            }
+                        }
+                        break;
+                    }
+                case "HEX":
+                    {
+                        string? s = Adres_name.SelectedItem as string;
+                        if (s is null) break;
+                        dataGridView1.RowCount = Adr[s].Length;
+                        dataGridView1.ColumnCount = 2;
+                        dataGridView1.ColumnHeadersVisible = false;
+                        for (int i = 0; i < Adr[s].Length; i++)
+                        {
+                            if (dataGridView1.Rows[i].Cells[1].Value != Convert.ToString(Adr[s][i], 16))
+                                dataGridView1.Rows[i].Cells[1].Value = Convert.ToString(Adr[s][i], 16);
+                            dataGridView1.Rows[i].Cells[0].Value = i;
+                        }
+                        break;
+                    }
+                default: break;
+            }
         }
 
         static private int ContvertDec(string Binari)
         {
             int dec = 0;
-            for(int i = 0; i < Binari.Length; i++)
+            for (int i = 0; i < Binari.Length; i++)
             {
-                dec +=(int)(Math.Pow(2, i) * int.Parse(Binari[15-i].ToString()));
+                dec += (int)(Math.Pow(2, i) * int.Parse(Binari[15 - i].ToString()));
             }
             return dec;
         }
@@ -45,58 +101,7 @@ namespace LogixForms
         private void Adres_name_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            switch (Value_type.Items[select_type_index].ToString())
-            {
-                case "Целочисленный":
-                    {
-                        var s = Adres_name.SelectedItem as string;
-                        if (s is null) break;
-                        dataGridView1.RowCount = Adr[s].Length;
-                        dataGridView1.ColumnCount = 2;
-                        dataGridView1.ColumnHeadersVisible = false;
-                        for (int i = 0; i < Adr[s].Length; i++)
-                        {
-                            dataGridView1.Rows[i].Cells[1].Value = Adr[s][i];
-                            dataGridView1.Rows[i].Cells[0].Value = s + ':' + i;
-                        }
-                        break;
-                    }
-                case "Бинарный":
-                    {
-                        var s = Adres_name.SelectedItem as string;
-                        if (s is null) break;
-                        dataGridView1.RowCount = Adr[s].Length;
-                        dataGridView1.ColumnCount = 17;
-                        dataGridView1.ColumnHeadersVisible = true;
-                        for (int i = 0; i < Adr[s].Length; i++)
-                        {
-                            dataGridView1.Rows[i].Cells[0].Value = s + ':' + i + '/';
-                            string bin = Convert.ToString(Adr[s][i], 2);
-                            bin = new string('0', 16 - bin.Length) + bin;
-                            for (int j = 1; j < 17; j++)
-                            {
-                                dataGridView1.Columns[j].HeaderText = (16 - j).ToString();
-                                dataGridView1.Rows[i].Cells[j].Value = bin[j - 1];
-                            }
-                        }
-                        break;
-                    }
-                case "HEX":
-                    {
-                        var s = Adres_name.SelectedItem as string;
-                        if (s is null) break;
-                        dataGridView1.RowCount = Adr[s].Length;
-                        dataGridView1.ColumnCount = 2;
-                        dataGridView1.ColumnHeadersVisible = false;
-                        for (int i = 0; i < Adr[s].Length; i++)
-                        {
-                            dataGridView1.Rows[i].Cells[1].Value = Convert.ToString(Adr[s][i], 16);
-                            dataGridView1.Rows[i].Cells[0].Value = i;
-                        }
-                        break;
-                    }
-                default: break;
-            }
+            CreateTabl();
         }
 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -124,7 +129,7 @@ namespace LogixForms
                 case "HEX":
                     {
                         var cel = dataGridView1.CurrentCellAddress;
-                        Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString(),System.Globalization.NumberStyles.HexNumber);
+                        Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString(), System.Globalization.NumberStyles.HexNumber);
                         break;
                     }
                 default: break;
@@ -144,7 +149,13 @@ namespace LogixForms
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            //Adr = adreses;
+
+        }
+
+        private void ValueAdres_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Adr = null;
+            GC.Collect();
         }
     }
 }

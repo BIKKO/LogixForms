@@ -42,7 +42,7 @@ namespace LogixForms
                 {
                     foreach (string ip in ip_buf)
                     {
-                        if (!int.TryParse(ip, out isnumber)) ;
+                        if (!int.TryParse(ip, out isnumber)) continue;
                     }
 
                 }
