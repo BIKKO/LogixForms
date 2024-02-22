@@ -12,10 +12,10 @@ namespace LogixForms
 {
     public partial class ConnectForms : Form
     {
-        Form1 form1;
+        MainThread form1;
         private int isnumber;
         private int slave;
-        public ConnectForms(Form1 owner)
+        public ConnectForms(MainThread owner)
         {
             form1 = owner;
             InitializeComponent();
@@ -59,7 +59,9 @@ namespace LogixForms
             }
             try
             {
+#pragma warning disable CS0642 // Возможно, ошибочный пустой оператор
                 if (!int.TryParse(Step.Text, out isnumber)) ;
+#pragma warning restore CS0642 // Возможно, ошибочный пустой оператор
             }
             catch
             {

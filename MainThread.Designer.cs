@@ -2,7 +2,7 @@
 {
 
 
-    partial class Form1
+    partial class MainThread
     {
         /// <summary>
         ///  Required designer variable.
@@ -31,8 +31,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            Update = new System.Windows.Forms.Timer(components);
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainThread));
             menu = new Panel();
             XIO_el = new Button();
             XIC_el = new Button();
@@ -54,12 +53,6 @@
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
-            // 
-            // Update
-            // 
-            Update.Enabled = true;
-            Update.Interval = 25;
-            Update.Tick += Update_Tick;
             // 
             // menu
             // 
@@ -181,7 +174,7 @@
             // AdresUpdate
             // 
             AdresUpdate.Enabled = true;
-            AdresUpdate.Interval = 500;
+            AdresUpdate.Interval = 300;
             AdresUpdate.Tick += AdresUpdate_Tick;
             // 
             // Files
@@ -214,7 +207,6 @@
         }
 
         #endregion
-        private new System.Windows.Forms.Timer Update;
         private Panel menu;
         private System.Windows.Forms.Timer ModBusUpdate;
         private System.Windows.Forms.Timer FileUpdate;
@@ -228,8 +220,6 @@
         private OpenFileDialog openFileDialog2;
         private SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Timer AdresUpdate;
-        //private MyTabControl Files;
-        private MyTabPage tabPage1;
         private Panel panel1;
         private MyTabControl Files;
         private ToolStripMenuItem newToolStripMenuItem;
@@ -242,7 +232,7 @@
 //изменения для нейтролизации мерцания при перерисовке
 namespace System.Windows.Forms
 {
-    class MyPanel : Panel
+    public class MyPanel : Panel
     {
         public MyPanel()
         {
