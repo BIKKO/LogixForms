@@ -15,6 +15,7 @@ namespace LogixForms
         MainThread form1;
         private int isnumber;
         private int slave;
+        private string[] ip_and_port = new string[2];
         public ConnectForms(MainThread owner)
         {
             form1 = owner;
@@ -37,7 +38,8 @@ namespace LogixForms
         {
             try
             {
-                var ip_buf = IP.Text.Split('.');
+                ip_and_port = IP.Text.Split(':');
+                string[] ip_buf = ip_and_port[0].Split('.');
                 if (ip_buf.Length == 4)
                 {
                     foreach (string ip in ip_buf)
@@ -57,20 +59,20 @@ namespace LogixForms
             {
                 MessageBox.Show("Не верно указан IP адрес: встречено не число");
             }
-            try
-            {
-#pragma warning disable CS0642 // Возможно, ошибочный пустой оператор
-                if (!int.TryParse(Step.Text, out isnumber)) ;
-#pragma warning restore CS0642 // Возможно, ошибочный пустой оператор
-            }
-            catch
-            {
-                MessageBox.Show("Введите число");
-            }
+            if (!int.TryParse(Step.Text, out isnumber)) MessageBox.Show("Введите число");
 
-            comboBox1_SelectedIndexChanged(sender, e);
-            form1.con(IP.Text, int.Parse(Step.Text), (byte)slave);
-            Close();
+            if (ip_and_port.Length < 2)
+            {
+                comboBox1_SelectedIndexChanged(sender, e);
+                form1.con(ip_and_port[0], "502", int.Parse(Step.Text), (byte)slave);
+                Close();
+            }
+            else
+            {
+                comboBox1_SelectedIndexChanged(sender, e);
+                form1.con(ip_and_port[0], ip_and_port[1], int.Parse(Step.Text), (byte)slave);
+                Close();
+            }
         }
     }
 }

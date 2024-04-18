@@ -7,7 +7,18 @@ namespace LogixForms
     public partial class MainThread : Form
     {
         // значения адресов
-        public static Dictionary<string, ushort[]> Adr = new Dictionary<string, ushort[]>();
+        private static Dictionary<string, ushort[]> Adr = new Dictionary<string, ushort[]>();
+        private static Dictionary<string, ushort> MB_adres = new Dictionary<string, ushort>() { {"T4",1300},
+                                                                                                {"T4_c",7000},
+                                                                                                {"T4_b",0},
+                                                                                                {"Timer_control",6800},
+                                                                                                {"N13",1000},
+                                                                                                {"N15",600},
+                                                                                                {"N18",1200},
+                                                                                                {"N40",2000},
+                                                                                                {"B3",7200},
+                                                                                                };
+
         /*
         private static ushort[] T4 = new ushort[24];
         private static ushort[] T4_c = new ushort[24];
@@ -30,6 +41,8 @@ namespace LogixForms
         private ModbusIpMaster master;
         private bool NotFount = false;
         private List<ClassDrow> mainWindows = new List<ClassDrow>();
+        private List<TcpClient> TcpClients = new List<TcpClient>();
+        private TcpClient client;
 
 
         public MainThread()
@@ -75,14 +88,11 @@ namespace LogixForms
 
         private void AdresUpdate_Tick(object sender, EventArgs e)
         {
-            Adr["T4"] = master.ReadHoldingRegisters(1, 1300, 24);
-            Adr["T4_c"] = master.ReadHoldingRegisters(1, 6800, 24);
-            Adr["N13"] = master.ReadHoldingRegisters(1, 10000, 3);
-            Adr["N15"] = master.ReadHoldingRegisters(1, 600, 48);
-            Adr["N18"] = master.ReadHoldingRegisters(1, 1200, 24);
-            Adr["N40"] = master.ReadHoldingRegisters(1, 2000, 1);
-            Adr["B3"] = master.ReadHoldingRegisters(1, 7200, 32);
-
+            string[] adreskey = Adr.Keys.ToArray();
+            foreach (string adkey in adreskey)
+            {
+                Adr[adkey] = master.ReadHoldingRegisters(1, MB_adres[adkey], (ushort)Adr[adkey].Length);
+            }
         }
 
         private void ModBusUpdate_Tick(object sender, EventArgs e)
@@ -100,6 +110,9 @@ namespace LogixForms
         private void close_Click(object sender, EventArgs e)
         {
             mainWindows[Files.SelectedIndex] = null;
+            mainWindows.Remove(mainWindows[Files.SelectedIndex]);
+            TcpClients[0] = null;
+            TcpClients.Clear();
             Files.TabPages.Remove(Files.SelectedTab);
             GC.Collect();
         }
@@ -169,12 +182,13 @@ namespace LogixForms
             }
         }
 
-        public void con(string ip, int step, byte slave)
+        public void con(string ip, string port, int step, byte slave)
         {
             try
             {
                 TextRangs.Clear();
-                TcpClient client = new TcpClient(ip, 502);
+                client = new TcpClient(ip, int.Parse(port));
+                TcpClients.Add(client);
                 master = ModbusIpMaster.CreateIp(client);
                 ModBusUpdate.Enabled = true;
 
@@ -210,9 +224,16 @@ namespace LogixForms
                     if (len != 0) TextRangs.Add(g);
                     else break;
                 }
+
+                string[] adreskey = Adr.Keys.ToArray();
+                foreach (string adkey in adreskey)
+                {
+                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                }
+
                 ModbusCl = true;
                 var tb = new TabPage();
-                tb.Text = ip + ":502";
+                tb.Text = ip + ':' + port;
 
                 VScrollBar Vscrol = new()
                 {
@@ -235,6 +256,8 @@ namespace LogixForms
                     Maximum = pan.Width,
                     Minimum = 0,
                 };
+                VScrollBarList.Add(Vscrol);
+                HScrollBarList.Add(hScroll);
                 ContextMenuStrip contextMenu = new ContextMenuStrip();
                 var close = new ToolStripMenuItem("Закрыть");
                 contextMenu.Items.Add(close);
@@ -258,14 +281,17 @@ namespace LogixForms
 
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FileUpdate.Enabled = false;
-            //ModBusUpdate.Enabled = true;
-
-            if (Application.OpenForms["ConnectForms"] == null)
+            if (TcpClients.Count < 1)
             {
-                new ConnectForms(this).Show();
-                OpenFile = false;
-                //con();
+                FileUpdate.Enabled = false;
+                //ModBusUpdate.Enabled = true;
+
+                if (Application.OpenForms["ConnectForms"] == null)
+                {
+                    new ConnectForms(this).Show();
+                    OpenFile = false;
+                    //con();
+                }
             }
         }
 
@@ -273,7 +299,7 @@ namespace LogixForms
         {
             if (Application.OpenForms["SettingsLogix"] == null)
             {
-                new SettingsLogix(Adr).Show();
+                new SettingsLogix(Adr, MB_adres).Show();
             }
         }
 

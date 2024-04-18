@@ -12,13 +12,15 @@ namespace LogixForms
 {
     public partial class SettingsLogix : Form
     {
-        Dictionary<string, ushort[]> adres;
-        List<int> rows = new List<int>();
-        string[] name_adr;
-        public SettingsLogix(Dictionary<string, ushort[]> adreses)
+        private Dictionary<string, ushort[]> adres;
+        private List<int> rows = new List<int>();
+        private string[] name_adr;
+        Dictionary<string, ushort> adres_adr;
+        public SettingsLogix(Dictionary<string, ushort[]> adreses, Dictionary<string, ushort> mbadres)
         {
             InitializeComponent();
             adres = adreses;
+            adres_adr = mbadres;
         }
 
         public void UpdateGrid()
@@ -28,7 +30,8 @@ namespace LogixForms
             for (int i = 0; i < adres.Count; i++)
             {
                 dataGridView1.Rows[i].Cells[1].Value = name_adr[i];
-                dataGridView1.Rows[i].Cells[2].Value = adres[name_adr[i]].Length;
+                dataGridView1.Rows[i].Cells[2].Value = adres_adr[name_adr[i]];
+                dataGridView1.Rows[i].Cells[3].Value = adres[name_adr[i]].Length;
             }
         }
 
@@ -114,7 +117,7 @@ namespace LogixForms
             
             if (Application.OpenForms["ChangeAdres"] == null)
             {
-                new ChangeAdres(rows,adres,this).Show();
+                new ChangeAdres(rows,adres, adres_adr,this).Show();
             }
         }
 
@@ -135,7 +138,7 @@ namespace LogixForms
         {
             if (Application.OpenForms["AddAdres"] == null)
             {
-                new AddAdres(adres,this).Show();
+                new AddAdres(adres, adres_adr, this).Show();
             }
         }
     }

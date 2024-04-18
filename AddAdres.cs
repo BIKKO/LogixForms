@@ -13,20 +13,23 @@ namespace LogixForms
     public partial class AddAdres : Form
     {
         Dictionary<string, ushort[]> adres;
+        Dictionary<string, ushort> MbAdress;
         int u;
         SettingsLogix sl;
-        public AddAdres(Dictionary<string, ushort[]> adreses, SettingsLogix owner)
+        public AddAdres(Dictionary<string, ushort[]> adreses, Dictionary<string, ushort> MbAdres, SettingsLogix owner)
         {
             InitializeComponent();
             adres = adreses;
+            MbAdress = MbAdres;
             sl = owner;
         }
 
         private void Save_Click(object sender, EventArgs e)
         {
-            if (int.TryParse(textBox2.Text, out u))
+            if (int.TryParse(textBox2.Text, out u) && int.TryParse(textBox3.Text, out u))
             {
                 adres.Add(textBox1.Text, new ushort[u]);
+                MbAdress.Add(textBox1.Text, ushort.Parse(textBox3.Text));
                 sl.UpdateGrid();
                 Close();
             }

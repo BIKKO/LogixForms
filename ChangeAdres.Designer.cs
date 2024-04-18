@@ -28,26 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            textBox1 = new TextBox();
-            textBox2 = new TextBox();
+            AdresName = new TextBox();
+            AdresCount = new TextBox();
             Save = new Button();
             Cancl = new Button();
+            MBAdres = new TextBox();
             comboBox1 = new ComboBox();
             SuspendLayout();
             // 
-            // textBox1
+            // AdresName
             // 
-            textBox1.Location = new Point(24, 95);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(205, 27);
-            textBox1.TabIndex = 0;
+            AdresName.Location = new Point(24, 95);
+            AdresName.Name = "AdresName";
+            AdresName.Size = new Size(205, 27);
+            AdresName.TabIndex = 0;
             // 
-            // textBox2
+            // AdresCount
             // 
-            textBox2.Location = new Point(235, 95);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(91, 27);
-            textBox2.TabIndex = 1;
+            AdresCount.Location = new Point(235, 95);
+            AdresCount.Name = "AdresCount";
+            AdresCount.Size = new Size(91, 27);
+            AdresCount.TabIndex = 1;
             // 
             // Save
             // 
@@ -69,10 +70,17 @@
             Cancl.UseVisualStyleBackColor = true;
             Cancl.Click += Cancl_Click;
             // 
+            // MBAdres
+            // 
+            MBAdres.Location = new Point(24, 62);
+            MBAdres.Name = "MBAdres";
+            MBAdres.Size = new Size(91, 27);
+            MBAdres.TabIndex = 5;
+            // 
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(24, 37);
+            comboBox1.Location = new Point(24, 25);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(205, 28);
             comboBox1.TabIndex = 4;
@@ -83,11 +91,12 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(582, 139);
+            Controls.Add(MBAdres);
             Controls.Add(comboBox1);
             Controls.Add(Cancl);
             Controls.Add(Save);
-            Controls.Add(textBox2);
-            Controls.Add(textBox1);
+            Controls.Add(AdresCount);
+            Controls.Add(AdresName);
             Name = "ChangeAdres";
             Text = "ChangeAdres";
             Load += ChangeAdres_Load;
@@ -97,10 +106,11 @@
 
         #endregion
 
-        private TextBox textBox1;
-        private TextBox textBox2;
+        private TextBox AdresName;
+        private TextBox AdresCount;
         private Button Save;
         private Button Cancl;
+        private TextBox MBAdres;
         private ComboBox comboBox1;
     }
 }

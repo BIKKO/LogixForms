@@ -12,33 +12,40 @@ namespace LogixForms
 {
     public partial class ChangeAdres : Form
     {
-        Dictionary<string, ushort[]> adres;
-        List<int> rows;
-        string[] name_adr;
-        int u;
-        SettingsLogix sl;
-        public ChangeAdres(List<int> CheckBoxOn, Dictionary<string, ushort[]> adreses, SettingsLogix owner)
+        private Dictionary<string, ushort[]> adres;
+        private List<int> rows;
+        private string[] name_adr;
+        private int u;
+        private ushort m;
+        private SettingsLogix sl;
+        Dictionary<string, ushort> MB_AdresList;
+
+        public ChangeAdres(List<int> CheckBoxOn, Dictionary<string, ushort[]> adreses, Dictionary<string, ushort> mbaders, SettingsLogix owner)
         {
             InitializeComponent();
             rows = CheckBoxOn;
             adres = adreses;
             sl = owner;
+            MB_AdresList = mbaders;
         }
 
         private void Save_Click(object sender, EventArgs e)
         {
-            if (int.TryParse(this.textBox2.Text, out u))
+            if (int.TryParse(this.AdresCount.Text, out u) && ushort.TryParse(this.MBAdres.Text, out m))
             {
-                if(textBox1.Text != comboBox1.Items[comboBox1.SelectedIndex].ToString())
+                if(AdresName.Text != comboBox1.Items[comboBox1.SelectedIndex].ToString())
                 {
                     adres.Remove(comboBox1.Items[comboBox1.SelectedIndex].ToString());
-                    adres.Add(textBox1.Text, new ushort[u]);
+                    adres.Add(AdresName.Text, new ushort[u]);
+                    MB_AdresList.Remove(comboBox1.Items[comboBox1.SelectedIndex].ToString());
+                    MB_AdresList.Add(AdresName.Text, m);
                     sl.UpdateGrid();
                     Close();
                 }
                 else
                 {
-                    adres[textBox1.Text] = new ushort[u];
+                    adres[AdresName.Text] = new ushort[u];
+                    MB_AdresList[AdresName.Text] = m;
                     sl.UpdateGrid();
                     Close();
                 }
@@ -56,6 +63,7 @@ namespace LogixForms
 
         private void ChangeAdres_Load(object sender, EventArgs e)
         {
+            
             name_adr = adres.Keys.ToArray();
             foreach (int i in rows)
             {
@@ -65,8 +73,9 @@ namespace LogixForms
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            textBox1.Text = comboBox1.Items[comboBox1.SelectedIndex].ToString();
-            textBox2.Text = adres[comboBox1.Items[comboBox1.SelectedIndex].ToString()].Count().ToString();
+            AdresName.Text = comboBox1.Items[comboBox1.SelectedIndex].ToString();
+            AdresCount.Text = adres[comboBox1.Items[comboBox1.SelectedIndex].ToString()].Count().ToString();
+            MBAdres.Text = MB_AdresList[comboBox1.Items[comboBox1.SelectedIndex].ToString()].ToString();
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LogixForms
 {
@@ -32,6 +36,9 @@ namespace LogixForms
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
         int Height, Width;
+        private Regex mask = new Regex(@"(\s\S*:\S*/?\s*|\d?0.[0-9]*\s?\d?0.[0-9]*\s?\d?0.[0-9]*\s?)");
+        private List<byte>BSTList = new List<byte>();
+        private int StopSap = 0;
 
         public ClassDrow(MyPanel Panel, List<string> File, VScrollBar vScroll, 
             HScrollBar hScroll, MyTabControl MyTab, Dictionary<string, ushort[]> AdresDir,
@@ -229,14 +236,131 @@ namespace LogixForms
             }
         }
 
+        private void DrowSap(PaintEventArgs e, string[] Rang, int IndexStart, int Start_Y, int StartSap, int maxCountEl)
+        {
+            int Index_StartBranch = IndexStart;
+            Graphics g = e.Graphics;
+            for (int index = StartSap+1; index < Rang.Length; index++)
+            {
+                string el = Rang[index];
+                if (el == "BND")
+                {//вертикаль
+                    g.DrawLine(pen_line, left_indent_rang_x + PointOfElemetts[IndexStart+ maxCountEl+1] + scroll_x,
+                        -top_indent_rang - scroll_y + Start_Y,left_indent_rang_x + PointOfElemetts[IndexStart + maxCountEl+1] + scroll_x,
+                        - scroll_y + Start_Y);
+                    //горизонталь
+                    g.DrawLine(pen_line, left_indent_rang_x + scroll_x + PointOfElemetts[IndexStart],
+                        Start_Y - scroll_y, left_indent_rang_x + scroll_x + PointOfElemetts[IndexStart + maxCountEl + 1],
+                        Start_Y - scroll_y);
+
+                    StopSap = index-1;
+
+                    BSTList.Remove((byte)IndexStart);
+                }
+                else if (el == "NXB")
+                {
+                    //леваый спуск
+                    g.DrawLine(pen_line, left_indent_rang_x + PointOfElemetts[IndexStart] + scroll_x,
+                        -scroll_y + Start_Y, left_indent_rang_x + PointOfElemetts[IndexStart] + scroll_x,
+                        -scroll_y + Start_Y + top_indent_rang);
+                    //правый спуск
+                    g.DrawLine(pen_line, left_indent_rang_x + PointOfElemetts[IndexStart + maxCountEl + 1] + scroll_x,
+                        - scroll_y + Start_Y, left_indent_rang_x + PointOfElemetts[IndexStart + maxCountEl + 1] + scroll_x,
+                        - scroll_y + Start_Y + top_indent_rang);
+                    //горизонталь
+                    g.DrawLine(pen_line, left_indent_rang_x + scroll_x + PointOfElemetts[IndexStart],
+                        Start_Y - scroll_y, left_indent_rang_x + scroll_x + PointOfElemetts[IndexStart + maxCountEl + 1],
+                        Start_Y - scroll_y);
+
+                    DrowSap(e, Rang, BSTList[^1], Start_Y + top_indent_rang, index, maxCountEl);
+                    index = StopSap;
+                }
+                else
+                {
+                    Index_StartBranch++;
+                    if (el == "BST")
+                    {
+                        BSTList.Add((byte)index);
+                    }
+                    else
+                    switch (el)
+                    {
+                        case "XIO":
+                            {
+
+                                g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[Index_StartBranch] - 27 + scroll_x,  - scroll_y - 25 + Start_Y, 54, 50));
+
+
+                                break;
+                            }
+                        case "XIC":
+                            {
+
+                                g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[Index_StartBranch] - 27 + scroll_x,  - scroll_y - 25 + Start_Y, 54, 50));
+
+                                break;
+                            }
+                        case "OTE":
+                            {
+                                //if (Adres(adres, mas))
+                                g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[Index_StartBranch] - 27 + scroll_x, -scroll_y - 25 + Start_Y, 54, 50));
+
+                                break;
+                            }
+                        case "OTL":
+                            {
+                                //if (Adres(adres, mas))
+                                g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[Index_StartBranch] - 27 + scroll_x, -scroll_y - 25 + Start_Y, 54, 50));
+
+                                break;
+                            }
+                        case "OTU":
+                            {
+                                //if (Adres(adres, mas))
+                                g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[Index_StartBranch] - 27 + scroll_x, -scroll_y - 25 + Start_Y, 54, 50));
+
+                                break;
+                            }
+                        case "ONS":
+                            {
+                                g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[Index_StartBranch] - 27 + scroll_x, -scroll_y - 25 + Start_Y, 54, 50));
+
+                                break;
+                            }
+                        case "TON":
+                            {
+                                g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[11] - 37 + scroll_x, scroll_y - 25, 75, 50));
+
+                                break;
+                            }
+                        case "MOV":
+                            {
+                                g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[11] - 37 + scroll_x, scroll_y - 25, 75, 50));
+
+                                break;
+                            }
+                        default:
+                            {
+                                break;
+                            }
+                    }
+                }
+            }
+        }
+
         private void PaintLines(PaintEventArgs e)
         {
-            Graphics g = e.Graphics;//использование графики
+            HScroll.Maximum = panel.Width - SelectedTab.Width + 36;
+            HScroll.Minimum = 0;
 
+            scroll_y = VScroll.Value;//прокрутка
+            scroll_x = panel.Width > 1300 ? HScroll.Value = 0 : -HScroll.Value;
+            Graphics g = e.Graphics;//использование графики
             for (int i = 0; i < PointOfElemetts.Length; i++)
             {
                 PointOfElemetts[i] = ((panel.Width) / CountElInRang + 1) * (i + 1) - left_indent_rang_x / 2;
             }
+            /*
 
             int maxY = top_indent_rang * (info_file.Count - 2);//макс кол-во пикселей для scroll_y
             for (int i = 0; i < info_file.Count; i++)
@@ -247,10 +371,6 @@ namespace LogixForms
             //PointF MaxY = new PointF(79, 70);
 
             VScroll.Maximum = maxY - top_indent_rang / 2;
-            HScroll.Maximum = panel.Width - SelectedTab.Width + 36;
-            HScroll.Minimum = 0;
-            scroll_x = panel.Width > 1300 ? HScroll.Value = 0 : -HScroll.Value;
-            scroll_y = VScroll.Value;//прокрутка
 
             //вспом. вывод информации
             //g.DrawString((TabPanel[SelectedTab.SelectedIndex][1] > 1300 ? 0 : -HScroll[SelectedTab.SelectedIndex].Value).ToString(), RangsFont, Brushes.Black, Scroll);
@@ -264,12 +384,12 @@ namespace LogixForms
             locationToDrawRangs.X = 20 + scroll_x;
             locationToDrawRangs.Y = top_indent_rang - scroll_y - 10;
 
-            /*/отрисовка первого ранга
+            ///отрисовка первого ранга
             g.DrawString("1", RangsFont, Brushes.Black, locationToDrawRangs);
             g.DrawLine(pen_line, left_indent_rang_x + scroll_x, top_indent_rang - scroll_y, TabPanel[SelectedTab.SelectedIndex][1] - 4 + scroll_x, top_indent_rang - scroll_y);
             for (int i = 0; i < PointOfElemetts.Length - 1; i++)
                 g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i] + scroll_x, top_indent_rang - scroll_y - 2, 4, 4);
-            */
+            
             //верхний отступ отрисовки
             //rang_y[0] = top_step;
             int top_step = top_indent_rang;
@@ -351,7 +471,95 @@ namespace LogixForms
 
             }
             //вспомогательная информация (выводится)
-            //g.DrawString(info[15,3].ToString(), RangsFont, Brushes.Black, MaxY);
+            //g.DrawString(info[15,3].ToString(), RangsFont, Brushes.Black, MaxY);*/
+            //Новая отрисовка рангов \/
+            g.DrawLine(pen_line, left_indent_rang_x + scroll_x, top_indent_rang - scroll_y, panel.Width - 4 + scroll_x, top_indent_rang - scroll_y);
+            for (int i = 0; i < PointOfElemetts.Length - 1; i++) //
+                g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i] + scroll_x, top_indent_rang - scroll_y - 2, 4, 4);
+            for (int rang = 0; rang < info_file.Count; rang++)
+            {
+                string[] rang_text = mask.Replace(info_file[rang]," ").Trim().Split(" ");
+                for(int index = 0;  index < rang_text.Length; index++)
+                {
+                    string el = rang_text[index];
+                    if (el == "BST")
+                    {
+                        BSTList.Add((byte)index);
+                    }
+                    else if (el == "NXB")
+                    {
+                        g.DrawLine(pen_line, left_indent_rang_x + PointOfElemetts[BSTList[^1]] + scroll_x,
+                            top_indent_rang - scroll_y, left_indent_rang_x + PointOfElemetts[BSTList[^1]] + scroll_x,
+                            2 * top_indent_rang - scroll_y);
+                        DrowSap(e, rang_text, BSTList[^1], 2 * top_indent_rang, index, info[rang,0]);
+                        index = StopSap;
+                    }
+                    else
+                    {
+                        switch (el)
+                        {
+                            case "XIO":
+                                {
+                                    
+                                        g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[index] - 27 + scroll_x,((4 * top_indent_rang) / 4) - scroll_y - 25, 54, 50));
+                                    
+
+                                    break;
+                                }
+                            case "XIC":
+                                {
+                                    
+                                        g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[index] - 27 + scroll_x, ((4 * top_indent_rang) / 4) - scroll_y - 25, 54, 50));
+   
+                                    break;
+                                }
+                            case "OTE":
+                                {
+                                    //if (Adres(adres, mas))
+                                    g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[index] - 27 + scroll_x, ((4 * top_indent_rang) / 4) - scroll_y - 25, 54, 50));
+       
+                                    break;
+                                }
+                            case "OTL":
+                                {
+                                    //if (Adres(adres, mas))
+                                    g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[index] - 27 + scroll_x, ((4 * top_indent_rang) / 4) - scroll_y - 25, 54, 50));
+                 
+                                    break;
+                                }
+                            case "OTU":
+                                {
+                                    //if (Adres(adres, mas))
+                                    g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[index] - 27 + scroll_x, ((4 * top_indent_rang) / 4) - scroll_y - 25, 54, 50));
+                
+                                    break;
+                                }
+                            case "ONS":
+                                {
+                                    g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[index] - 27 + scroll_x, ((4 * top_indent_rang) / 4) - scroll_y - 25, 54, 50));
+                    
+                                    break;
+                                }
+                            case "TON":
+                                {
+                                    g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[11] - 37 + scroll_x,  scroll_y - 25, 75, 50));
+                            
+                                    break;
+                                }
+                            case "MOV":
+                                {
+                                    g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[11] - 37 + scroll_x, scroll_y - 25, 75, 50));
+                                   
+                                    break;
+                                }
+                            default:
+                                {
+                                    break;
+                                }
+                        }
+                    }
+                }
+            }
         }
 
         private void PaintText(object sender, PaintEventArgs e)
@@ -360,6 +568,7 @@ namespace LogixForms
             g.Clear(Color.White);
             RangsInfo();
             PaintLines(e);
+            return;
             for (int rang = 0; rang < info_file.Count; rang++)
             {
                 int nxb = 0;
@@ -493,7 +702,7 @@ namespace LogixForms
             panel.Paint += PaintText;
             while(true)
             {
-                await Task.Delay(50);
+                await Task.Delay(60);
                 panel.Refresh();
                 panel.Height = Height - 20;
 

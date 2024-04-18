@@ -37,6 +37,7 @@
             dataGridView1 = new DataGridView();
             Выбор = new DataGridViewCheckBoxColumn();
             Names = new DataGridViewTextBoxColumn();
+            MB_Adres = new DataGridViewTextBoxColumn();
             Len = new DataGridViewTextBoxColumn();
             tabControl1.SuspendLayout();
             Adreses.SuspendLayout();
@@ -119,7 +120,7 @@
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Выбор, Names, Len });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Выбор, Names, MB_Adres, Len });
             dataGridView1.Location = new Point(3, 3);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
@@ -148,6 +149,14 @@
             Names.MinimumWidth = 6;
             Names.Name = "Names";
             Names.ReadOnly = true;
+            // 
+            // MB_Adres
+            // 
+            MB_Adres.HeaderText = "Адрес";
+            MB_Adres.MinimumWidth = 6;
+            MB_Adres.Name = "MB_Adres";
+            MB_Adres.ReadOnly = true;
+            MB_Adres.Width = 80;
             // 
             // Len
             // 
@@ -185,5 +194,6 @@
         private DataGridViewCheckBoxColumn Выбор;
         private DataGridViewTextBoxColumn Names;
         private DataGridViewTextBoxColumn Len;
+        private DataGridViewTextBoxColumn MB_Adres;
     }
 }

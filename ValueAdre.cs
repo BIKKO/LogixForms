@@ -23,7 +23,7 @@ namespace LogixForms
             Value_type.SelectedIndex = 0;
         }
 
-        private void CreateTabl()
+        private async void CreateTabl()
         {
             switch (Value_type.Items[select_type_index].ToString())
             {
@@ -49,16 +49,27 @@ namespace LogixForms
                         dataGridView1.RowCount = Adr[s].Length;
                         dataGridView1.ColumnCount = 17;
                         dataGridView1.ColumnHeadersVisible = true;
+                        ushort bin;
                         for (int i = 0; i < Adr[s].Length; i++)
                         {
                             dataGridView1.Rows[i].Cells[0].Value = s + ':' + i + '/';
-                            string bin = Convert.ToString(Adr[s][i], 2);
-                            bin = new string('0', 16 - bin.Length) + bin;
-                            for (int j = 1; j < 17; j++)
+                            bin = Adr[s][i];
+                            
+                            //bin = new string('0', 16 - bin.Length) + bin;
+                            for (int j = 0; j < 16; j++)
                             {
-                                dataGridView1.Columns[j].HeaderText = (16 - j).ToString();
-                                if (dataGridView1.Rows[i].Cells[j].Value != bin[j - 1].ToString())
-                                    dataGridView1.Rows[i].Cells[j].Value = bin[j - 1];
+                                dataGridView1.Columns[j + 1].HeaderText = (15 - j).ToString();
+                                //if (bin == 0) continue;
+                                if ((bin & 32768 >> j) != 0)
+                                {
+                                    if (dataGridView1.Rows[i].Cells[j + 1].Value != (object)1)
+                                        dataGridView1.Rows[i].Cells[j + 1].Value = 1;
+                                }
+                                else
+                                {
+                                    if (dataGridView1.Rows[i].Cells[j + 1].Value != (object)0)
+                                        dataGridView1.Rows[i].Cells[j + 1].Value = 0;
+                                }
                             }
                         }
                         break;
@@ -80,6 +91,7 @@ namespace LogixForms
                     }
                 default: break;
             }
+            await Task.Delay(1);
         }
 
         static private int ContvertDec(string Binari)

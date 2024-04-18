@@ -32,11 +32,12 @@
             textBox1 = new TextBox();
             Cancl = new Button();
             Save = new Button();
+            textBox3 = new TextBox();
             SuspendLayout();
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(232, 34);
+            textBox2.Location = new Point(182, 12);
             textBox2.Name = "textBox2";
             textBox2.PlaceholderText = "Длинна";
             textBox2.Size = new Size(91, 27);
@@ -44,15 +45,15 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(21, 34);
+            textBox1.Location = new Point(12, 12);
             textBox1.Name = "textBox1";
             textBox1.PlaceholderText = "Название";
-            textBox1.Size = new Size(205, 27);
+            textBox1.Size = new Size(151, 27);
             textBox1.TabIndex = 4;
             // 
             // Cancl
             // 
-            Cancl.Location = new Point(456, 33);
+            Cancl.Location = new Point(182, 95);
             Cancl.Name = "Cancl";
             Cancl.Size = new Size(94, 29);
             Cancl.TabIndex = 7;
@@ -62,7 +63,7 @@
             // 
             // Save
             // 
-            Save.Location = new Point(356, 32);
+            Save.Location = new Point(69, 95);
             Save.Name = "Save";
             Save.Size = new Size(94, 29);
             Save.TabIndex = 6;
@@ -70,11 +71,20 @@
             Save.UseVisualStyleBackColor = true;
             Save.Click += Save_Click;
             // 
+            // textBox3
+            // 
+            textBox3.Location = new Point(182, 45);
+            textBox3.Name = "textBox3";
+            textBox3.PlaceholderText = "Адрес";
+            textBox3.Size = new Size(91, 27);
+            textBox3.TabIndex = 8;
+            // 
             // AddAdres
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(574, 88);
+            ClientSize = new Size(291, 136);
+            Controls.Add(textBox3);
             Controls.Add(Cancl);
             Controls.Add(Save);
             Controls.Add(textBox2);
@@ -90,5 +100,6 @@
         private TextBox textBox1;
         private Button Cancl;
         private Button Save;
+        private TextBox textBox3;
     }
 }
