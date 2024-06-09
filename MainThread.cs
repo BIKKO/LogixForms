@@ -95,6 +95,11 @@ namespace LogixForms
             }
         }
 
+        private void MemoryClear_Tick(object sender, EventArgs e)
+        {
+            GC.Collect();
+        }
+
         private void ModBusUpdate_Tick(object sender, EventArgs e)
         {
 
@@ -111,8 +116,11 @@ namespace LogixForms
         {
             mainWindows[Files.SelectedIndex] = null;
             mainWindows.Remove(mainWindows[Files.SelectedIndex]);
-            TcpClients[0] = null;
-            TcpClients.Clear();
+            if (TcpClients.Count > 0)
+            {
+                TcpClients[0] = null;
+                TcpClients.Clear();
+            }
             Files.TabPages.Remove(Files.SelectedTab);
             GC.Collect();
         }

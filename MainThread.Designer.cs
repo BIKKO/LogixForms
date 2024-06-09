@@ -49,6 +49,7 @@
             openFileDialog2 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
             AdresUpdate = new System.Windows.Forms.Timer(components);
+            MemoryClear = new System.Windows.Forms.Timer(components);
             Files = new MyTabControl();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
@@ -177,6 +178,12 @@
             AdresUpdate.Interval = 300;
             AdresUpdate.Tick += AdresUpdate_Tick;
             // 
+            // MemoryClear
+            // 
+            MemoryClear.Enabled = true;
+            MemoryClear.Interval = 3000;
+            MemoryClear.Tick += MemoryClear_Tick;
+            // 
             // Files
             // 
             Files.Dock = DockStyle.Fill;
@@ -220,6 +227,7 @@
         private OpenFileDialog openFileDialog2;
         private SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Timer AdresUpdate;
+        private System.Windows.Forms.Timer MemoryClear;
         private Panel panel1;
         private MyTabControl Files;
         private ToolStripMenuItem newToolStripMenuItem;

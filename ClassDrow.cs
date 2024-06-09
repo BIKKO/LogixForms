@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
+﻿using System.Text.RegularExpressions;
 
 namespace LogixForms
 {
@@ -240,6 +236,7 @@ namespace LogixForms
         {
             int Index_StartBranch = IndexStart;
             Graphics g = e.Graphics;
+            //new Branch(g, new Point(left_indent_rang_x + PointOfElemetts[IndexStart], Start_Y - top_indent_rang)).DrowBranch();
             for (int index = StartSap+1; index < Rang.Length; index++)
             {
                 string el = Rang[index];
@@ -272,7 +269,7 @@ namespace LogixForms
                         Start_Y - scroll_y, left_indent_rang_x + scroll_x + PointOfElemetts[IndexStart + maxCountEl + 1],
                         Start_Y - scroll_y);
 
-                    DrowSap(e, Rang, BSTList[^1], Start_Y + top_indent_rang, index, maxCountEl);
+                    DrowSap(e, Rang, BSTList[^1], Start_Y + 100, index, maxCountEl);
                     index = StopSap;
                 }
                 else
@@ -473,6 +470,7 @@ namespace LogixForms
             //вспомогательная информация (выводится)
             //g.DrawString(info[15,3].ToString(), RangsFont, Brushes.Black, MaxY);*/
             //Новая отрисовка рангов \/
+            /*
             g.DrawLine(pen_line, left_indent_rang_x + scroll_x, top_indent_rang - scroll_y, panel.Width - 4 + scroll_x, top_indent_rang - scroll_y);
             for (int i = 0; i < PointOfElemetts.Length - 1; i++) //
                 g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i] + scroll_x, top_indent_rang - scroll_y - 2, 4, 4);
@@ -560,6 +558,16 @@ namespace LogixForms
                     }
                 }
             }
+            */
+            int y = 0;
+            Rang rang;
+            foreach (string str in info_file)
+            {
+                rang = new Rang(g, ref scroll_y, ref scroll_x, y);
+                rang.Draw(str);
+                y = rang.Max;
+            }
+            
         }
 
         private void PaintText(object sender, PaintEventArgs e)
@@ -702,6 +710,7 @@ namespace LogixForms
             panel.Paint += PaintText;
             while(true)
             {
+                
                 await Task.Delay(60);
                 panel.Refresh();
                 panel.Height = Height - 20;
