@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Microsoft.VisualBasic.Devices;
+using System.Text.RegularExpressions;
 
 namespace LogixForms
 {
@@ -561,13 +562,17 @@ namespace LogixForms
             */
             int y = 0;
             Rang rang;
+            ushort count_rangs = 1;
             foreach (string str in info_file)
             {
-                rang = new Rang(g, ref scroll_y, ref scroll_x, y);
+                rang = new Rang(g, ref scroll_y, ref scroll_x, y, count_rangs);
                 rang.Draw(str);
                 y = rang.Max;
+                count_rangs++;
             }
-            
+            rang = null;
+            VScroll.Maximum = y - panel.Height+60;
+            g.DrawString($"scroll: {VScroll.Value} MaxScroll: {VScroll.Maximum}", RangsFont, Brushes.Red, 300, 200);
         }
 
         private void PaintText(object sender, PaintEventArgs e)

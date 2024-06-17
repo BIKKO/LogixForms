@@ -71,12 +71,13 @@ namespace LogixForms
             if (e.Delta > 0)
             {
                 //вверх
-                wheel = TextRangs.Count % 10 != 0 ? -25 : -250;//если рангов > 10 то -1 иначе -10
+                wheel = TextRangs.Count % 10 != 0 ? -10 : -100;//если рангов > 10 то -1 иначе -10
+                //MessageBox.Show("Test");
             }
             else
             {
                 //вниз
-                wheel = TextRangs.Count % 10 != 0 ? 25 : 250;//если рангов > 10 то 1 иначе 10
+                wheel = TextRangs.Count % 10 != 0 ? 10 : 100;//если рангов > 10 то 1 иначе 10
             }
             if (Files.TabCount > 0)
             {

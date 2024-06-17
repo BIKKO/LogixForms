@@ -11,6 +11,7 @@
         private const byte wight = 54;
         private Graphics g;
         private Point p;
+        private int scrollX, scrollY;
 
         public Branch()
         {
@@ -21,8 +22,10 @@
             }
         }
 
-        public Branch(Graphics g, Point StartIndex)
+        public Branch(Graphics g, Point StartIndex, ref int scrollY, ref int scrollX)
         {
+            this.scrollX = scrollX;
+            this.scrollY = scrollY;
             count_el = 0;
             for (int i = 0; i < PointOfElemetts.Length; i++)
             {
@@ -32,8 +35,10 @@
             p = StartIndex;
         }
 
-        public Branch(Graphics g, Point StartIndex, short count)
+        public Branch(Graphics g, Point StartIndex, ref int scrollY, ref int scrollX, short count)
         {
+            this.scrollX = scrollX;
+            this.scrollY = scrollY;
             this.g = g;
             p = StartIndex;
             count_el = count;
@@ -147,10 +152,11 @@
         {
             if (count_el == 0)
             {
-                g.DrawLine(line, p.X - indent - (wight * count_el), p.Y + top_indent, p.X + indent + (wight * count_el), p.Y + top_indent);   //горизонт
-                g.DrawLine(line, p.X - indent - (wight * count_el), p.Y, p.X - indent - (wight * count_el), p.Y + top_indent);
-                g.DrawLine(line, p.X + indent + (wight * count_el), p.Y, p.X + indent + (wight * count_el), p.Y + top_indent);
-                g.DrawEllipse(point, p.X, p.Y + top_indent - 2, 4, 4);
+                g.DrawLine(line, p.X - indent - (wight * count_el)+scrollX, p.Y + top_indent - scrollY, p.X + indent + (wight * count_el) + scrollX, p.Y + top_indent - scrollY);   //горизонт
+                g.DrawString($"y: {p.Y + top_indent}", new Font("Arial", 10), Brushes.Red, p.X + indent + (wight * count_el) + scrollX+20, p.Y + top_indent - scrollY);
+                g.DrawLine(line, p.X - indent - (wight * count_el) + scrollX, p.Y - scrollY, p.X - indent - (wight * count_el) + scrollX, p.Y + top_indent - scrollY);
+                g.DrawLine(line, p.X + indent + (wight * count_el) + scrollX, p.Y- scrollY, p.X + indent + (wight * count_el) + scrollX, p.Y + top_indent - scrollY);
+                g.DrawEllipse(point, p.X + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
             }
             else
             {
@@ -163,15 +169,15 @@
                         break;
                     }
                 }
-                g.DrawLine(line, p.X, p.Y + top_indent, PointOfElemetts[count] + 70, p.Y + top_indent);   //горизонт
-                g.DrawLine(line, p.X, p.Y, p.X, p.Y + top_indent);//left
-                g.DrawLine(line, PointOfElemetts[count] + 70, p.Y, PointOfElemetts[count] + 70, p.Y + top_indent);//right
+                g.DrawLine(line, p.X + scrollX, p.Y + top_indent - scrollY, PointOfElemetts[count] + 70 + scrollX, p.Y + top_indent - scrollY);   //горизонт
+                g.DrawLine(line, p.X + scrollX, p.Y - scrollY, p.X+scrollX, p.Y + top_indent-scrollY);//left
+                g.DrawLine(line, PointOfElemetts[count] + 70 + scrollX, p.Y-scrollY, PointOfElemetts[count] + 70+scrollX, p.Y + top_indent-scrollY);//right
                 count = 0;
                 foreach (var item in PointOfElemetts)
                 {
                     if (item > p.X - 70)
                     {
-                        g.DrawEllipse(point, item + 70, p.Y + top_indent - 2, 4, 4);
+                        g.DrawEllipse(point, item + 70 + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
                         count++;
                         if (count == count_el) break;
                     }
