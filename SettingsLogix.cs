@@ -13,6 +13,7 @@
             adres_adr = mbadres;
         }
 
+
         public void UpdateGrid()
         {
             dataGridView1.RowCount = adres.Count;
@@ -102,6 +103,11 @@
             }
         }
 
+        /// <summary>
+        /// Показ адреса
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Ref_Click(object sender, EventArgs e)
         {
             
@@ -111,6 +117,11 @@
             }
         }
 
+        /// <summary>
+        /// Удаление выбранного адреса
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Delite_Click(object sender, EventArgs e)
         {
             foreach (int ind in rows)
@@ -124,6 +135,11 @@
             UpdateGrid();
         }
 
+        /// <summary>
+        /// Добавление нового адреса
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddBut_Click(object sender, EventArgs e)
         {
             if (Application.OpenForms["AddAdres"] == null)

@@ -1,16 +1,19 @@
-﻿using System.Diagnostics.Metrics;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 
 namespace LogixForms
 {
+    /// <summary>
+    /// Отрисовка рангов
+    /// </summary>
     internal class Rang
     {
         private Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
-            OTE = NodEn.OTE, OTL = NodEn.OTE, XICD = NodDis.XICdis, XIOD = NodDis.XIOdis; // загрузка изображений
+            OTE = NodEn.OTE, OTL = NodEn.OTL, XICD = NodDis.XICdis, XIOD = NodDis.XIOdis; // загрузка изображений
         private Pen pen_line = new Pen(Brushes.Blue);
         private Pen PenOfPoint = new Pen(Brushes.Yellow, 7);
-        private Regex mask = new Regex(@"(\s\S*:\S*/?\s*|\d?0.[0-9]*\s?\d?0.[0-9]*\s?\d?0.[0-9]*\s?)");
+        private Regex mask = new Regex(@"((\s?[A-Z]\d?\d?\d?:\d?\d?\d?)(/\b?\b?)?\s?)|[0.0-9999.0]");// Выделение мномоник
+        private Regex maskAdr = new Regex(@"\s?([A-Z]{3})\s?");// Выделение Адрес
         private const int left_indent_rang_x = 70;
         private const int top_indent_rang = 150;
         private int startY;
@@ -22,10 +25,22 @@ namespace LogixForms
         private int MaxYRangs;
         private int MaxYBranch;
         private ushort Number;
+        private Dictionary<string, ushort[]> Adr;
+        private int[] Timer_control = new int[32];
+        private string TextRang;
 
-
-        public Rang(Graphics graf, ref int scrollY, ref int scrollX, int start, ushort num)
+        /// <summary>
+        /// Инициализация конструктора ранга
+        /// </summary>
+        /// <param name="graf">Отображение графики</param>
+        /// <param name="scrollY">Вертикальная прокрутка</param>
+        /// <param name="scrollX">Горизонтальная прокрутка</param>
+        /// <param name="start">Старт по координате Y</param>
+        /// <param name="num">Номер ранга</param>
+        /// <param name="AdresDir">Список адресов</param>
+        public Rang(Graphics graf, ref int scrollY, ref int scrollX, int start, ushort num, Dictionary<string, ushort[]> AdresDir)
         {
+            Adr = AdresDir;
             Number = num;
             this.scrollY = scrollY;
             this.scrollX = scrollX;
@@ -40,25 +55,103 @@ namespace LogixForms
             }
 
             g.DrawLine(pen_line, left_indent_rang_x + scrollX, top_indent_rang - scrollY + startY, 1300 - 4 + scrollX, top_indent_rang - scrollY + startY);
-            for (int i = 0; i < PointOfElemetts.Length - 1; i++) //
+            for (int i = 0; i < PointOfElemetts.Length - 1; i++) 
                 g.DrawEllipse(PenOfPoint, left_indent_rang_x + PointOfElemetts[i] + scrollX, top_indent_rang - scrollY - 2 + startY, 4, 4);
         }
 
+        /// <summary>
+        /// Максимальный Y ранга
+        /// </summary>
         public int Max { get { return Math.Max(MaxYRangs, MaxYBranch); } }
 
+        /// <summary>
+        /// Отрисовка ранга
+        /// </summary>
+        /// <param name="RangText">Текст ранга</param>
         public void Draw(string RangText)
         {
             DrawLine(RangText);
             DrawElem(RangText);
         }
 
+        /// <summary>
+        /// Проверка активноти элемента
+        /// </summary>
+        /// <param name="st">Адрес</param>
+        /// <param name="mas">Название</param>
+        /// <returns>Активность</returns>
+        private bool Adres(string st, string mas)
+        {
+            try
+            {
+                if (mas == "") return false;
+                string[] k = new string[2];
+                int Bitmask = 0;
+                int ind_1;
+                int adr;
+
+                if (st.Contains("N13")) k = st.Replace("N13:", "").Split('/');
+                if (st.Contains("N15")) k = st.Replace("N15:", "").Split('/');
+                if (st.Contains("N18")) k = st.Replace("N18:", "").Split('/');
+                if (st.Contains("N40")) k = st.Replace("N40:", "").Split('/');
+                if (st.Contains("B3")) k = st.Replace("B3:", "").Split('/');
+                if (st.Contains("T4")) k = st.Replace("T4:", "").Split('/');
+
+                if (k.Contains("EN"))
+                {
+                    Bitmask = 1;
+                    ind_1 = int.Parse(k[0]);
+                    adr = Timer_control[ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return true;
+                    return false;
+                }
+                else if (k.Contains("DN"))
+                {
+                    Bitmask = 2;
+                    ind_1 = int.Parse(k[0]);
+                    adr = Timer_control[ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return true;
+                    return false;
+                }
+                else if (k.Contains("TT"))
+                {
+                    Bitmask = 4;
+                    ind_1 = int.Parse(k[0]);
+                    adr = Timer_control[ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return true;
+                    return false;
+                }
+                else
+                {
+                    Bitmask = 1 << int.Parse(k[1]);
+
+                    ind_1 = int.Parse(k[0]);
+                    adr = Adr[mas][ind_1];
+
+                    if ((adr & Bitmask) == Bitmask) return true;
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Отображение основной ветви ранга
+        /// </summary>
+        /// <param name="RangText">Тект ранга</param>
         private void DrawLine(string RangText)
         {
             int count_of_branch = 0;
             Point p = new Point();
             bool BranchStart = false;
             Branch branch = new Branch();
-            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(" ");
+            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "").ToArray();
             int x_branch = 0;
             int drow_ind = 0;
             for (int index = 0; index < rang_text.Length; index++)
@@ -76,7 +169,7 @@ namespace LogixForms
                 {
                     int[] inf = DrowSap(rang_text, index + 1, p.Y + top_indent, x_branch, p, count_of_branch, branch.Count);
                     index = inf[0];
-                    branch.Update();
+                    branch.ClearBranch();
                     if (branch < inf[1]) branch = branch - branch + Math.Max(branch.Count, inf[1]);
                     branch += inf[4];
                     branch.DrowBranch();
@@ -89,7 +182,7 @@ namespace LogixForms
                 {
                     if (BranchStart)
                     {
-                        branch.Update();
+                        branch.ClearBranch();
                         branch++;
                         branch.DrowBranch();
                     }
@@ -101,6 +194,18 @@ namespace LogixForms
             g.DrawString(Number.ToString(), new Font("Arial", 12), Brushes.DimGray, (int)(left_indent_rang_x * .4) + scrollX, startY + top_indent_rang - 10 - scrollY);
         }
 
+        /// <summary>
+        /// Метод для рекурсивного отображения рангов
+        /// </summary>
+        /// <param name="rang_text">Массив мномоник ранга</param>
+        /// <param name="IndexStart">Индекс, проболжения перебора массива рангов</param>
+        /// <param name="Start_Y">Y координата горизонта ветви</param>
+        /// <param name="Start_X">X координата горизонта ветви</param>
+        /// <param name="point">Точка отрисовки ветви</param>
+        /// <param name="CountOfBranch">Кол-во ветвей</param>
+        /// <param name="CountInBranch">Кол-во эл в ветве</param>
+        /// <returns>Индек массива, кол-во эл в ветви, -, индекс остановки в точках, кол-во веток - 1</returns>
+        /// <exception cref="Не найден конец ветви">г</exception>
         private int[] DrowSap(string[] rang_text, int IndexStart, int Start_Y, int Start_X, Point point, int CountOfBranch, int CountInBranch)
         {
             int count_of_branch = CountOfBranch;
@@ -114,7 +219,7 @@ namespace LogixForms
             {
                 string el = rang_text[index];
                 if (el == "BST")
-                {
+                {//добавить отрисовку влженных ветвей через кол-во переносов во вложенной ветке
                     p = new Point(left_indent_rang_x + PointOfElemetts[drow_ind], Start_Y);
                     x_branch = drow_ind + 1;
                     branch = new Branch(g, p, ref scrollY, ref scrollX);
@@ -124,16 +229,36 @@ namespace LogixForms
                 else if (el == "NXB")
                 {
                     p.Y += top_indent;
-                    branch = new Branch(g, p, ref scrollY, ref scrollX, (short)CountInBranch);
-                    int[] inf = DrowSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, CountInBranch);
-                    index = inf[0];
-                    branch.Update();
-                    if (branch < inf[1]) branch = branch - branch + Math.Max(branch.Count, inf[1]);
-                    if (count_of_branch == 1) branch.DrowBranch();
-                    BranchStart = Convert.ToBoolean(inf[2]);
-                    drow_ind = Math.Max(drow_ind+1, inf[3]);
-                    if (0 == inf[4]) return inf;
-                    continue;
+                    int[] inf;
+                    if (count_of_branch < 2)//одиночная ветвь с глубоким переносом
+                    {
+                        inf = DrowSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, CountInBranch);
+                        branch = new Branch(g, p, ref scrollY, ref scrollX, (short)CountInBranch);
+                        count_of_branch--;
+                        index = inf[0];
+                        branch.ClearBranch();
+                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch.Count, inf[1]);
+                        branch.DrowBranch();
+                        BranchStart = Convert.ToBoolean(inf[2]);
+                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
+                        if (count_of_branch == inf[4]) return inf;
+                        continue;
+                    }
+                    else//ветвь на ветви
+                    {
+                        inf = DrowSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, 1);
+                        p.Y -= top_indent;
+                        branch = new Branch(g, p, ref scrollY, ref scrollX);
+                        count_of_branch--;
+                        index = inf[0];
+                        branch.ClearBranch();
+                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch.Count, inf[1]);
+                        branch.DrowBranch();
+                        BranchStart = Convert.ToBoolean(inf[2]);
+                        drow_ind = Math.Max(drow_ind+1, inf[3]);
+                        if (count_of_branch == inf[4]) return inf;
+                        continue;
+                    }
                 }
                 else if(el == "BND")
                 {
@@ -146,23 +271,28 @@ namespace LogixForms
                     count_el_in_branch++;
                     if (BranchStart)
                     {
-                        branch.Update();
+                        branch.ClearBranch();
                         branch++;
                         branch.DrowBranch();
                     }
                 }
                 drow_ind++;
             }
+            //return new int[] { rang_text.Length, count_el_in_branch, 0, drow_ind, count_of_branch - 1 };
             throw new Exception("Not met BND");
         }
 
+        /// <summary>
+        /// Отрисовка элементов рнга
+        /// </summary>
+        /// <param name="RangText">Текст ранга</param>
         private void DrawElem(string RangText)
         {
             int count_of_branch = 0;
             Point p = new Point();
             bool BranchStart = false;
             int branch = 0;
-            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(" ");
+            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "").ToArray();
             int x_branch = 0;
             int drow_ind = 0;
             for (int index = 0; index < rang_text.Length; index++)
@@ -196,7 +326,7 @@ namespace LogixForms
                             {
 
                                 g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
 
                                 break;
                             }
@@ -204,34 +334,34 @@ namespace LogixForms
                             {
 
                                 g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "OTE":
                             {
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "OTL":
                             {
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "OTU":
                             {
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "ONS":
                             {
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "TON":
@@ -256,6 +386,18 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Рекурсиный метод отрисовки элементов ветвей ранга
+        /// </summary>
+        /// <param name="rang_text">Массив элементов</param>
+        /// <param name="IndexStart">Старт перебора массива</param>
+        /// <param name="Start_Y">Старт отрисовки по Y</param>
+        /// <param name="Start_X">Старт отрисовки по X</param>
+        /// <param name="point">Точка старта ветви</param>
+        /// <param name="CountOfBranch">Кол-во ветвей</param>
+        /// <param name="CountInBranch">Кол-во элеменов в ветви</param>
+        /// <returns>индекс конца перебора, кол-во эл в полученной ветви, ~, точка отрисовки, кол-во ветвей - 1</returns>
+        /// <exception cref="Не найден конец ветви"></exception>
         private int[] DrawElemInSap(string[] rang_text, int IndexStart, int Start_Y, int Start_X, Point point, int CountOfBranch, int CountInBranch)
         {
             int count_of_branch = CountOfBranch;
@@ -278,15 +420,34 @@ namespace LogixForms
                 }
                 else if (el == "NXB")
                 {
+
                     p.Y += top_indent;
-                    branch = CountInBranch;
-                    int[] inf = DrawElemInSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, CountInBranch);
-                    index = inf[0];
-                    if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
-                    BranchStart = Convert.ToBoolean(inf[2]);
-                    drow_ind = Math.Max(drow_ind + 1, inf[3]);
-                    if (0 == inf[4]) return inf;
-                    continue;
+                    int[] inf;
+                    if (count_of_branch < 2)
+                    {
+                        inf = DrawElemInSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, CountInBranch);
+                        branch = CountInBranch;
+                        count_of_branch--;
+                        index = inf[0];
+                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
+                        BranchStart = Convert.ToBoolean(inf[2]);
+                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
+                        if (count_of_branch == inf[4]) return inf;
+                        continue;
+                    }
+                    else
+                    {
+                        inf = DrawElemInSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, 1);
+                        p.Y -= top_indent;
+                        branch = 0;
+                        count_of_branch--;
+                        index = inf[0];
+                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
+                        BranchStart = Convert.ToBoolean(inf[2]);
+                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
+                        if (count_of_branch == inf[4]) return inf;
+                        continue;
+                    }
                 }
                 else if (el == "BND")
                 {
@@ -304,7 +465,7 @@ namespace LogixForms
                             {
 
                                 g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                               //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
 
                                 break;
                             }
@@ -312,34 +473,34 @@ namespace LogixForms
                             {
 
                                 g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                               //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
                             }
                         case "OTE":
                             {
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
                             }
                         case "OTL":
                             {
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
                             }
                         case "OTU":
                             {
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
                             }
                         case "ONS":
                             {
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
                             }
                         case "TON":
@@ -362,6 +523,7 @@ namespace LogixForms
                 }
                 drow_ind++;
             }
+            //return new int[] { rang_text.Length, count_el_in_branch, 0, drow_ind, count_of_branch - 1 };
             throw new Exception("Not met BND");
         }
     }

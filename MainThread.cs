@@ -10,7 +10,6 @@ namespace LogixForms
         private static Dictionary<string, ushort[]> Adr = new Dictionary<string, ushort[]>();
         private static Dictionary<string, ushort> MB_adres = new Dictionary<string, ushort>() { {"T4",1300},
                                                                                                 {"T4_c",7000},
-                                                                                                {"T4_b",0},
                                                                                                 {"Timer_control",6800},
                                                                                                 {"N13",1000},
                                                                                                 {"N15",600},
@@ -65,19 +64,24 @@ namespace LogixForms
             AdresUpdate.Enabled = false;
         }
 
+        /// <summary>
+        /// Обработчик прокрутки колесика мыши
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void This_MouseWheel(object sender, MouseEventArgs e)
         {
             int wheel = 0;//прокрутка вверх или вниз
             if (e.Delta > 0)
             {
                 //вверх
-                wheel = TextRangs.Count % 10 != 0 ? -10 : -100;//если рангов > 10 то -1 иначе -10
+                wheel = -(int)(VScrollBarList[Files.SelectedIndex].Maximum*0.05);//если рангов > 10 то -1 иначе -10
                 //MessageBox.Show("Test");
             }
             else
             {
                 //вниз
-                wheel = TextRangs.Count % 10 != 0 ? 10 : 100;//если рангов > 10 то 1 иначе 10
+                wheel = (int)(VScrollBarList[Files.SelectedIndex].Maximum * 0.05);//если рангов > 10 то 1 иначе 10
             }
             if (Files.TabCount > 0)
             {
@@ -87,6 +91,11 @@ namespace LogixForms
             wheel = 0;//одиночное сробатование
         }
 
+        /// <summary>
+        /// Обновление значений адресов в памяти с устройтва
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AdresUpdate_Tick(object sender, EventArgs e)
         {
             string[] adreskey = Adr.Keys.ToArray();
@@ -96,16 +105,31 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Таймер оистки кучи
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MemoryClear_Tick(object sender, EventArgs e)
         {
             GC.Collect();
         }
 
+        /// <summary>
+        /// Обновление програмы с устройства
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ModBusUpdate_Tick(object sender, EventArgs e)
         {
 
         }
 
+        /// <summary>
+        /// Обновление программы с файла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FileUpdate_Tick(object sender, EventArgs e)
         {
             FileUpdate.Enabled = false;
@@ -113,6 +137,11 @@ namespace LogixForms
             foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) OpenFileOrCon[Files.SelectedIndex].Add(el);
         }
 
+        /// <summary>
+        /// Закрытие окна отображения
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void close_Click(object sender, EventArgs e)
         {
             mainWindows[Files.SelectedIndex] = null;
@@ -126,6 +155,11 @@ namespace LogixForms
             GC.Collect();
         }
 
+        /// <summary>
+        /// Открытие файла с ПК
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog2.ShowDialog() == DialogResult.OK)
@@ -174,6 +208,11 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Сохранение программмы на ПК
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
@@ -191,6 +230,13 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Подключение к устройству
+        /// </summary>
+        /// <param name="ip">IP адрес</param>
+        /// <param name="port">Порт</param>
+        /// <param name="step">Шаг считывания ModBus адресов(устанавливать 1 при считывании с устройства)</param>
+        /// <param name="slave">ID</param>
         public void con(string ip, string port, int step, byte slave)
         {
             try
@@ -205,11 +251,10 @@ namespace LogixForms
 
                 for (int j = 0; j < 100; j++)
                 {
-                    inputs = master.ReadHoldingRegisters(slave, (ushort)(step * j + 8000), 120);
+                    inputs = master.ReadHoldingRegisters(slave, (ushort)(j + 8000), 120);
                     string g = "";
                     int len = 0;
                     int buf;
-
 
                     for (int i = 0; i < 240; i++)
                     {
@@ -233,12 +278,12 @@ namespace LogixForms
                     if (len != 0) TextRangs.Add(g);
                     else break;
                 }
-
+                /*
                 string[] adreskey = Adr.Keys.ToArray();
                 foreach (string adkey in adreskey)
                 {
                     Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
-                }
+                }*/
 
                 ModbusCl = true;
                 var tb = new TabPage();
@@ -288,6 +333,11 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Вызов окна для ввода данных при подключении
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (TcpClients.Count < 1)
@@ -304,6 +354,11 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Вызов окна настроек
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Application.OpenForms["SettingsLogix"] == null)
@@ -312,11 +367,21 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Вызов окна справки
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Временно ничего нет!");
         }
 
+        /// <summary>
+        /// Создание пустого окна
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var tb = new MyTabPage();
@@ -359,14 +424,23 @@ namespace LogixForms
             mainWindows.Add(tab_to_drow);
         }
 
+        /// <summary>
+        /// Сохранение парамметров перед завершением работы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default["H"] = Height;
             Properties.Settings.Default["W"] = Width;
-            Properties.Settings.Default["Adres"] = Adr;
             Properties.Settings.Default.Save();
         }
 
+        /// <summary>
+        /// Получение таблицы значений адресов
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void adresesValuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Application.OpenForms["ValueAdre"] == null)

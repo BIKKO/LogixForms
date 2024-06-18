@@ -19,6 +19,12 @@
             MB_AdresList = mbaders;
         }
 
+
+        /// <summary>
+        /// Сохранение изменений
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Save_Click(object sender, EventArgs e)
         {
             if (int.TryParse(this.AdresCount.Text, out u) && ushort.TryParse(this.MBAdres.Text, out m))
@@ -46,11 +52,22 @@
             }
         }
 
+        /// <summary>
+        /// Отмена измененй
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Cancl_Click(object sender, EventArgs e)
         {
             Close();
         }
 
+
+        /// <summary>
+        /// Подгрузка адресов из памяти
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChangeAdres_Load(object sender, EventArgs e)
         {
             
@@ -61,6 +78,11 @@
             }
         }
 
+        /// <summary>
+        /// Выделение выбранного адреса
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             AdresName.Text = comboBox1.Items[comboBox1.SelectedIndex].ToString();

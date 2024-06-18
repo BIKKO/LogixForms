@@ -12,6 +12,9 @@
             Value_type.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Создание и изменение таблицы значаний
+        /// </summary>
         private async void CreateTabl()
         {
             switch (Value_type.Items[select_type_index].ToString())
@@ -83,6 +86,11 @@
             await Task.Delay(1);
         }
 
+        /// <summary>
+        /// Конвертация в целое число
+        /// </summary>
+        /// <param name="Binari"></param>
+        /// <returns></returns>
         static private int ContvertDec(string Binari)
         {
             int dec = 0;
@@ -93,18 +101,32 @@
             return dec;
         }
 
+        /// <summary>
+        /// Выбор системы счисления
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Value_type_SelectedIndexChanged(object sender, EventArgs e)
         {
             select_type_index = Value_type.SelectedIndex;
             Adres_name_SelectedIndexChanged(sender, e);
         }
 
+        /// <summary>
+        /// Показ выбранного адреса
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Adres_name_SelectedIndexChanged(object sender, EventArgs e)
         {
-
             CreateTabl();
         }
 
+        /// <summary>
+        /// Изменение значения в памяти
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             switch (Value_type.Items[select_type_index].ToString())
@@ -137,6 +159,11 @@
             }
         }
 
+        /// <summary>
+        /// Загрузка значений из адресов
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ValueAdres_Load(object sender, EventArgs e)
         {
             int n = 0;
@@ -153,6 +180,11 @@
 
         }
 
+        /// <summary>
+        /// Завершение просмотра
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ValueAdres_FormClosing(object sender, FormClosingEventArgs e)
         {
             Adr = null;

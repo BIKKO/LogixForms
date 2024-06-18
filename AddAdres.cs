@@ -14,6 +14,11 @@
             sl = owner;
         }
 
+        /// <summary>
+        /// Сохранение нового адреса
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Save_Click(object sender, EventArgs e)
         {
             if (int.TryParse(textBox2.Text, out u) && int.TryParse(textBox3.Text, out u))
@@ -29,6 +34,11 @@
             }
         }
 
+        /// <summary>
+        /// Отмена создания
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Cancl_Click(object sender, EventArgs e)
         {
             Close();

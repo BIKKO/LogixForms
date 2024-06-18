@@ -2,17 +2,11 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="LogixForms.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Adres" Type="System.Collections.Generic.Dictionary" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="W" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
     </Setting>
     <Setting Name="H" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">500</Value>
-    </Setting>
-	<Setting Name="MyTab" Type="System.Windows.Forms.MyTabControl" Scope="User">
-      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

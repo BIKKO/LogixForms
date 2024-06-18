@@ -12,7 +12,7 @@ namespace LogixForms.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.9.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -20,17 +20,6 @@ namespace LogixForms.Properties {
         public static Settings Default {
             get {
                 return defaultInstance;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.Dictionary<string, ushort[]> Adres {
-            get {
-                return ((global::System.Collections.Generic.Dictionary<string, ushort[]>)(this["Adres"]));
-            }
-            set {
-                this["Adres"] = value;
             }
         }
         
@@ -55,17 +44,6 @@ namespace LogixForms.Properties {
             }
             set {
                 this["H"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Windows.Forms.MyTabControl MyTab {
-            get {
-                return ((global::System.Windows.Forms.MyTabControl)(this["MyTab"]));
-            }
-            set {
-                this["MyTab"] = value;
             }
         }
     }

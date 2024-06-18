@@ -14,16 +14,31 @@
                 Slave.Items.Add(i);
         }
 
+        /// <summary>
+        /// Отмена
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
             Close();
         }
 
+        /// <summary>
+        /// Определение ID
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             slave = Slave.SelectedIndex + 1;
         }
 
+        /// <summary>
+        /// Обработка и передача полученных значений
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             try
