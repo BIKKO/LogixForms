@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic.Devices;
 using Modbus.Device;
 using System.Net.Sockets;
 using System.Text;
@@ -39,7 +40,7 @@ namespace LogixForms
         private bool ModbusCl = false;
         private ModbusIpMaster master;
         private bool NotFount = false;
-        private List<ClassDrow> mainWindows = new List<ClassDrow>();
+        private List<ClassDraw> mainWindows = new List<ClassDraw>();
         private List<TcpClient> TcpClients = new List<TcpClient>();
         private TcpClient client;
 
@@ -48,13 +49,12 @@ namespace LogixForms
         {
             //Files.Visible = false;
             InitializeComponent();//инициализация формы
-            MouseWheel += This_MouseWheel;//подключения колёсика мыши
+            //MouseWheel += This_MouseWheel;//подключения колёсика мыши
             Height = int.Parse(Properties.Settings.Default["H"].ToString());
             Width = int.Parse(Properties.Settings.Default["W"].ToString());
             //Adr = (Dictionary<string, ushort[]>)Properties.Settings.Default["Adres"];
             Adr.Add("T4", new ushort[24]);
             Adr.Add("T4_c", new ushort[24]);
-            Adr.Add("T4_b", new ushort[24]);
             Adr.Add("Timer_control", new ushort[32]);
             Adr.Add("N13", new ushort[70]);
             Adr.Add("N15", new ushort[70]);
@@ -62,33 +62,6 @@ namespace LogixForms
             Adr.Add("N40", new ushort[70]);
             Adr.Add("B3", new ushort[70]);
             AdresUpdate.Enabled = false;
-        }
-
-        /// <summary>
-        /// Обработчик прокрутки колесика мыши
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void This_MouseWheel(object sender, MouseEventArgs e)
-        {
-            int wheel = 0;//прокрутка вверх или вниз
-            if (e.Delta > 0)
-            {
-                //вверх
-                wheel = -(int)(VScrollBarList[Files.SelectedIndex].Maximum*0.05);//если рангов > 10 то -1 иначе -10
-                //MessageBox.Show("Test");
-            }
-            else
-            {
-                //вниз
-                wheel = (int)(VScrollBarList[Files.SelectedIndex].Maximum * 0.05);//если рангов > 10 то 1 иначе 10
-            }
-            if (Files.TabCount > 0)
-            {
-                if (VScrollBarList[Files.SelectedIndex].Maximum >= VScrollBarList[Files.SelectedIndex].Value + wheel && VScrollBarList[Files.SelectedIndex].Minimum <= VScrollBarList[Files.SelectedIndex].Value + wheel)
-                    VScrollBarList[Files.SelectedIndex].Value += wheel;//не выходим ли за приделы scrollbar
-            }
-            wheel = 0;//одиночное сробатование
         }
 
         /// <summary>
@@ -144,6 +117,7 @@ namespace LogixForms
         /// <param name="e"></param>
         private void close_Click(object sender, EventArgs e)
         {
+            MouseWheel -= mainWindows[Files.SelectedIndex].This_MouseWheel;
             mainWindows[Files.SelectedIndex] = null;
             mainWindows.Remove(mainWindows[Files.SelectedIndex]);
             if (TcpClients.Count > 0)
@@ -200,11 +174,12 @@ namespace LogixForms
                 tb.Controls.Add(pan);
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
-                ClassDrow tab_to_drow = new ClassDrow(pan, File.ReadAllLines(openFileDialog2.FileName,
+                ClassDraw tab_to_drow = new ClassDraw(pan, File.ReadAllLines(openFileDialog2.FileName,
                     Encoding.UTF8).ToList(), vscrol,
                     hScroll, Files, Adr, Height, Width);
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
+                MouseWheel += tab_to_drow.This_MouseWheel;
             }
         }
 
@@ -322,10 +297,12 @@ namespace LogixForms
                 tb.Controls.Add(pan);
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
-                ClassDrow tab_to_drow = new ClassDrow(pan, TextRangs, Vscrol,
+                ClassDraw tab_to_drow = new ClassDraw(pan, TextRangs, Vscrol,
                     hScroll, Files, Adr, Height, Width);
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
+                MouseWheel += tab_to_drow.This_MouseWheel;
+                
             }
             catch (Exception ex)
             {
@@ -418,7 +395,7 @@ namespace LogixForms
             tb.Controls.Add(pan);
             Files.TabPages.Add(tb);
             Files.SelectTab(Files.TabCount - 1);
-            ClassDrow tab_to_drow = new ClassDrow(pan, new List<string> { "" }, Vscrol,
+            ClassDraw tab_to_drow = new ClassDraw(pan, new List<string> { "" }, Vscrol,
                 hScroll, Files, Adr, Height, Width);
             tab_to_drow.StartDrow();
             mainWindows.Add(tab_to_drow);

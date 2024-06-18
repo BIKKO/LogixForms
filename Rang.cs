@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogixForms
 {
@@ -27,7 +28,7 @@ namespace LogixForms
         private ushort Number;
         private Dictionary<string, ushort[]> Adr;
         private int[] Timer_control = new int[32];
-        private string TextRang;
+        private string[] TextRang;
 
         /// <summary>
         /// Инициализация конструктора ранга
@@ -80,11 +81,11 @@ namespace LogixForms
         /// <param name="st">Адрес</param>
         /// <param name="mas">Название</param>
         /// <returns>Активность</returns>
-        private bool Adres(string st, string mas)
+        private bool Adres(string st)
         {
             try
             {
-                if (mas == "") return false;
+                string mas = new Regex(@":\w*(/(\w*)?)?").Replace(st, "");
                 string[] k = new string[2];
                 int Bitmask = 0;
                 int ind_1;
@@ -151,7 +152,7 @@ namespace LogixForms
             Point p = new Point();
             bool BranchStart = false;
             Branch branch = new Branch();
-            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "").ToArray();
+            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "" && a != "DN" && a != "EN" && a != "TT").ToArray();
             int x_branch = 0;
             int drow_ind = 0;
             for (int index = 0; index < rang_text.Length; index++)
@@ -288,11 +289,16 @@ namespace LogixForms
         /// <param name="RangText">Текст ранга</param>
         private void DrawElem(string RangText)
         {
+            string[] adress = maskAdr.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "" && a != "DN" && a != "EN" && a != "TT").ToArray();
+            double u;
+            TextRang = adress.Where(x => !double.TryParse(new Regex(@"(:\d*.?\d*)").Replace(x, "").Replace('.', ','), out u)).ToArray();
+
+            int enumer_el = 0;
             int count_of_branch = 0;
             Point p = new Point();
             bool BranchStart = false;
             int branch = 0;
-            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "").ToArray();
+            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "" && a != "DN" && a != "EN" && a != "TT").ToArray();
             int x_branch = 0;
             int drow_ind = 0;
             for (int index = 0; index < rang_text.Length; index++)
@@ -308,7 +314,8 @@ namespace LogixForms
                 }
                 else if (el == "NXB")
                 {
-                    int[] inf = DrawElemInSap(rang_text, index + 1, p.Y + top_indent, x_branch, p, count_of_branch, branch);
+                    int[] inf = DrawElemInSap(rang_text, TextRang, enumer_el, index + 1, p.Y + top_indent, x_branch, p, count_of_branch, branch);
+                    enumer_el = inf[2];
                     index = inf[0];
                     if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
                     branch += inf[4];
@@ -324,56 +331,69 @@ namespace LogixForms
                     {
                         case "XIO":
                             {
+                                if (!Adres(TextRang[enumer_el]))
+                                    g.DrawImage(XIOD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                else
+                                    g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
 
-                                g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                //g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-
+                                enumer_el++;
                                 break;
                             }
                         case "XIC":
                             {
-
-                                g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                if (Adres(TextRang[enumer_el]))
+                                    g.DrawImage(XICD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                else
+                                    g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                //g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                enumer_el++;
                                 break;
                             }
                         case "OTE":
                             {
-                                //if (Adres(adres, mas))
+                                //if (Adres(TextRang[enumer_el]))
                                 g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                enumer_el++;
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "OTL":
                             {
-                                //if (Adres(adres, mas))
+                                //if (Adres(TextRang[enumer_el]))
                                 g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+
+                                enumer_el++;
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "OTU":
                             {
-                                //if (Adres(adres, mas))
+                                //if (Adres(TextRang[enumer_el]))
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+
+                                enumer_el++;//g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "ONS":
                             {
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                enumer_el++;
                                 break;
                             }
                         case "TON":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 75, 50));
-
+                                enumer_el++;
                                 break;
                             }
                         case "MOV":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 75, 50));
-
+                                enumer_el++;
                                 break;
                             }
                         default:
@@ -381,6 +401,7 @@ namespace LogixForms
                                 break;
                             }
                     }
+                    
                 }
                 drow_ind++;
             }
@@ -398,8 +419,9 @@ namespace LogixForms
         /// <param name="CountInBranch">Кол-во элеменов в ветви</param>
         /// <returns>индекс конца перебора, кол-во эл в полученной ветви, ~, точка отрисовки, кол-во ветвей - 1</returns>
         /// <exception cref="Не найден конец ветви"></exception>
-        private int[] DrawElemInSap(string[] rang_text, int IndexStart, int Start_Y, int Start_X, Point point, int CountOfBranch, int CountInBranch)
+        private int[] DrawElemInSap(string[] rang_text, string[] adres_text,int enumel, int IndexStart, int Start_Y, int Start_X, Point point, int CountOfBranch, int CountInBranch)
         {
+            int enum_el = enumel;
             int count_of_branch = CountOfBranch;
             Point p = point;
             bool BranchStart = false;
@@ -425,7 +447,8 @@ namespace LogixForms
                     int[] inf;
                     if (count_of_branch < 2)
                     {
-                        inf = DrawElemInSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, CountInBranch);
+                        inf = DrawElemInSap(rang_text, adres_text, enum_el, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, CountInBranch);
+                        enum_el = inf[2];
                         branch = CountInBranch;
                         count_of_branch--;
                         index = inf[0];
@@ -437,7 +460,8 @@ namespace LogixForms
                     }
                     else
                     {
-                        inf = DrawElemInSap(rang_text, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, 1);
+                        inf = DrawElemInSap(rang_text, adres_text, enum_el, index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, 1);
+                        enum_el = inf[2];
                         p.Y -= top_indent;
                         branch = 0;
                         count_of_branch--;
@@ -453,7 +477,7 @@ namespace LogixForms
                 {
                     int ind3 = drow_ind;
                     MaxYBranch = Math.Max(MaxYBranch, Start_Y);
-                    return new int[] { index, count_el_in_branch, 0, ind3, count_of_branch - 1 };
+                    return new int[] { index, count_el_in_branch, enum_el, ind3, count_of_branch - 1 };
                 }
                 else
                 {
@@ -463,17 +487,23 @@ namespace LogixForms
                     {
                         case "XIO":
                             {
-
-                                g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                               //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                if (!Adres(TextRang[enum_el]))
+                                    g.DrawImage(XIOD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
+                                else
+                                    g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
+                                enum_el++;
+                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
 
                                 break;
                             }
                         case "XIC":
                             {
-
-                                g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                               //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                if (Adres(TextRang[enum_el]))
+                                    g.DrawImage(XICD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
+                                else
+                                    g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
+                                enum_el++;
+                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
                             }
                         case "OTE":
@@ -481,6 +511,7 @@ namespace LogixForms
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                enum_el++;
                                 break;
                             }
                         case "OTL":
@@ -488,6 +519,7 @@ namespace LogixForms
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                enum_el++;
                                 break;
                             }
                         case "OTU":
@@ -495,24 +527,26 @@ namespace LogixForms
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                enum_el++;
                                 break;
                             }
                         case "ONS":
                             {
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                enum_el++;
                                 break;
                             }
                         case "TON":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, Start_Y - 25 - scrollY, 75, 50));
-
+                                enum_el++;
                                 break;
                             }
                         case "MOV":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, Start_Y - 25 - scrollY, 75, 50));
-
+                                enum_el++;
                                 break;
                             }
                         default:

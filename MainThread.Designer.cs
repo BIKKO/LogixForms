@@ -65,7 +65,7 @@
             menu.ForeColor = SystemColors.Menu;
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
-            menu.Size = new Size(982, 41);
+            menu.Size = new Size(919, 41);
             menu.TabIndex = 1;
             // 
             // XIO_el
@@ -92,7 +92,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(982, 28);
+            menuStrip1.Size = new Size(919, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -165,7 +165,7 @@
             // 
             // FileUpdate
             // 
-            FileUpdate.Interval = 1000;
+            FileUpdate.Interval = 2000;
             FileUpdate.Tick += FileUpdate_Tick;
             // 
             // openFileDialog2
@@ -190,20 +190,20 @@
             Files.Location = new Point(0, 41);
             Files.Name = "Files";
             Files.SelectedIndex = 0;
-            Files.Size = new Size(982, 412);
+            Files.Size = new Size(919, 423);
             Files.TabIndex = 2;
             // 
-            // Form1
+            // MainThread
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(982, 453);
+            ClientSize = new Size(919, 464);
             Controls.Add(Files);
             Controls.Add(menu);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
-            Name = "Form1";
+            Name = "MainThread";
             Text = "Logix";
             FormClosing += Form1_FormClosing;
             menu.ResumeLayout(false);

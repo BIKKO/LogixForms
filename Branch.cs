@@ -247,7 +247,7 @@
             if (count_el == 0)
             {
                 g.DrawLine(line, p.X - indent +scrollX, p.Y + top_indent - scrollY, p.X + indent  + scrollX, p.Y + top_indent - scrollY);   //горизонт
-                g.DrawString($"y: {p.Y + top_indent}\nx:{p.X + indent + (wight * count_el)}", new Font("Arial", 10), Brushes.Red, p.X + indent + scrollX+20, p.Y + top_indent - scrollY);
+                //g.DrawString($"y: {p.Y + top_indent}\nx:{p.X + indent + (wight * count_el)}", new Font("Arial", 10), Brushes.Red, p.X + indent + scrollX+20, p.Y + top_indent - scrollY);
                 g.DrawLine(line, p.X - indent + scrollX, p.Y - scrollY, p.X - indent + scrollX, p.Y + top_indent*h - scrollY);
                 g.DrawLine(line, p.X + indent + scrollX, p.Y- scrollY, p.X + indent + scrollX, p.Y + top_indent*h - scrollY);
                 g.DrawEllipse(point, p.X + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
@@ -264,7 +264,7 @@
                     }
                 }
                 g.DrawLine(line, p.X + scrollX, p.Y + top_indent - scrollY, PointOfElemetts[count] + 70 + scrollX, p.Y + top_indent - scrollY);   //горизонт
-                g.DrawString($"y: {p.Y + top_indent}\nx:{PointOfElemetts[count] + 70}", new Font("Arial", 10), Brushes.Red, PointOfElemetts[count] + 70 + scrollX + 20, p.Y + top_indent - scrollY);
+                //g.DrawString($"y: {p.Y + top_indent}\nx:{PointOfElemetts[count] + 70}", new Font("Arial", 10), Brushes.Red, PointOfElemetts[count] + 70 + scrollX + 20, p.Y + top_indent - scrollY);
                 g.DrawLine(line, p.X + scrollX, p.Y - scrollY, p.X+scrollX, p.Y + top_indent-scrollY);//left
                 g.DrawLine(line, PointOfElemetts[count] + 70 + scrollX, p.Y-scrollY, PointOfElemetts[count] + 70+scrollX, p.Y + top_indent-scrollY);//right
                 count = 0;
