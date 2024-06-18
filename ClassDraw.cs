@@ -8,29 +8,13 @@ namespace LogixForms
     /// </summary>
     public class ClassDraw
     {
-        private Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
-            OTE = NodEn.OTE, OTL = NodEn.OTL, XICD = NodDis.XICdis, XIOD = NodDis.XIOdis; // загрузка изображений
         private List<string> info_file;
-        private int isnumber;
-        private  int[,] info;
-        private int[] rang_y;
-        private List<string[]> ElementsRang;
-        private List<string[]> AdresRang;
-        private List<int[]> BIGM;
-        private Dictionary<int, int[,]> Info;
-        private Dictionary<int, int[]> Start;
-        private Dictionary<int, int[]> Stop;
-        private  int CountElInRang = 13;
-        private int[] PointOfElemetts;
-        private int left_indent_rang_x = 50;
-        private int top_indent_rang = 150;
         private VScrollBar VScroll;
         private HScrollBar HScroll;
         private int scroll_y = 0;//смещение
         private int scroll_x = 0;
         private MyTabControl SelectedTab;
-        private Font RangsFont = new Font("Arial", 12); //текст для номера ранга
-        private int[] Timer_control = new int[32];
+        //private Font RangsFont = new Font("Arial", 12); //текст для номера рангаs
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
         int Height, Width;
@@ -51,15 +35,6 @@ namespace LogixForms
             int height, int widht)
         {
             info_file = File;
-            ElementsRang = new List<string[]>();
-            AdresRang = new List<string[]>();
-            info = new int[info_file.Count, 3];
-            rang_y = new int[info_file.Count];
-            BIGM = new List<int[]>();
-            Info = new Dictionary<int, int[,]>();
-            Start = new Dictionary<int, int[]>();
-            Stop = new Dictionary<int, int[]>();
-            PointOfElemetts = new int[CountElInRang + 1];
             VScroll = vScroll;
             HScroll = hScroll;
             SelectedTab = MyTab;
@@ -145,12 +120,6 @@ namespace LogixForms
                 await Task.Delay(60);
                 panel.Refresh();
                 panel.Height = Height - 20;
-
-                if (panel.Height * info_file.Count / 150 >= 150)
-                {
-                    top_indent_rang = (panel.Height * info_file.Count) / 150;
-                }
-                else top_indent_rang = 150;
 
                 if (Width - 50 >= 1300)
                 {

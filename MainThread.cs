@@ -18,28 +18,12 @@ namespace LogixForms
                                                                                                 {"N40",2000},
                                                                                                 {"B3",7200},
                                                                                                 };
-
-        /*
-        private static ushort[] T4 = new ushort[24];
-        private static ushort[] T4_c = new ushort[24];
-        private static ushort[] T4_b = new ushort[24];
-        private static int[] Timer_control = new int[32];
-        private static ushort[] N13 = new ushort[70];
-        private static ushort[] N15 = new ushort[70];
-        private static ushort[] N18 = new ushort[70];
-        private static ushort[] N40 = new ushort[70];
-        private static ushort[] B3 = new ushort[70];*/
-
         //файл(ddd | ddd - copy)
         private static List<List<string>> OpenFileOrCon = new List<List<string>>();
         private static List<string> TextRangs = new List<string>();//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
         private List<VScrollBar> VScrollBarList = new List<VScrollBar>();
         private List<HScrollBar> HScrollBarList = new List<HScrollBar>();
-        //private int isnumber;
-        private bool OpenFile = false;
-        private bool ModbusCl = false;
         private ModbusIpMaster master;
-        private bool NotFount = false;
         private List<ClassDraw> mainWindows = new List<ClassDraw>();
         private List<TcpClient> TcpClients = new List<TcpClient>();
         private TcpClient client;
@@ -47,12 +31,9 @@ namespace LogixForms
 
         public MainThread()
         {
-            //Files.Visible = false;
             InitializeComponent();//инициализация формы
-            //MouseWheel += This_MouseWheel;//подключения колёсика мыши
             Height = int.Parse(Properties.Settings.Default["H"].ToString());
             Width = int.Parse(Properties.Settings.Default["W"].ToString());
-            //Adr = (Dictionary<string, ushort[]>)Properties.Settings.Default["Adres"];
             Adr.Add("T4", new ushort[24]);
             Adr.Add("T4_c", new ushort[24]);
             Adr.Add("Timer_control", new ushort[32]);
@@ -260,7 +241,6 @@ namespace LogixForms
                     Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
                 }*/
 
-                ModbusCl = true;
                 var tb = new TabPage();
                 tb.Text = ip + ':' + port;
 
@@ -325,7 +305,6 @@ namespace LogixForms
                 if (Application.OpenForms["ConnectForms"] == null)
                 {
                     new ConnectForms(this).Show();
-                    OpenFile = false;
                     //con();
                 }
             }
