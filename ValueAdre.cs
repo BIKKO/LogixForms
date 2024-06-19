@@ -5,11 +5,13 @@
         private Dictionary<string, ushort[]> Adr;
         private int select_type_index = 0;
 
-        public ValueAdres(Dictionary<string, ushort[]> adreses)
+        public ValueAdres(ref Dictionary<string, ushort[]> adreses, string NameTab)
         {
             Adr = adreses;
             InitializeComponent();
             Value_type.SelectedIndex = 0;
+            Text += ": " + NameTab;
+            this.Name = NameTab;
         }
 
         /// <summary>
@@ -21,6 +23,7 @@
             {
                 case "Целочисленный":
                     {
+                        dataGridView1.ReadOnly = false;
                         string? s = Adres_name.SelectedItem as string;
                         if (s is null) break;
                         dataGridView1.RowCount = Adr[s].Length;
@@ -36,22 +39,22 @@
                     }
                 case "Бинарный":
                     {
+                        dataGridView1.ReadOnly = true;
                         string? s = Adres_name.SelectedItem as string;
                         if (s is null) break;
                         dataGridView1.RowCount = Adr[s].Length;
                         dataGridView1.ColumnCount = 17;
                         dataGridView1.ColumnHeadersVisible = true;
                         ushort bin;
+                        dataGridView1.Columns[0].Frozen = true;
                         for (int i = 0; i < Adr[s].Length; i++)
                         {
                             dataGridView1.Rows[i].Cells[0].Value = s + ':' + i + '/';
                             bin = Adr[s][i];
-                            
-                            //bin = new string('0', 16 - bin.Length) + bin;
+
                             for (int j = 0; j < 16; j++)
                             {
                                 dataGridView1.Columns[j + 1].HeaderText = (15 - j).ToString();
-                                //if (bin == 0) continue;
                                 if ((bin & 32768 >> j) != 0)
                                 {
                                     if (dataGridView1.Rows[i].Cells[j + 1].Value != (object)1)
@@ -68,6 +71,7 @@
                     }
                 case "HEX":
                     {
+                        dataGridView1.ReadOnly = false;
                         string? s = Adres_name.SelectedItem as string;
                         if (s is null) break;
                         dataGridView1.RowCount = Adr[s].Length;
@@ -108,6 +112,7 @@
         /// <param name="e"></param>
         private void Value_type_SelectedIndexChanged(object sender, EventArgs e)
         {
+            dataGridView1.Select();
             select_type_index = Value_type.SelectedIndex;
             Adres_name_SelectedIndexChanged(sender, e);
         }
@@ -120,6 +125,7 @@
         private void Adres_name_SelectedIndexChanged(object sender, EventArgs e)
         {
             CreateTabl();
+            dataGridView1.Select();
         }
 
         /// <summary>
@@ -133,12 +139,14 @@
             {
                 case "Целочисленный":
                     {
+                        dataGridView1.ReadOnly = false;
                         var cel = dataGridView1.CurrentCellAddress;
                         Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString());
                         break;
                     }
                 case "Бинарный":
                     {
+                        dataGridView1.ReadOnly = true;
                         var cel = dataGridView1.CurrentCellAddress;
                         string s = "";
                         for (int i = 1; i < 17; i++)
@@ -151,6 +159,7 @@
                     }
                 case "HEX":
                     {
+                        dataGridView1.ReadOnly = false;
                         var cel = dataGridView1.CurrentCellAddress;
                         Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString(), System.Globalization.NumberStyles.HexNumber);
                         break;
@@ -175,11 +184,6 @@
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-
-        }
-
         /// <summary>
         /// Завершение просмотра
         /// </summary>
@@ -189,6 +193,41 @@
         {
             Adr = null;
             GC.Collect();
+        }
+
+        /// <summary>
+        /// Изминение по двойнму клику на ячейке
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (Value_type.Items[select_type_index].ToString() == "Бинарный")
+            {
+                dataGridView1.ReadOnly = true;
+                try
+                {
+                    //изенение бита на противоположный
+                    if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "0")
+                        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 1;//дд смену по дабл клику
+                    else
+                        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
+                    //сохранение в памяти
+                    int cel = dataGridView1.CurrentCellAddress.Y;
+                    string s = "";
+                    for (int i = 1; i < 17; i++)
+                    {
+                        s += dataGridView1.Rows[cel].Cells[i].Value.ToString();
+                    }
+                    Adr[Adres_name.SelectedItem.ToString()][cel] = (ushort)ContvertDec(s);
+                }
+                catch { }
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            CreateTabl();
         }
     }
 }

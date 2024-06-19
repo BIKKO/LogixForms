@@ -39,7 +39,7 @@ namespace LogixForms
         /// <param name="start">Старт по координате Y</param>
         /// <param name="num">Номер ранга</param>
         /// <param name="AdresDir">Список адресов</param>
-        public Rang(Graphics graf, ref int scrollY, ref int scrollX, int start, ushort num, Dictionary<string, ushort[]> AdresDir)
+        public Rang(Graphics graf, ref int scrollY, ref int scrollX, int start, ushort num, ref Dictionary<string, ushort[]> AdresDir)
         {
             Adr = AdresDir;
             Number = num;
@@ -338,6 +338,7 @@ namespace LogixForms
 
                                 //g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
                                 enumer_el++;
                                 break;
                             }
@@ -349,6 +350,7 @@ namespace LogixForms
                                     g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
                                 //g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
                                 enumer_el++;
                                 break;
                             }
@@ -356,6 +358,7 @@ namespace LogixForms
                             {
                                 //if (Adres(TextRang[enumer_el]))
                                 g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
                                 enumer_el++;
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
@@ -364,6 +367,7 @@ namespace LogixForms
                             {
                                 //if (Adres(TextRang[enumer_el]))
                                 g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
 
                                 enumer_el++;
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
@@ -373,6 +377,7 @@ namespace LogixForms
                             {
                                 //if (Adres(TextRang[enumer_el]))
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
 
                                 enumer_el++;//g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
@@ -381,18 +386,21 @@ namespace LogixForms
                             {
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
                                 enumer_el++;
                                 break;
                             }
                         case "TON":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 75, 50));
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
                                 enumer_el++;
                                 break;
                             }
                         case "MOV":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 75, 50));
+                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
                                 enumer_el++;
                                 break;
                             }
@@ -401,7 +409,6 @@ namespace LogixForms
                                 break;
                             }
                     }
-                    
                 }
                 drow_ind++;
             }
@@ -491,6 +498,7 @@ namespace LogixForms
                                     g.DrawImage(XIOD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 else
                                     g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-35, Start_Y - scrollY-40);
                                 enum_el++;
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
 
@@ -502,6 +510,7 @@ namespace LogixForms
                                     g.DrawImage(XICD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 else
                                     g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-35, Start_Y - scrollY-40);
                                 enum_el++;
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
@@ -511,6 +520,7 @@ namespace LogixForms
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
                                 enum_el++;
                                 break;
                             }
@@ -519,6 +529,7 @@ namespace LogixForms
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
                                 enum_el++;
                                 break;
                             }
@@ -527,6 +538,7 @@ namespace LogixForms
                                 //if (Adres(adres, mas))
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
                                 enum_el++;
                                 break;
                             }
@@ -534,18 +546,21 @@ namespace LogixForms
                             {
                                 g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
                                 enum_el++;
                                 break;
                             }
                         case "TON":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, Start_Y - 25 - scrollY, 75, 50));
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
                                 enum_el++;
                                 break;
                             }
                         case "MOV":
                             {
                                 g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, Start_Y - 25 - scrollY, 75, 50));
+                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
                                 enum_el++;
                                 break;
                             }

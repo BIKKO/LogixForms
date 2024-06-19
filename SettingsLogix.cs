@@ -13,7 +13,9 @@
             adres_adr = mbadres;
         }
 
-
+        /// <summary>
+        /// Обновление таблицы
+        /// </summary>
         public void UpdateGrid()
         {
             dataGridView1.RowCount = adres.Count;
@@ -26,45 +28,21 @@
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SettingsLogix_Load(object sender, EventArgs e)
         {
             UpdateGrid();
         }
 
-        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
-                if (row.Index == e.RowIndex)
-                {
-                    if (Convert.ToBoolean(row.Cells[0].Value))
-                    {
-                        row.Cells[0].Value = false;
-                        rows.Remove(e.RowIndex);
-                    }
-                    else
-                    {
-                        row.Cells[0].Value = true;
-                        rows.Add(e.RowIndex);
-                    }
-                }
-                else continue;
-            }
-            if (rows.Count > 0)
-            {
-                if (!Delite.Enabled)
-                {
-                    Delite.Enabled = true;
-                    Ref.Enabled = true;
-                }
-            }
-            else
-            {
-                Delite.Enabled = false;
-                Ref.Enabled = false;
-            }
-        }
-
+        /// <summary>
+        /// Сохранение и отображение chekbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == 0)
@@ -93,27 +71,11 @@
                 if (!Delite.Enabled)
                 {
                     Delite.Enabled = true;
-                    Ref.Enabled = true;
                 }
             }
             else
             {
                 Delite.Enabled = false;
-                Ref.Enabled = false;
-            }
-        }
-
-        /// <summary>
-        /// Показ адреса
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Ref_Click(object sender, EventArgs e)
-        {
-            
-            if (Application.OpenForms["ChangeAdres"] == null)
-            {
-                new ChangeAdres(rows,adres, adres_adr,this).Show();
             }
         }
 
@@ -131,7 +93,6 @@
             }
             rows.Clear();
             Delite.Enabled = false;
-            Ref.Enabled = false;
             UpdateGrid();
         }
 

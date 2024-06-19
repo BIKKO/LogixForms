@@ -38,18 +38,21 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCellsExceptHeader;
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.ColumnHeadersVisible = false;
             dataGridView1.Dock = DockStyle.Top;
             dataGridView1.Location = new Point(0, 0);
+            dataGridView1.MultiSelect = false;
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowHeadersVisible = false;
             dataGridView1.RowHeadersWidth = 51;
             dataGridView1.RowTemplate.Height = 29;
             dataGridView1.Size = new Size(342, 384);
             dataGridView1.TabIndex = 0;
+            dataGridView1.CellDoubleClick += dataGridView1_CellDoubleClick;
             dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
             // 
             // Value_type
@@ -77,7 +80,7 @@
             // timer1
             // 
             timer1.Enabled = true;
-            timer1.Interval = 500;
+            timer1.Interval = 250;
             timer1.Tick += timer1_Tick;
             // 
             // ValueAdres
@@ -90,7 +93,7 @@
             Controls.Add(dataGridView1);
             MinimumSize = new Size(360, 500);
             Name = "ValueAdres";
-            Text = "ValueAdre";
+            Text = "Таблица";
             FormClosing += ValueAdres_FormClosing;
             Load += ValueAdres_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();

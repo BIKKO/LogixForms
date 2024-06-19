@@ -8,8 +8,39 @@ namespace LogixForms
     public partial class MainThread : Form
     {
         // значения адресов
-        private static Dictionary<string, ushort[]> Adr = new Dictionary<string, ushort[]>();
-        private static Dictionary<string, ushort> MB_adres = new Dictionary<string, ushort>() { {"T4",1300},
+        private static Dictionary<string, ushort[]> Adr;
+        private static Dictionary<string, ushort> MB_adres;
+        //файл(ddd | ddd - copy)
+        private static List<List<string>> OpenFileOrCon = new List<List<string>>();
+        private static List<string> TextRangs = new List<string>();//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
+        private List<VScrollBar> VScrollBarList = new List<VScrollBar>();
+        private List<HScrollBar> HScrollBarList = new List<HScrollBar>();
+        private ModbusIpMaster master;
+        private List<ClassDraw> mainWindows = new List<ClassDraw>();
+        private List<ClassDraw> ConnectedWindows = new List<ClassDraw>();
+        private List<TcpClient> TcpClients = new List<TcpClient>();
+        private TcpClient client;
+        private byte slave;
+
+
+        public MainThread()
+        {
+            InitializeComponent();//инициализация формы
+            Height = int.Parse(Properties.Settings.Default["H"].ToString());
+            Width = int.Parse(Properties.Settings.Default["W"].ToString());
+            AdresUpdate.Enabled = false;
+            Adr = new Dictionary<string, ushort[]>
+            {
+                { "T4", new ushort[24] },
+                { "T4_c", new ushort[24] },
+                { "Timer_control", new ushort[32] },
+                { "N13", new ushort[70] },
+                { "N15", new ushort[70] },
+                { "N18", new ushort[70] },
+                { "N40", new ushort[70] },
+                { "B3", new ushort[70] }
+            };
+            MB_adres = new Dictionary<string, ushort>() { {"T4",1300},
                                                                                                 {"T4_c",7000},
                                                                                                 {"Timer_control",6800},
                                                                                                 {"N13",1000},
@@ -18,31 +49,7 @@ namespace LogixForms
                                                                                                 {"N40",2000},
                                                                                                 {"B3",7200},
                                                                                                 };
-        //файл(ddd | ddd - copy)
-        private static List<List<string>> OpenFileOrCon = new List<List<string>>();
-        private static List<string> TextRangs = new List<string>();//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
-        private List<VScrollBar> VScrollBarList = new List<VScrollBar>();
-        private List<HScrollBar> HScrollBarList = new List<HScrollBar>();
-        private ModbusIpMaster master;
-        private List<ClassDraw> mainWindows = new List<ClassDraw>();
-        private List<TcpClient> TcpClients = new List<TcpClient>();
-        private TcpClient client;
-
-
-        public MainThread()
-        {
-            InitializeComponent();//инициализация формы
-            Height = int.Parse(Properties.Settings.Default["H"].ToString());
-            Width = int.Parse(Properties.Settings.Default["W"].ToString());
-            Adr.Add("T4", new ushort[24]);
-            Adr.Add("T4_c", new ushort[24]);
-            Adr.Add("Timer_control", new ushort[32]);
-            Adr.Add("N13", new ushort[70]);
-            Adr.Add("N15", new ushort[70]);
-            Adr.Add("N18", new ushort[70]);
-            Adr.Add("N40", new ushort[70]);
-            Adr.Add("B3", new ushort[70]);
-            AdresUpdate.Enabled = false;
+            
         }
 
         /// <summary>
@@ -55,8 +62,9 @@ namespace LogixForms
             string[] adreskey = Adr.Keys.ToArray();
             foreach (string adkey in adreskey)
             {
-                Adr[adkey] = master.ReadHoldingRegisters(1, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
             }
+            ConnectedWindows[^1].SetAdresTab(ref Adr);
         }
 
         /// <summary>
@@ -120,7 +128,7 @@ namespace LogixForms
             if (openFileDialog2.ShowDialog() == DialogResult.OK)
             {
                 var tb = new MyTabPage();
-                tb.Text = openFileDialog2.FileName;
+                tb.Text = openFileDialog2.FileName.Split('\\')[^1];
 
                 VScrollBar vscrol = new()
                 {
@@ -157,7 +165,7 @@ namespace LogixForms
                 Files.SelectTab(Files.TabCount - 1);
                 ClassDraw tab_to_drow = new ClassDraw(pan, File.ReadAllLines(openFileDialog2.FileName,
                     Encoding.UTF8).ToList(), vscrol,
-                    hScroll, Files, Adr, Height, Width);
+                    hScroll, Files, Height, Width);
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
                 MouseWheel += tab_to_drow.This_MouseWheel;
@@ -201,7 +209,7 @@ namespace LogixForms
                 client = new TcpClient(ip, int.Parse(port));
                 TcpClients.Add(client);
                 master = ModbusIpMaster.CreateIp(client);
-                ModBusUpdate.Enabled = true;
+                this.slave = slave;
 
                 ushort[] inputs;
 
@@ -234,12 +242,11 @@ namespace LogixForms
                     if (len != 0) TextRangs.Add(g);
                     else break;
                 }
-                /*
                 string[] adreskey = Adr.Keys.ToArray();
                 foreach (string adkey in adreskey)
                 {
                     Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
-                }*/
+                }
 
                 var tb = new TabPage();
                 tb.Text = ip + ':' + port;
@@ -279,14 +286,18 @@ namespace LogixForms
                 Files.SelectTab(Files.TabCount - 1);
                 ClassDraw tab_to_drow = new ClassDraw(pan, TextRangs, Vscrol,
                     hScroll, Files, Adr, Height, Width);
+                MouseWheel += tab_to_drow.This_MouseWheel;
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
-                MouseWheel += tab_to_drow.This_MouseWheel;
-                
+                ConnectedWindows.Add(tab_to_drow);
+                ModBusUpdate.Enabled = true;
+                AdresUpdate.Enabled = true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.");
+                TcpClients.Clear();
+                new ConnectForms(this).Show();
             }
         }
 
@@ -375,7 +386,7 @@ namespace LogixForms
             Files.TabPages.Add(tb);
             Files.SelectTab(Files.TabCount - 1);
             ClassDraw tab_to_drow = new ClassDraw(pan, new List<string> { "" }, Vscrol,
-                hScroll, Files, Adr, Height, Width);
+                hScroll, Files, Height, Width);
             tab_to_drow.StartDrow();
             mainWindows.Add(tab_to_drow);
         }
@@ -399,9 +410,9 @@ namespace LogixForms
         /// <param name="e"></param>
         private void adresesValuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Application.OpenForms["ValueAdre"] == null)
+            if (Files.TabCount > 0 && Application.OpenForms[Files.SelectedTab.Text] == null)
             {
-                new ValueAdres(Adr).Show();
+                    new ValueAdres(ref mainWindows[Files.SelectedIndex].GetAdresTabl, Files.SelectedTab.Text).Show();
             }
         }
     }

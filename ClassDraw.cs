@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualBasic.Devices;
-using System.Text.RegularExpressions;
-
-namespace LogixForms
+﻿namespace LogixForms
 {
     /// <summary>
     /// Отрисовка программы
@@ -14,7 +11,6 @@ namespace LogixForms
         private int scroll_y = 0;//смещение
         private int scroll_x = 0;
         private MyTabControl SelectedTab;
-        //private Font RangsFont = new Font("Arial", 12); //текст для номера рангаs
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
         int Height, Width;
@@ -42,6 +38,50 @@ namespace LogixForms
             panel = Panel;
             Height = height;
             Width = widht;
+        }
+
+        /// <summary>
+        /// Конструктор отрисовки
+        /// </summary>
+        /// <param name="Panel">Панель, на которой требуется отрисовк программы</param>
+        /// <param name="File">Программа</param>
+        /// <param name="vScroll">Ссылка на вертикальный ползунок</param>
+        /// <param name="hScroll">Ссылка на горизонтальный ползунок</param>
+        /// <param name="MyTab">Окно отображения</param>
+        /// <param name="AdresDir">Список адресов</param>
+        /// <param name="height">Высота</param>
+        /// <param name="widht">Ширина</param>
+        public ClassDraw(MyPanel Panel, List<string> File, VScrollBar vScroll,
+            HScrollBar hScroll, MyTabControl MyTab, int height, int widht)
+        {
+            info_file = File;
+            VScroll = vScroll;
+            HScroll = hScroll;
+            SelectedTab = MyTab;
+            Adr = new Dictionary<string, ushort[]>
+            {
+                { "T4", new ushort[24] },
+                { "T4_c", new ushort[24] },
+                { "Timer_control", new ushort[32] },
+                { "N13", new ushort[70] },
+                { "N15", new ushort[70] },
+                { "N18", new ushort[70] },
+                { "N40", new ushort[70] },
+                { "B3", new ushort[70] }
+            };
+            panel = Panel;
+            Height = height;
+            Width = widht;
+        }
+
+        public ref Dictionary<string, ushort[]> GetAdresTabl
+        {
+            get { return ref Adr; }
+        }
+
+        public void SetAdresTab(ref Dictionary<string, ushort[]> tab)
+        {
+            Adr = tab;
         }
 
         /// <summary>
@@ -85,7 +125,7 @@ namespace LogixForms
             ushort count_rangs = 1;
             foreach (string str in info_file)
             {
-                rang = new Rang(g, ref scroll_y, ref scroll_x, y, count_rangs, Adr);
+                rang = new Rang(g, ref scroll_y, ref scroll_x, y, count_rangs, ref Adr);
                 rang.Draw(str);
                 y = rang.Max;
                 count_rangs++;
@@ -105,7 +145,6 @@ namespace LogixForms
             Graphics g = e.Graphics;
             g.Clear(Color.White);
             Draw(e);
-            return;
         }
 
         /// <summary>
@@ -116,8 +155,7 @@ namespace LogixForms
             panel.Paint += PaintText;
             while(true)
             {
-                
-                await Task.Delay(60);
+                await Task.Delay(100);
                 panel.Refresh();
                 panel.Height = Height - 20;
 

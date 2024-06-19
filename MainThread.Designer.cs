@@ -228,7 +228,6 @@
         private SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Timer AdresUpdate;
         private System.Windows.Forms.Timer MemoryClear;
-        private Panel panel1;
         private MyTabControl Files;
         private ToolStripMenuItem newToolStripMenuItem;
         private Button XIO_el;

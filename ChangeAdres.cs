@@ -17,6 +17,7 @@
             adres = adreses;
             sl = owner;
             MB_AdresList = mbaders;
+            name_adr = new string[] { };
         }
 
 

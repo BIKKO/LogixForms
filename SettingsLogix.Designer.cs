@@ -28,18 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             tabControl1 = new TabControl();
             Common = new TabPage();
             Adreses = new TabPage();
             AddBut = new Button();
             Delite = new Button();
-            Ref = new Button();
             dataGridView1 = new DataGridView();
             Выбор = new DataGridViewCheckBoxColumn();
             Names = new DataGridViewTextBoxColumn();
             MB_Adres = new DataGridViewTextBoxColumn();
             Len = new DataGridViewTextBoxColumn();
+            timer1 = new System.Windows.Forms.Timer(components);
+            label1 = new Label();
             tabControl1.SuspendLayout();
+            Common.SuspendLayout();
             Adreses.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -57,6 +60,7 @@
             // 
             // Common
             // 
+            Common.Controls.Add(label1);
             Common.Location = new Point(4, 29);
             Common.Name = "Common";
             Common.Padding = new Padding(3);
@@ -69,7 +73,6 @@
             // 
             Adreses.Controls.Add(AddBut);
             Adreses.Controls.Add(Delite);
-            Adreses.Controls.Add(Ref);
             Adreses.Controls.Add(dataGridView1);
             Adreses.Location = new Point(4, 29);
             Adreses.Name = "Adreses";
@@ -82,7 +85,7 @@
             // AddBut
             // 
             AddBut.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            AddBut.Location = new Point(409, 279);
+            AddBut.Location = new Point(501, 279);
             AddBut.Name = "AddBut";
             AddBut.Size = new Size(89, 27);
             AddBut.TabIndex = 3;
@@ -102,18 +105,6 @@
             Delite.UseVisualStyleBackColor = true;
             Delite.Click += Delite_Click;
             // 
-            // Ref
-            // 
-            Ref.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            Ref.Enabled = false;
-            Ref.Location = new Point(504, 279);
-            Ref.Name = "Ref";
-            Ref.Size = new Size(89, 27);
-            Ref.TabIndex = 1;
-            Ref.Text = "Изменить";
-            Ref.UseVisualStyleBackColor = true;
-            Ref.Click += Ref_Click;
-            // 
             // dataGridView1
             // 
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -123,14 +114,12 @@
             dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Выбор, Names, MB_Adres, Len });
             dataGridView1.Location = new Point(3, 3);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersVisible = false;
             dataGridView1.RowHeadersWidth = 51;
             dataGridView1.RowTemplate.Height = 29;
             dataGridView1.Size = new Size(668, 270);
             dataGridView1.TabIndex = 0;
             dataGridView1.CellClick += dataGridView1_CellClick;
-            dataGridView1.CellDoubleClick += dataGridView1_CellDoubleClick;
             // 
             // Выбор
             // 
@@ -138,7 +127,6 @@
             Выбор.HeaderText = "";
             Выбор.MinimumWidth = 6;
             Выбор.Name = "Выбор";
-            Выбор.ReadOnly = true;
             Выбор.TrueValue = "1";
             Выбор.Width = 24;
             // 
@@ -148,14 +136,12 @@
             Names.HeaderText = "Имя";
             Names.MinimumWidth = 6;
             Names.Name = "Names";
-            Names.ReadOnly = true;
             // 
             // MB_Adres
             // 
             MB_Adres.HeaderText = "Адрес";
             MB_Adres.MinimumWidth = 6;
             MB_Adres.Name = "MB_Adres";
-            MB_Adres.ReadOnly = true;
             MB_Adres.Width = 80;
             // 
             // Len
@@ -163,8 +149,22 @@
             Len.HeaderText = "Длинна";
             Len.MinimumWidth = 6;
             Len.Name = "Len";
-            Len.ReadOnly = true;
             Len.Width = 91;
+            // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Interval = 1000;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point);
+            label1.Location = new Point(111, 123);
+            label1.Name = "label1";
+            label1.Size = new Size(454, 57);
+            label1.TabIndex = 0;
+            label1.Text = "Временно ничего нет!";
             // 
             // SettingsLogix
             // 
@@ -177,6 +177,8 @@
             Text = "SettingsLogix";
             Load += SettingsLogix_Load;
             tabControl1.ResumeLayout(false);
+            Common.ResumeLayout(false);
+            Common.PerformLayout();
             Adreses.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
@@ -189,11 +191,12 @@
         private TabPage Adreses;
         private DataGridView dataGridView1;
         private Button Delite;
-        private Button Ref;
         private Button AddBut;
         private DataGridViewCheckBoxColumn Выбор;
         private DataGridViewTextBoxColumn Names;
         private DataGridViewTextBoxColumn Len;
         private DataGridViewTextBoxColumn MB_Adres;
+        private System.Windows.Forms.Timer timer1;
+        private Label label1;
     }
 }
