@@ -51,6 +51,7 @@
             AdresUpdate = new System.Windows.Forms.Timer(components);
             MemoryClear = new System.Windows.Forms.Timer(components);
             Files = new MyTabControl();
+            OutToLogix = new ToolStripMenuItem();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -89,7 +90,7 @@
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem, OutToLogix });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(919, 28);
@@ -193,6 +194,12 @@
             Files.Size = new Size(919, 423);
             Files.TabIndex = 2;
             // 
+            // OutToLogix
+            // 
+            OutToLogix.Name = "OutToLogix";
+            OutToLogix.Size = new Size(39, 24);
+            OutToLogix.Text = "->";
+            // 
             // MainThread
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -233,6 +240,7 @@
         private Button XIO_el;
         private Button XIC_el;
         private ToolStripMenuItem adresesValuesToolStripMenuItem;
+        private ToolStripMenuItem OutToLogix;
     }
 
 }

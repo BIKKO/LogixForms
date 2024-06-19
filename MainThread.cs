@@ -106,16 +106,24 @@ namespace LogixForms
         /// <param name="e"></param>
         private void close_Click(object sender, EventArgs e)
         {
-            MouseWheel -= mainWindows[Files.SelectedIndex].This_MouseWheel;
-            mainWindows[Files.SelectedIndex] = null;
-            mainWindows.Remove(mainWindows[Files.SelectedIndex]);
-            if (TcpClients.Count > 0)
+            try
             {
-                TcpClients[0] = null;
-                TcpClients.Clear();
+                MouseWheel -= mainWindows[Files.SelectedIndex].This_MouseWheel;
+                if (TcpClients.Count > 0)
+                {
+                    TcpClients[0] = null;
+                    TcpClients.Clear();
+                }
             }
-            Files.TabPages.Remove(Files.SelectedTab);
-            GC.Collect();
+            finally
+            {
+                VScrollBarList.Remove(VScrollBarList[Files.SelectedIndex]);
+                HScrollBarList.Remove(HScrollBarList[Files.SelectedIndex]);
+                ClassDraw cd = mainWindows[Files.SelectedIndex];
+                mainWindows.Remove(cd);
+                Files.TabPages.Remove(Files.SelectedTab);
+                GC.Collect();
+            }
         }
 
         /// <summary>
@@ -157,15 +165,16 @@ namespace LogixForms
                 var close = new ToolStripMenuItem("Закрыть");
                 contextMenu.Items.Add(close);
                 tb.ContextMenuStrip = contextMenu;
+                contextMenu = null;
                 close.Click += close_Click;
                 pan.Controls.Add(vscrol);
                 pan.Controls.Add(hScroll);
                 tb.Controls.Add(pan);
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
-                ClassDraw tab_to_drow = new ClassDraw(pan, File.ReadAllLines(openFileDialog2.FileName,
-                    Encoding.UTF8).ToList(), vscrol,
-                    hScroll, Files, Height, Width);
+                List<string> Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
+                ClassDraw tab_to_drow = new ClassDraw(ref pan, ref Text, ref vscrol,
+                    ref hScroll, ref Files, Height, Width);
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
                 MouseWheel += tab_to_drow.This_MouseWheel;
@@ -278,6 +287,7 @@ namespace LogixForms
                 var close = new ToolStripMenuItem("Закрыть");
                 contextMenu.Items.Add(close);
                 tb.ContextMenuStrip = contextMenu;
+                contextMenu = null;
                 close.Click += close_Click;
                 pan.Controls.Add(Vscrol);
                 pan.Controls.Add(hScroll);
@@ -354,7 +364,7 @@ namespace LogixForms
             var tb = new MyTabPage();
             tb.Text = openFileDialog2.FileName;
 
-            VScrollBar Vscrol = new()
+            VScrollBar vscrol = new()
             {
                 Dock = DockStyle.Right,
                 Width = 20,
@@ -379,14 +389,16 @@ namespace LogixForms
             var close = new ToolStripMenuItem("Закрыть");
             contextMenu.Items.Add(close);
             tb.ContextMenuStrip = contextMenu;
+            contextMenu = null;
             close.Click += close_Click;
-            pan.Controls.Add(Vscrol);
+            pan.Controls.Add(vscrol);
             pan.Controls.Add(hScroll);
             tb.Controls.Add(pan);
             Files.TabPages.Add(tb);
             Files.SelectTab(Files.TabCount - 1);
-            ClassDraw tab_to_drow = new ClassDraw(pan, new List<string> { "" }, Vscrol,
-                hScroll, Files, Height, Width);
+            List<string> Text = new List<string> { "" };
+            ClassDraw tab_to_drow = new ClassDraw(ref pan, ref Text, ref vscrol,
+                    ref hScroll, ref Files, Height, Width);
             tab_to_drow.StartDrow();
             mainWindows.Add(tab_to_drow);
         }

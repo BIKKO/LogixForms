@@ -14,6 +14,7 @@
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
         int Height, Width;
+        private Rang rang;
 
         /// <summary>
         /// Конструктор отрисовки
@@ -51,8 +52,8 @@
         /// <param name="AdresDir">Список адресов</param>
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>
-        public ClassDraw(MyPanel Panel, List<string> File, VScrollBar vScroll,
-            HScrollBar hScroll, MyTabControl MyTab, int height, int widht)
+        public ClassDraw(ref MyPanel Panel, ref List<string> File, ref VScrollBar vScroll,
+            ref HScrollBar hScroll, ref MyTabControl MyTab, int height, int widht)
         {
             info_file = File;
             VScroll = vScroll;
@@ -72,6 +73,19 @@
             panel = Panel;
             Height = height;
             Width = widht;
+        }
+
+        ~ClassDraw()
+        {
+            info_file.Clear();
+            info_file = null;
+            VScroll = null;
+            HScroll = null;
+            SelectedTab = null;
+            Adr.Clear();
+            Adr = null;
+            panel = null;
+            //GC.Collect();
         }
 
         public ref Dictionary<string, ushort[]> GetAdresTabl
@@ -121,7 +135,6 @@
             scroll_x = panel.Width > 1300 ? HScroll.Value = 0 : -HScroll.Value;
             Graphics g = e.Graphics;//использование графики
             int y = 0;
-            Rang rang;
             ushort count_rangs = 1;
             foreach (string str in info_file)
             {
