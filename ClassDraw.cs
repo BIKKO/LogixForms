@@ -75,19 +75,6 @@
             Width = widht;
         }
 
-        ~ClassDraw()
-        {
-            info_file.Clear();
-            info_file = null;
-            VScroll = null;
-            HScroll = null;
-            SelectedTab = null;
-            Adr.Clear();
-            Adr = null;
-            panel = null;
-            //GC.Collect();
-        }
-
         public ref Dictionary<string, ushort[]> GetAdresTabl
         {
             get { return ref Adr; }
@@ -168,7 +155,8 @@
             panel.Paint += PaintText;
             while(true)
             {
-                await Task.Delay(100);
+                await Task.Delay(200);
+
                 panel.Refresh();
                 panel.Height = Height - 20;
 

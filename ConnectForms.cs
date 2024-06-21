@@ -5,13 +5,12 @@
         MainThread form1;
         private int isnumber;
         private int slave;
-        private string[] ip_and_port = new string[2];
+        private string ip_and_port;
+
         public ConnectForms(MainThread owner)
         {
             form1 = owner;
             InitializeComponent();
-            for (int i = 1; i < 6; i++)
-                Slave.Items.Add(i);
         }
 
         /// <summary>
@@ -25,16 +24,6 @@
         }
 
         /// <summary>
-        /// Определение ID
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            slave = Slave.SelectedIndex + 1;
-        }
-
-        /// <summary>
         /// Обработка и передача полученных значений
         /// </summary>
         /// <param name="sender"></param>
@@ -43,8 +32,8 @@
         {
             try
             {
-                ip_and_port = IP.Text.Split(':');
-                string[] ip_buf = ip_and_port[0].Split('.');
+                ip_and_port = IP.Text;
+                string[] ip_buf = ip_and_port.Split('.');
                 if (ip_buf.Length == 4)
                 {
                     foreach (string ip in ip_buf)
@@ -64,20 +53,9 @@
             {
                 MessageBox.Show("Не верно указан IP адрес: встречено не число");
             }
-            if (!int.TryParse(Step.Text, out isnumber)) MessageBox.Show("Введите число");
 
-            if (ip_and_port.Length < 2)
-            {
-                comboBox1_SelectedIndexChanged(sender, e);
-                form1.con(ip_and_port[0], "502", int.Parse(Step.Text), (byte)slave);
-                Close();
-            }
-            else
-            {
-                comboBox1_SelectedIndexChanged(sender, e);
-                form1.con(ip_and_port[0], ip_and_port[1], int.Parse(Step.Text), (byte)slave);
-                Close();
-            }
+            form1.con(ip_and_port, Port.Text, (byte)slave);
+            Close();
         }
     }
 }

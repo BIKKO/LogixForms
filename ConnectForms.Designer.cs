@@ -32,18 +32,16 @@
             button1 = new Button();
             button2 = new Button();
             IP = new TextBox();
-            Step = new TextBox();
             label1 = new Label();
-            label2 = new Label();
-            label3 = new Label();
-            Slave = new ComboBox();
+            label4 = new Label();
+            Port = new TextBox();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(99, 144);
+            button1.Location = new Point(91, 62);
             button1.Name = "button1";
-            button1.Size = new Size(111, 34);
+            button1.Size = new Size(109, 34);
             button1.TabIndex = 0;
             button1.Text = "Connect";
             button1.UseVisualStyleBackColor = true;
@@ -51,9 +49,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(216, 144);
+            button2.Location = new Point(208, 62);
             button2.Name = "button2";
-            button2.Size = new Size(111, 34);
+            button2.Size = new Size(109, 34);
             button2.TabIndex = 1;
             button2.Text = "Cancel";
             button2.UseVisualStyleBackColor = true;
@@ -61,19 +59,12 @@
             // 
             // IP
             // 
-            IP.Location = new Point(64, 18);
+            IP.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            IP.Location = new Point(59, 15);
             IP.Name = "IP";
-            IP.Size = new Size(263, 27);
+            IP.Size = new Size(108, 30);
             IP.TabIndex = 2;
             IP.Text = "127.0.0.1";
-            // 
-            // Step
-            // 
-            Step.Location = new Point(64, 51);
-            Step.Name = "Step";
-            Step.Size = new Size(263, 27);
-            Step.TabIndex = 3;
-            Step.Text = "240";
             // 
             // label1
             // 
@@ -84,43 +75,31 @@
             label1.TabIndex = 5;
             label1.Text = "IP";
             // 
-            // label2
+            // label4
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(14, 60);
-            label2.Name = "label2";
-            label2.Size = new Size(39, 20);
-            label2.TabIndex = 6;
-            label2.Text = "Step";
+            label4.AutoSize = true;
+            label4.Location = new Point(185, 18);
+            label4.Name = "label4";
+            label4.Size = new Size(35, 20);
+            label4.TabIndex = 10;
+            label4.Text = "Port";
             // 
-            // label3
+            // Port
             // 
-            label3.AutoSize = true;
-            label3.Location = new Point(14, 91);
-            label3.Name = "label3";
-            label3.Size = new Size(44, 20);
-            label3.TabIndex = 7;
-            label3.Text = "Slave";
-            // 
-            // Slave
-            // 
-            Slave.FormattingEnabled = true;
-            Slave.Location = new Point(64, 91);
-            Slave.Name = "Slave";
-            Slave.Size = new Size(61, 28);
-            Slave.TabIndex = 8;
-            Slave.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            Port.Location = new Point(242, 15);
+            Port.Name = "Port";
+            Port.Size = new Size(75, 27);
+            Port.TabIndex = 9;
+            Port.Text = "502";
             // 
             // ConnectForms
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(345, 190);
-            Controls.Add(Slave);
-            Controls.Add(label3);
-            Controls.Add(label2);
+            ClientSize = new Size(331, 108);
+            Controls.Add(label4);
+            Controls.Add(Port);
             Controls.Add(label1);
-            Controls.Add(Step);
             Controls.Add(IP);
             Controls.Add(button2);
             Controls.Add(button1);
@@ -138,10 +117,8 @@
         private Button button1;
         private Button button2;
         private TextBox IP;
-        private TextBox Step;
         private Label label1;
-        private Label label2;
-        private Label label3;
-        private ComboBox Slave;
+        private Label label4;
+        private TextBox Port;
     }
 }

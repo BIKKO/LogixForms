@@ -41,14 +41,14 @@ namespace LogixForms
                 { "B3", new ushort[70] }
             };
             MB_adres = new Dictionary<string, ushort>() { {"T4",1300},
-                                                                                                {"T4_c",7000},
-                                                                                                {"Timer_control",6800},
-                                                                                                {"N13",1000},
-                                                                                                {"N15",600},
-                                                                                                {"N18",1200},
-                                                                                                {"N40",2000},
-                                                                                                {"B3",7200},
-                                                                                                };
+                                                        {"T4_c",7000},
+                                                        {"Timer_control",6800},
+                                                        {"N13",1000},
+                                                        {"N15",600},
+                                                        {"N18",1200},
+                                                        {"N40",2000},
+                                                        {"B3",7200},
+                                                        };
             
         }
 
@@ -113,6 +113,7 @@ namespace LogixForms
                 {
                     TcpClients[0] = null;
                     TcpClients.Clear();
+                    AdresUpdate.Enabled = false;
                 }
             }
             finally
@@ -172,9 +173,12 @@ namespace LogixForms
                 tb.Controls.Add(pan);
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
-                List<string> Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
+                List<string> Text;
+                if (tb.Text.Contains("ldf")) Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
+                else Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
                 ClassDraw tab_to_drow = new ClassDraw(ref pan, ref Text, ref vscrol,
                     ref hScroll, ref Files, Height, Width);
+                //BeginInvoke(new MethodInvoker(tab_to_drow.StartDrow));
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
                 MouseWheel += tab_to_drow.This_MouseWheel;
@@ -190,7 +194,7 @@ namespace LogixForms
         {
             saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
             saveFileDialog1.RestoreDirectory = true;
-            saveFileDialog1.DefaultExt = "RandsSave";
+            saveFileDialog1.DefaultExt = "RangsSave";
             saveFileDialog1.Filter = "txt files (*.txt) | *.txt";
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -208,9 +212,9 @@ namespace LogixForms
         /// </summary>
         /// <param name="ip">IP адрес</param>
         /// <param name="port">ѕорт</param>
-        /// <param name="step">Ўаг считывани€ ModBus адресов(устанавливать 1 при считывании с устройства)</param>
+        /// <param name="simulate"></param>
         /// <param name="slave">ID</param>
-        public void con(string ip, string port, int step, byte slave)
+        public void con(string ip, string port, byte slave)
         {
             try
             {
