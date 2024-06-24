@@ -10,11 +10,6 @@ namespace LogixForms
         // значения адресов
         private static Dictionary<string, ushort[]> Adr;
         private static Dictionary<string, ushort> MB_adres;
-        //файл(ddd | ddd - copy)
-        private static List<List<string>> OpenFileOrCon = new List<List<string>>();
-        private static List<string> TextRangs = new List<string>();//= File.ReadAllLines(@"C:\Users\njnji\Desktop\проеты\matplotlib\ddd", Encoding.UTF8);
-        private List<VScrollBar> VScrollBarList = new List<VScrollBar>();
-        private List<HScrollBar> HScrollBarList = new List<HScrollBar>();
         private ModbusIpMaster master;
         private List<ClassDraw> mainWindows = new List<ClassDraw>();
         private List<ClassDraw> ConnectedWindows = new List<ClassDraw>();
@@ -95,8 +90,6 @@ namespace LogixForms
         private void FileUpdate_Tick(object sender, EventArgs e)
         {
             FileUpdate.Enabled = false;
-            OpenFileOrCon[Files.SelectedIndex].Clear();
-            foreach (var el in File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8)) OpenFileOrCon[Files.SelectedIndex].Add(el);
         }
 
         /// <summary>
@@ -118,8 +111,6 @@ namespace LogixForms
             }
             finally
             {
-                VScrollBarList.Remove(VScrollBarList[Files.SelectedIndex]);
-                HScrollBarList.Remove(HScrollBarList[Files.SelectedIndex]);
                 ClassDraw cd = mainWindows[Files.SelectedIndex];
                 mainWindows.Remove(cd);
                 Files.TabPages.Remove(Files.SelectedTab);
@@ -134,6 +125,7 @@ namespace LogixForms
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            openFileDialog2.Filter = "My files (*.LDF)|*.ldf|txt files (*.txt)|*.txt|All files (*.*)|*.*";
             if (openFileDialog2.ShowDialog() == DialogResult.OK)
             {
                 var tb = new MyTabPage();
@@ -160,8 +152,6 @@ namespace LogixForms
                     Maximum = pan.Width,
                     Minimum = 0,
                 };
-                VScrollBarList.Add(vscrol);
-                HScrollBarList.Add(hScroll);
                 ContextMenuStrip contextMenu = new ContextMenuStrip();
                 var close = new ToolStripMenuItem("Закрыть");
                 contextMenu.Items.Add(close);
@@ -174,11 +164,20 @@ namespace LogixForms
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
                 List<string> Text;
-                if (tb.Text.Contains("ldf")) Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
-                else Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
-                ClassDraw tab_to_drow = new ClassDraw(ref pan, ref Text, ref vscrol,
-                    ref hScroll, ref Files, Height, Width);
-                //BeginInvoke(new MethodInvoker(tab_to_drow.StartDrow));
+                ClassDraw tab_to_drow;
+                if (tb.Text.Contains("ldf"))
+                {
+                    Dictionary<string, ushort[]> adr = CreateFile.GetData(openFileDialog2.FileName);
+                    Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
+                    tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                    ref hScroll, ref Files, ref adr, Height, Width);
+                }
+                else
+                {
+                    Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
+                    tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                        ref hScroll, ref Files, Height, Width);
+                }
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
                 MouseWheel += tab_to_drow.This_MouseWheel;
@@ -195,15 +194,25 @@ namespace LogixForms
             saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
             saveFileDialog1.RestoreDirectory = true;
             saveFileDialog1.DefaultExt = "RangsSave";
-            saveFileDialog1.Filter = "txt files (*.txt) | *.txt";
+            saveFileDialog1.Filter = "My files (*.ldf)|*.ldf|txt files (*.txt)|*.txt";
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
+                if (Files.SelectedTab.Text != saveFileDialog1.FileName.Split('\\')[^1]) Files.SelectedTab.Text = saveFileDialog1.FileName.Split('\\')[^1];
                 Stream file = saveFileDialog1.OpenFile();
                 StreamWriter sw = new StreamWriter(file);
-                foreach (string rang in OpenFileOrCon[Files.SelectedIndex])
+                if (saveFileDialog1.FileName.Contains(".ldf"))
+                {
+                    sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl));
+                    sw.Close();
+                    file.Close();
+                    return;
+                }
+                foreach (string rang in mainWindows[Files.SelectedIndex].GetTextRang)
                     sw.WriteLine(rang);
                 sw.Close();
                 file.Close();
+                file.Dispose();
+                sw.Dispose();
             }
         }
 
@@ -218,7 +227,7 @@ namespace LogixForms
         {
             try
             {
-                TextRangs.Clear();
+                List<string> TextRangs = new List<string>();
                 client = new TcpClient(ip, int.Parse(port));
                 TcpClients.Add(client);
                 master = ModbusIpMaster.CreateIp(client);
@@ -264,7 +273,10 @@ namespace LogixForms
                 var tb = new TabPage();
                 tb.Text = ip + ':' + port;
 
-                VScrollBar Vscrol = new()
+                client.Dispose();
+                master.Dispose();
+
+                VScrollBar vscrol = new()
                 {
                     Dock = DockStyle.Right,
                     Width = 20,
@@ -285,21 +297,19 @@ namespace LogixForms
                     Maximum = pan.Width,
                     Minimum = 0,
                 };
-                VScrollBarList.Add(Vscrol);
-                HScrollBarList.Add(hScroll);
                 ContextMenuStrip contextMenu = new ContextMenuStrip();
                 var close = new ToolStripMenuItem("Закрыть");
                 contextMenu.Items.Add(close);
                 tb.ContextMenuStrip = contextMenu;
                 contextMenu = null;
                 close.Click += close_Click;
-                pan.Controls.Add(Vscrol);
+                pan.Controls.Add(vscrol);
                 pan.Controls.Add(hScroll);
                 tb.Controls.Add(pan);
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
-                ClassDraw tab_to_drow = new ClassDraw(pan, TextRangs, Vscrol,
-                    hScroll, Files, Adr, Height, Width);
+                ClassDraw tab_to_drow = new ClassDraw(ref pan, TextRangs, ref vscrol,
+                    ref hScroll, ref Files, ref Adr, Height, Width);
                 MouseWheel += tab_to_drow.This_MouseWheel;
                 tab_to_drow.StartDrow();
                 mainWindows.Add(tab_to_drow);
@@ -401,7 +411,7 @@ namespace LogixForms
             Files.TabPages.Add(tb);
             Files.SelectTab(Files.TabCount - 1);
             List<string> Text = new List<string> { "" };
-            ClassDraw tab_to_drow = new ClassDraw(ref pan, ref Text, ref vscrol,
+            ClassDraw tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
                     ref hScroll, ref Files, Height, Width);
             tab_to_drow.StartDrow();
             mainWindows.Add(tab_to_drow);
@@ -428,7 +438,7 @@ namespace LogixForms
         {
             if (Files.TabCount > 0 && Application.OpenForms[Files.SelectedTab.Text] == null)
             {
-                    new ValueAdres(ref mainWindows[Files.SelectedIndex].GetAdresTabl, Files.SelectedTab.Text).Show();
+                    new ValueAdres(ref mainWindows[Files.SelectedIndex].GetDataTabl, Files.SelectedTab.Text).Show();
             }
         }
     }

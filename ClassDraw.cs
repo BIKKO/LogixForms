@@ -27,8 +27,8 @@
         /// <param name="AdresDir">Список адресов</param>
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>
-        public ClassDraw(MyPanel Panel, List<string> File, VScrollBar vScroll, 
-            HScrollBar hScroll, MyTabControl MyTab, Dictionary<string, ushort[]> AdresDir,
+        public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll, 
+            ref HScrollBar hScroll, ref MyTabControl MyTab, ref Dictionary<string, ushort[]> AdresDir,
             int height, int widht)
         {
             info_file = File;
@@ -52,7 +52,7 @@
         /// <param name="AdresDir">Список адресов</param>
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>
-        public ClassDraw(ref MyPanel Panel, ref List<string> File, ref VScrollBar vScroll,
+        public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
             ref HScrollBar hScroll, ref MyTabControl MyTab, int height, int widht)
         {
             info_file = File;
@@ -75,10 +75,12 @@
             Width = widht;
         }
 
-        public ref Dictionary<string, ushort[]> GetAdresTabl
+        public ref Dictionary<string, ushort[]> GetDataTabl
         {
             get { return ref Adr; }
         }
+
+        public string[] GetTextRang => info_file.ToArray();
 
         public void SetAdresTab(ref Dictionary<string, ushort[]> tab)
         {
