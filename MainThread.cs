@@ -9,13 +9,12 @@ namespace LogixForms
     {
         // значения адресов
         private static Dictionary<string, ushort[]> Adr;
-        private static Dictionary<string, ushort> MB_adres;
-        private ModbusIpMaster master;
+        protected static Dictionary<string, ushort> MB_adres;
+        public ModbusIpMaster master;
         private List<ClassDraw> mainWindows = new List<ClassDraw>();
-        private List<ClassDraw> ConnectedWindows = new List<ClassDraw>();
-        private List<TcpClient> TcpClients = new List<TcpClient>();
+        private List<int> ConnectedWindows = new List<int>();
         private TcpClient client;
-        private byte slave;
+        private byte slave = 1;
 
 
         public MainThread()
@@ -57,9 +56,9 @@ namespace LogixForms
             string[] adreskey = Adr.Keys.ToArray();
             foreach (string adkey in adreskey)
             {
+                //Thread.Sleep(100);
                 Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
             }
-            ConnectedWindows[^1].SetAdresTab(ref Adr);
         }
 
         /// <summary>
@@ -102,11 +101,12 @@ namespace LogixForms
             try
             {
                 MouseWheel -= mainWindows[Files.SelectedIndex].This_MouseWheel;
-                if (TcpClients.Count > 0)
+                if (ConnectedWindows.Contains(Files.SelectedIndex) && ConnectedWindows.Count - 1 == 0)
                 {
-                    TcpClients[0] = null;
-                    TcpClients.Clear();
                     AdresUpdate.Enabled = false;
+                    ModBusUpdate.Enabled = false;
+                    master = null;
+                    ConnectedWindows.Remove(Files.SelectedIndex);
                 }
             }
             finally
@@ -114,6 +114,7 @@ namespace LogixForms
                 ClassDraw cd = mainWindows[Files.SelectedIndex];
                 mainWindows.Remove(cd);
                 Files.TabPages.Remove(Files.SelectedTab);
+                cd.Dispose();
                 GC.Collect();
             }
         }
@@ -167,20 +168,31 @@ namespace LogixForms
                 ClassDraw tab_to_drow;
                 if (tb.Text.Contains("ldf"))
                 {
-                    Dictionary<string, ushort[]> adr = CreateFile.GetData(openFileDialog2.FileName);
-                    Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
-                    tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                    ref hScroll, ref Files, ref adr, Height, Width);
+                    new Thread(()=>
+                    {
+                        BeginInvoke(new MethodInvoker(() =>
+                        {
+                            Dictionary<string, ushort[]> adr = CreateFile.GetData(openFileDialog2.FileName);
+                            Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
+                            tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                            ref hScroll, ref Files, ref adr, Height, Width, CreateFile.GetTegs(openFileDialog2.FileName));
+                            tab_to_drow.StartDrow();
+                            mainWindows.Add(tab_to_drow);
+                            MouseWheel += tab_to_drow.This_MouseWheel;
+                        }
+                        ));
+                    }).Start();
                 }
                 else
                 {
                     Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
                     tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
                         ref hScroll, ref Files, Height, Width);
+                    tab_to_drow.StartDrow();
+                    mainWindows.Add(tab_to_drow);
+                    MouseWheel += tab_to_drow.This_MouseWheel;
                 }
-                tab_to_drow.StartDrow();
-                mainWindows.Add(tab_to_drow);
-                MouseWheel += tab_to_drow.This_MouseWheel;
+                
             }
         }
 
@@ -202,7 +214,7 @@ namespace LogixForms
                 StreamWriter sw = new StreamWriter(file);
                 if (saveFileDialog1.FileName.Contains(".ldf"))
                 {
-                    sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl));
+                    sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl, CreateFile.CreateTEGS(mainWindows[Files.SelectedIndex].GetTegs)));
                     sw.Close();
                     file.Close();
                     return;
@@ -229,15 +241,14 @@ namespace LogixForms
             {
                 List<string> TextRangs = new List<string>();
                 client = new TcpClient(ip, int.Parse(port));
-                TcpClients.Add(client);
+                //TcpClients.Add(client);
                 master = ModbusIpMaster.CreateIp(client);
-                this.slave = slave;
 
                 ushort[] inputs;
 
                 for (int j = 0; j < 100; j++)
                 {
-                    inputs = master.ReadHoldingRegisters(slave, (ushort)(j + 8000), 120);
+                    inputs = master.ReadHoldingRegisters(1, (ushort)(j + 8000), 120);
                     string g = "";
                     int len = 0;
                     int buf;
@@ -267,14 +278,11 @@ namespace LogixForms
                 string[] adreskey = Adr.Keys.ToArray();
                 foreach (string adkey in adreskey)
                 {
-                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                    Adr[adkey] = master.ReadHoldingRegisters(1, MB_adres[adkey], (ushort)Adr[adkey].Length);
                 }
 
                 var tb = new TabPage();
                 tb.Text = ip + ':' + port;
-
-                client.Dispose();
-                master.Dispose();
 
                 VScrollBar vscrol = new()
                 {
@@ -308,64 +316,29 @@ namespace LogixForms
                 tb.Controls.Add(pan);
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
-                ClassDraw tab_to_drow = new ClassDraw(ref pan, TextRangs, ref vscrol,
+
+                new Thread(() =>
+                {
+                    BeginInvoke(new MethodInvoker(() =>
+                    {
+                        ClassDraw tab_to_drow = new ClassDraw(ref pan, TextRangs, ref vscrol,
                     ref hScroll, ref Files, ref Adr, Height, Width);
-                MouseWheel += tab_to_drow.This_MouseWheel;
-                tab_to_drow.StartDrow();
-                mainWindows.Add(tab_to_drow);
-                ConnectedWindows.Add(tab_to_drow);
-                ModBusUpdate.Enabled = true;
-                AdresUpdate.Enabled = true;
+                        MouseWheel += tab_to_drow.This_MouseWheel;
+                        tab_to_drow.StartDrow();
+                        ConnectedWindows.Add(mainWindows.Count);
+                        mainWindows.Add(tab_to_drow);
+                        ModBusUpdate.Enabled = true;
+                        AdresUpdate.Enabled = true;
+                    }
+                    ));
+                }).Start();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.");
-                TcpClients.Clear();
+                ConnectedWindows.Remove(mainWindows.Count-1);
                 new ConnectForms(this).Show();
             }
-        }
-
-        /// <summary>
-        /// Вызов окна для ввода данных при подключении
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (TcpClients.Count < 1)
-            {
-                FileUpdate.Enabled = false;
-                //ModBusUpdate.Enabled = true;
-
-                if (Application.OpenForms["ConnectForms"] == null)
-                {
-                    new ConnectForms(this).Show();
-                    //con();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Вызов окна настроек
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (Application.OpenForms["SettingsLogix"] == null)
-            {
-                new SettingsLogix(Adr, MB_adres).Show();
-            }
-        }
-
-        /// <summary>
-        /// Вызов окна справки
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Временно ничего нет!");
         }
 
         /// <summary>
@@ -410,11 +383,77 @@ namespace LogixForms
             tb.Controls.Add(pan);
             Files.TabPages.Add(tb);
             Files.SelectTab(Files.TabCount - 1);
-            List<string> Text = new List<string> { "" };
-            ClassDraw tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                    ref hScroll, ref Files, Height, Width);
-            tab_to_drow.StartDrow();
-            mainWindows.Add(tab_to_drow);
+
+            new Thread(() =>
+            {
+                BeginInvoke(new MethodInvoker(() =>
+                {
+                    List<string> Text = new List<string> { "" };
+                    ClassDraw tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                            ref hScroll, ref Files, Height, Width);
+                    tab_to_drow.StartDrow();
+                    mainWindows.Add(tab_to_drow);
+                    MouseWheel += tab_to_drow.This_MouseWheel;
+                }
+                ));
+            }).Start();
+        }
+
+        /// <summary>
+        /// Вызов окна для ввода данных при подключении
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ConnectedWindows.Count < 1)
+            {
+                FileUpdate.Enabled = false;
+                //ModBusUpdate.Enabled = true;
+
+                if (Application.OpenForms["ConnectForms"] == null)
+                {
+                    new ConnectForms(this).Show();
+                    //con();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Вызов окна настроек
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms["SettingsLogix"] == null)
+            {
+                new SettingsLogix(Adr, MB_adres).Show();
+            }
+        }
+
+        /// <summary>
+        /// Вызов окна справки
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Временно ничего нет!");
+        }
+
+        /// <summary>
+        /// Получение таблицы значений адресов
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void adresesValuesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Files.TabCount > 0 && Application.OpenForms[Files.SelectedTab.Text] == null)
+            {
+                bool flag = ConnectedWindows.Contains(Files.SelectedIndex);
+                new ValueAdres(ref mainWindows[Files.SelectedIndex].GetDataTabl, Files.SelectedTab.Text, master, ref MB_adres, ref flag).Show();
+            }
         }
 
         /// <summary>
@@ -427,19 +466,6 @@ namespace LogixForms
             Properties.Settings.Default["H"] = Height;
             Properties.Settings.Default["W"] = Width;
             Properties.Settings.Default.Save();
-        }
-
-        /// <summary>
-        /// Получение таблицы значений адресов
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void adresesValuesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (Files.TabCount > 0 && Application.OpenForms[Files.SelectedTab.Text] == null)
-            {
-                    new ValueAdres(ref mainWindows[Files.SelectedIndex].GetDataTabl, Files.SelectedTab.Text).Show();
-            }
         }
     }
 }

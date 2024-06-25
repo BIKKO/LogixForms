@@ -6,6 +6,7 @@
         Dictionary<string, ushort> MbAdress;
         int u;
         SettingsLogix sl;
+
         public AddAdres(Dictionary<string, ushort[]> adreses, Dictionary<string, ushort> MbAdres, SettingsLogix owner)
         {
             InitializeComponent();

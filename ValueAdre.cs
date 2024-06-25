@@ -1,18 +1,28 @@
-﻿namespace LogixForms
+﻿using Modbus.Device;
+using Modbus.Extensions.Enron;
+
+namespace LogixForms
 {
     public partial class ValueAdres : Form
     {
         private Dictionary<string, ushort[]> Adr;
         private int select_type_index = 0;
+        private ModbusIpMaster master;
+        private Dictionary<string, ushort> MBAdres;
+        private bool ConActiv;
 
-        public ValueAdres(ref Dictionary<string, ushort[]> adreses, string NameTab)
+        public ValueAdres(ref Dictionary<string, ushort[]> adreses, string NameTab, ModbusIpMaster _master, ref Dictionary<string, ushort> _MBAdres, ref bool _ConActiv)
         {
             Adr = adreses;
             InitializeComponent();
             Value_type.SelectedIndex = 0;
             Text += ": " + NameTab;
             this.Name = NameTab;
+            master = _master;
+            MBAdres = _MBAdres;
+            ConActiv = _ConActiv;
         }
+
 
         /// <summary>
         /// Создание и изменение таблицы значаний
@@ -142,6 +152,10 @@
                         dataGridView1.ReadOnly = false;
                         var cel = dataGridView1.CurrentCellAddress;
                         Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString());
+                        if (master != null && ConActiv)
+                        {
+                            master.WriteSingleRegister(1, (ushort)(MBAdres[Adres_name.SelectedItem.ToString()] + cel.Y), Adr[Adres_name.SelectedItem.ToString()][cel.Y]);
+                        }
                         break;
                     }
                 case "Бинарный":
@@ -155,6 +169,11 @@
                         }
                         //MessageBox.Show(ContvertDec(s).ToString());
                         Adr[Adres_name.SelectedItem.ToString()][cel.Y] = (ushort)ContvertDec(s);
+                        if (master != null && ConActiv)
+                        {
+                            //master.WriteMultipleRegisters(1, MBAdres[Adres_name.SelectedItem.ToString()], Adr[Adres_name.SelectedItem.ToString()]);
+                            master.WriteSingleRegister(1, (ushort)(MBAdres[Adres_name.SelectedItem.ToString()]+ cel.Y), Adr[Adres_name.SelectedItem.ToString()][cel.Y]);
+                        }
                         break;
                     }
                 case "HEX":
@@ -162,6 +181,10 @@
                         dataGridView1.ReadOnly = false;
                         var cel = dataGridView1.CurrentCellAddress;
                         Adr[Adres_name.SelectedItem.ToString()][cel.Y] = ushort.Parse(dataGridView1.Rows[cel.Y].Cells[1].Value.ToString(), System.Globalization.NumberStyles.HexNumber);
+                        if (master != null && ConActiv)
+                        {
+                            master.WriteSingleRegister(1, (ushort)(MBAdres[Adres_name.SelectedItem.ToString()] + cel.Y), Adr[Adres_name.SelectedItem.ToString()][cel.Y]);
+                        }
                         break;
                     }
                 default: break;
@@ -191,7 +214,10 @@
         /// <param name="e"></param>
         private void ValueAdres_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Adr.Clear();
             Adr = null;
+            MBAdres.Clear();
+            MBAdres = null;
             GC.Collect();
         }
 
@@ -220,6 +246,10 @@
                         s += dataGridView1.Rows[cel].Cells[i].Value.ToString();
                     }
                     Adr[Adres_name.SelectedItem.ToString()][cel] = (ushort)ContvertDec(s);
+                    if (master != null && ConActiv)
+                    {
+                        master.WriteSingleRegister(1, (ushort)(MBAdres[Adres_name.SelectedItem.ToString()] + cel), Adr[Adres_name.SelectedItem.ToString()][cel]);
+                    }
                 }
                 catch { }
             }

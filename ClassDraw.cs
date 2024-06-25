@@ -15,6 +15,7 @@
         private MyPanel panel;
         int Height, Width;
         private Rang rang;
+        Dictionary<string, string[]> Tegs;
 
         /// <summary>
         /// Конструктор отрисовки
@@ -27,7 +28,69 @@
         /// <param name="AdresDir">Список адресов</param>
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>
+        /// /// <param name="_Tegs">Список тегов</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll, 
+            ref HScrollBar hScroll, ref MyTabControl MyTab, ref Dictionary<string, ushort[]> AdresDir,
+            int height, int widht, Dictionary<string, string[]> _Tegs)
+        {
+            info_file = File;
+            VScroll = vScroll;
+            HScroll = hScroll;
+            SelectedTab = MyTab;
+            Adr = AdresDir;
+            panel = Panel;
+            Height = height;
+            Width = widht;
+            Tegs = _Tegs;
+        }
+
+        /// <summary>
+        /// Конструктор отрисовки
+        /// </summary>
+        /// <param name="Panel">Панель, на которой требуется отрисовк программы</param>
+        /// <param name="File">Программа</param>
+        /// <param name="vScroll">Ссылка на вертикальный ползунок</param>
+        /// <param name="hScroll">Ссылка на горизонтальный ползунок</param>
+        /// <param name="MyTab">Окно отображения</param>
+        /// <param name="height">Высота</param>
+        /// <param name="widht">Ширина</param>
+        /// <param name="_Tegs">Список тегов</param>
+        public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
+            ref HScrollBar hScroll, ref MyTabControl MyTab, int height, int widht, Dictionary<string, string[]> _Tegs)
+        {
+            Tegs = _Tegs;
+            info_file = File;
+            VScroll = vScroll;
+            HScroll = hScroll;
+            SelectedTab = MyTab;
+            Adr = new Dictionary<string, ushort[]>
+            {
+                { "T4", new ushort[24] },
+                { "T4_c", new ushort[24] },
+                { "Timer_control", new ushort[32] },
+                { "N13", new ushort[70] },
+                { "N15", new ushort[70] },
+                { "N18", new ushort[70] },
+                { "N40", new ushort[70] },
+                { "B3", new ushort[70] }
+            };
+            panel = Panel;
+            Height = height;
+            Width = widht;
+        }
+
+        /// <summary>
+        /// Конструктор отрисовки
+        /// </summary>
+        /// <param name="Panel">Панель, на которой требуется отрисовк программы</param>
+        /// <param name="File">Программа</param>
+        /// <param name="vScroll">Ссылка на вертикальный ползунок</param>
+        /// <param name="hScroll">Ссылка на горизонтальный ползунок</param>
+        /// <param name="MyTab">Окно отображения</param>
+        /// <param name="AdresDir">Список адресов</param>
+        /// <param name="height">Высота</param>
+        /// <param name="widht">Ширина</param>
+        public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
             ref HScrollBar hScroll, ref MyTabControl MyTab, ref Dictionary<string, ushort[]> AdresDir,
             int height, int widht)
         {
@@ -49,9 +112,8 @@
         /// <param name="vScroll">Ссылка на вертикальный ползунок</param>
         /// <param name="hScroll">Ссылка на горизонтальный ползунок</param>
         /// <param name="MyTab">Окно отображения</param>
-        /// <param name="AdresDir">Список адресов</param>
         /// <param name="height">Высота</param>
-        /// <param name="widht">Ширина</param>
+        /// <param name="widht">Ширина</param>>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
             ref HScrollBar hScroll, ref MyTabControl MyTab, int height, int widht)
         {
@@ -75,14 +137,29 @@
             Width = widht;
         }
 
+        /// <summary>
+        /// Получение адресов
+        /// </summary>
         public ref Dictionary<string, ushort[]> GetDataTabl
         {
             get { return ref Adr; }
         }
 
+        /// <summary>
+        /// Полчение текста рангов
+        /// </summary>
         public string[] GetTextRang => info_file.ToArray();
 
-        public void SetAdresTab(ref Dictionary<string, ushort[]> tab)
+        /// <summary>
+        /// Получение тегов
+        /// </summary>
+        public Dictionary<string, string[]> GetTegs => Tegs;
+
+        /// <summary>
+        /// Установление значения данныйх
+        /// </summary>
+        /// <param name="tab">Новые данные</param>
+        public void SetAdresTab(Dictionary<string, ushort[]> tab)
         {
             Adr = tab;
         }
@@ -127,7 +204,7 @@
             ushort count_rangs = 1;
             foreach (string str in info_file)
             {
-                rang = new Rang(g, ref scroll_y, ref scroll_x, y, count_rangs, ref Adr);
+                rang = new Rang(g, ref scroll_y, ref scroll_x, y, count_rangs, ref Adr, Tegs);
                 rang.Draw(str);
                 y = rang.Max;
                 count_rangs++;
@@ -176,6 +253,24 @@
                 }
                 Width = panel.Width;
             }
+        }
+
+        /// <summary>
+        /// Уничтожение экземпляра данного класса
+        /// </summary>
+        public void Dispose()
+        {
+            rang.Dispose();
+            panel.Paint -= PaintText;
+            panel.Dispose();
+            info_file.Clear();
+            info_file = null;
+            Tegs.Clear();
+            Tegs = null;
+            Adr.Clear();
+            Adr = null;
+            SelectedTab = null;
+            GC.Collect();
         }
     }
 }
