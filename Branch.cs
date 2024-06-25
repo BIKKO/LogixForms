@@ -59,6 +59,67 @@
         }
 
         /// <summary>
+        /// Очистка нарисованной ветви
+        /// </summary>
+        public void ClearBranch() => Drow(new Pen(Brushes.White), new Pen(Brushes.White, 7));
+
+        /// <summary>
+        /// Нарисовать вевь
+        /// </summary>
+        public void DrowBranch()
+        {
+            Drow(new Pen(Brushes.Red), new Pen(Brushes.Brown, 7));
+        }
+
+        /// <summary>
+        /// Отрисовка ветви
+        /// </summary>
+        /// <param name="line">Инструмент отрисовки линий ветви</param>
+        /// <param name="point">Инструмент отрисовки точек</param>
+        private void Drow(Pen line, Pen point)
+        {
+            if (count_el == 0)
+            {
+                g.DrawLine(line, p.X - indent +scrollX, p.Y + top_indent - scrollY, p.X + indent  + scrollX, p.Y + top_indent - scrollY);   //горизонт
+                //g.DrawString($"y: {p.Y + top_indent}\nx:{p.X + indent + (wight * count_el)}", new Font("Arial", 10), Brushes.Red, p.X + indent + scrollX+20, p.Y + top_indent - scrollY);
+                g.DrawLine(line, p.X - indent + scrollX, p.Y - scrollY, p.X - indent + scrollX, p.Y + top_indent*h - scrollY);
+                g.DrawLine(line, p.X + indent + scrollX, p.Y- scrollY, p.X + indent + scrollX, p.Y + top_indent*h - scrollY);
+                g.DrawEllipse(point, p.X + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
+            }
+            else
+            {
+                byte count = 0;
+                for (int i = 0; i < PointOfElemetts.Length; i++)
+                {
+                    if (PointOfElemetts[i] == p.X - 70)
+                    {
+                        count = (byte)(i+count_el + 1);
+                        break;
+                    }
+                }
+                g.DrawLine(line, p.X + scrollX, p.Y + top_indent - scrollY, PointOfElemetts[count] + 70 + scrollX, p.Y + top_indent - scrollY);   //горизонт
+                //g.DrawString($"y: {p.Y + top_indent}\nx:{PointOfElemetts[count] + 70}", new Font("Arial", 10), Brushes.Red, PointOfElemetts[count] + 70 + scrollX + 20, p.Y + top_indent - scrollY);
+                g.DrawLine(line, p.X + scrollX, p.Y - scrollY, p.X+scrollX, p.Y + top_indent-scrollY);//left
+                g.DrawLine(line, PointOfElemetts[count] + 70 + scrollX, p.Y-scrollY, PointOfElemetts[count] + 70+scrollX, p.Y + top_indent-scrollY);//right
+                count = 0;
+                foreach (var item in PointOfElemetts)
+                {
+                    if (item > p.X - 70)
+                    {
+                        g.DrawEllipse(point, item + 70 + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
+                        count++;
+                        if (count == count_el) break;
+                    }
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            PointOfElemetts = null;
+        }
+
+        /// <summary>
         /// добавление елемента в ветку
         /// </summary>
         /// <param name="a"></param>
@@ -221,62 +282,6 @@
             set
             {
                 if(value >0) h = value;
-            }
-        }
-
-        /// <summary>
-        /// Очистка нарисованной ветви
-        /// </summary>
-        public void ClearBranch() => Drow(new Pen(Brushes.White), new Pen(Brushes.White, 7));
-
-        /// <summary>
-        /// Нарисовать вевь
-        /// </summary>
-        public void DrowBranch()
-        {
-            Drow(new Pen(Brushes.Red), new Pen(Brushes.Brown, 7));
-        }
-
-        /// <summary>
-        /// Отрисовка ветви
-        /// </summary>
-        /// <param name="line">Инструмент отрисовки линий ветви</param>
-        /// <param name="point">Инструмент отрисовки точек</param>
-        private void Drow(Pen line, Pen point)
-        {
-            if (count_el == 0)
-            {
-                g.DrawLine(line, p.X - indent +scrollX, p.Y + top_indent - scrollY, p.X + indent  + scrollX, p.Y + top_indent - scrollY);   //горизонт
-                //g.DrawString($"y: {p.Y + top_indent}\nx:{p.X + indent + (wight * count_el)}", new Font("Arial", 10), Brushes.Red, p.X + indent + scrollX+20, p.Y + top_indent - scrollY);
-                g.DrawLine(line, p.X - indent + scrollX, p.Y - scrollY, p.X - indent + scrollX, p.Y + top_indent*h - scrollY);
-                g.DrawLine(line, p.X + indent + scrollX, p.Y- scrollY, p.X + indent + scrollX, p.Y + top_indent*h - scrollY);
-                g.DrawEllipse(point, p.X + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
-            }
-            else
-            {
-                byte count = 0;
-                for (int i = 0; i < PointOfElemetts.Length; i++)
-                {
-                    if (PointOfElemetts[i] == p.X - 70)
-                    {
-                        count = (byte)(i+count_el + 1);
-                        break;
-                    }
-                }
-                g.DrawLine(line, p.X + scrollX, p.Y + top_indent - scrollY, PointOfElemetts[count] + 70 + scrollX, p.Y + top_indent - scrollY);   //горизонт
-                //g.DrawString($"y: {p.Y + top_indent}\nx:{PointOfElemetts[count] + 70}", new Font("Arial", 10), Brushes.Red, PointOfElemetts[count] + 70 + scrollX + 20, p.Y + top_indent - scrollY);
-                g.DrawLine(line, p.X + scrollX, p.Y - scrollY, p.X+scrollX, p.Y + top_indent-scrollY);//left
-                g.DrawLine(line, PointOfElemetts[count] + 70 + scrollX, p.Y-scrollY, PointOfElemetts[count] + 70+scrollX, p.Y + top_indent-scrollY);//right
-                count = 0;
-                foreach (var item in PointOfElemetts)
-                {
-                    if (item > p.X - 70)
-                    {
-                        g.DrawEllipse(point, item + 70 + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
-                        count++;
-                        if (count == count_el) break;
-                    }
-                }
             }
         }
     }

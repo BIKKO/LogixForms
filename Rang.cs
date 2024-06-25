@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Text.RegularExpressions;
 
 namespace LogixForms
 {
@@ -9,8 +7,18 @@ namespace LogixForms
     /// </summary>
     internal class Rang
     {
-        private readonly Bitmap XIC = NodEn.XIC, XIO = NodEn.XIO, Timer_Move = NodEn.Timer___Move, EnDnTt = NodEn.EN_DN_TT, OTU = NodEn.OTU,
-            OTE = NodEn.OTE, OTL = NodEn.OTL, XICD = NodDis.XICdis, XIOD = NodDis.XIOdis; // загрузка изображений
+        //private static readonly Dictionary<string, ElementDraw> _El = new Dictionary<string, ElementDraw>()
+        //{
+        //    {"XIC", new XIC() },
+        //    {"XIO", new XIO() },
+        //    {"OTE", new OTE() },
+        //    {"OTU", new OTU() },
+        //    {"OTL", new OTL() },
+        //    {"TON", new Timer() },
+        //    {"MOV", new Move() },
+        //    {"ADD", new Add() },
+        //};
+        private ElementDraw El;
         private readonly Pen pen_line = new Pen(Brushes.Blue);
         private readonly Pen PenOfPoint = new Pen(Brushes.Yellow, 7);
         private readonly Regex mask = new Regex(@"((\s?[A-Z]\d?\d?\d?:\d?\d?\d?)(/\b?\b?)?\s?)|[0.0-9999.0]");// Выделение мномоник
@@ -28,7 +36,7 @@ namespace LogixForms
         private ushort Number;
         private Dictionary<string, ushort[]> Adr;
         Dictionary<string, string[]> Tegs;
-        private int[] Timer_control = new int[32];
+        
         private string[] TextRang;
 
         /// <summary>
@@ -50,7 +58,7 @@ namespace LogixForms
             g = graf;
             MaxYRangs = top_indent_rang + startY;
             MaxYBranch = 0;
-
+            
             ReadyStart();
         }
 
@@ -106,7 +114,7 @@ namespace LogixForms
         /// <param name="st">Адрес</param>
         /// <param name="mas">Название</param>
         /// <returns>Активность</returns>
-        private bool Adres(string st)
+        /*private bool Adres(string st)
         {
             try
             {
@@ -165,7 +173,7 @@ namespace LogixForms
             {
                 return false;
             }
-        }
+        }*/
 
         /// <summary>
         /// Отображение основной ветви ранга
@@ -215,7 +223,7 @@ namespace LogixForms
                 }
                 drow_ind++;
             }
-
+            branch.Dispose();
             g.DrawLine(pen_line, left_indent_rang_x + scrollX, startY - scrollY - 50, left_indent_rang_x + scrollX, Max - scrollY);
             g.DrawString(Number.ToString(), new Font("Arial", 12), Brushes.DimGray, (int)(left_indent_rang_x * .4) + scrollX, startY + top_indent_rang - 10 - scrollY);
         }
@@ -352,127 +360,154 @@ namespace LogixForms
                 else
                 {
                     if (BranchStart) branch++;
+
+                    //try
+                    //{
+                    //    Point point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                    //    El = _El[el];
+                    //    El.Draw(g, TextRang[enumer_el], point, Adr);
+                    //    if (Tegs != null)
+                    //        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                    //        {
+                    //            point.Y -= 35;
+                    //            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                    //        }
+                    //    enumer_el++;
+                    //}
+                    //catch { enumer_el++; }
+                    Point point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-20, top_indent_rang + startY - scrollY-13);
                     switch (el)
                     {
                         case "XIO":
                             {
-                                if (!Adres(TextRang[enumer_el]))
-                                    g.DrawImage(XIOD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                else
-                                    g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-
-                                //g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if(Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;
+                                try
+                                {
+                                    El = new XIO();
+                                    El.Draw(g, TextRang[enumer_el], point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                                        {
+                                            point.Y -= 35;
+                                            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                                        }
+                                    enumer_el++;
+                                    El.Dispose();
+                                }
+                                catch { enumer_el++; }
                                 break;
                             }
                         case "XIC":
                             {
-                                if (Adres(TextRang[enumer_el]))
-                                    g.DrawImage(XICD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                else
-                                    g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                //g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;
+                                try
+                                {
+                                    El = new XIC();
+                                    El.Draw(g, TextRang[enumer_el], point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                                        {
+                                            point.Y -= 35;
+                                            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                                        }
+                                    enumer_el++;
+                                    El.Dispose();
+                                }
+                                catch { enumer_el++; }
                                 break;
                             }
                         case "OTE":
                             {
-                                //if (Adres(TextRang[enumer_el]))
-                                g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;
+                                try
+                                {
+                                    El = new OTE();
+                                    El.Draw(g, TextRang[enumer_el], point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                                        {
+                                            point.Y -= 35;
+                                            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                                        }
+                                    enumer_el++;
+                                }
+                                catch { enumer_el++; }
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "OTL":
                             {
-                                //if (Adres(TextRang[enumer_el]))
-                                g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;
+                                try
+                                {
+                                    El = new OTU();
+                                    El.Draw(g, TextRang[enumer_el], point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                                        {
+                                            point.Y -= 35;
+                                            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                                        }
+                                    enumer_el++;
+                                    El.Dispose();
+                                }
+                                catch { enumer_el++; }
                                 //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "OTU":
                             {
-                                //if (Adres(TextRang[enumer_el]))
-                                g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;//g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
+                                try
+                                {
+                                    El = new OTU();
+                                    El.Draw(g, TextRang[enumer_el], point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                                        {
+                                            point.Y -= 35;
+                                            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                                        }
+                                    enumer_el++;
+                                    El.Dispose();
+                                }
+                                catch { enumer_el++; }//g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
                                 break;
                             }
                         case "ONS":
                             {
-                                g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 54, 50));
-                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;
+                                    enumer_el++;
                                 break;
                             }
                         case "TON":
                             {
-                                g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 75, 50));
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;
+                                try
+                                {
+                                    El = new Timer();
+                                    El.Draw(g, TextRang[enumer_el], point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                                        {
+                                            point.Y -= 35;
+                                            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                                        }
+                                    enumer_el++;
+                                    El.Dispose();
+                                }
+                                catch { enumer_el++; }
                                 break;
                             }
                         case "MOV":
                             {
-                                g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25, 75, 50));
-                                g.DrawString(TextRang[enumer_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enumer_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enumer_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enumer_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, ((4 * top_indent_rang) / 4) + startY - scrollY - 78);
-                                    }
-                                enumer_el++;
+                                try
+                                {
+                                    El = new Move();
+                                    El.Draw(g, TextRang[enumer_el], point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enumer_el]))
+                                        {
+                                            point.Y -= 35;
+                                            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
+                                        }
+                                    enumer_el++;
+                                    El.Dispose();
+                                }
+                                catch { enumer_el++; }
                                 break;
                             }
                         default:
@@ -483,6 +518,7 @@ namespace LogixForms
                 }
                 drow_ind++;
             }
+            El.Dispose();
         }
 
         /// <summary>
@@ -561,126 +597,157 @@ namespace LogixForms
                 {
                     count_el_in_branch++;
                     if (BranchStart) branch++;
+                    //try
+                    //{
+                    //    Point _point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY);
+                    //    El = _El[el];
+                    //    El.Draw(g, TextRang[enum_el], _point, Adr);
+                    //    if (Tegs != null)
+                    //        if (Tegs.ContainsKey(TextRang[enum_el]))
+                    //        {
+                    //            _point.Y -= 35;
+                    //            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                    //        }
+                    //    enum_el++;
+                    //}
+                    //catch { enum_el++; }
+
+
+                    Point _point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-20, Start_Y - scrollY-13);
                     switch (el)
                     {
                         case "XIO":
                             {
-                                if (!Adres(TextRang[enum_el]))
-                                    g.DrawImage(XIOD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                else
-                                    g.DrawImage(XIO, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
-                                enum_el++;
+                                try
+                                {
+                                    El = new XIO();
+                                    El.Draw(g, TextRang[enum_el], _point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enum_el]))
+                                        {
+                                            _point.Y -= 35;
+                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                                        }
+                                    enum_el++;
+                                    El.Dispose();
+                                }
+                                catch { enum_el++; }
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
 
                                 break;
                             }
                         case "XIC":
                             {
-                                if (Adres(TextRang[enum_el]))
-                                    g.DrawImage(XICD, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                else
-                                    g.DrawImage(XIC, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
-                                enum_el++;
+                                try
+                                {
+                                    El = new XIC();
+                                    El.Draw(g, TextRang[enum_el], _point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enum_el]))
+                                        {
+                                            _point.Y -= 35;
+                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                                        }
+                                    enum_el++;
+                                    El.Dispose();
+                                }
+                                catch { enum_el++; }
                                 //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
                                 break;
                             }
                         case "OTE":
                             {
-                                //if (Adres(adres, mas))
-                                g.DrawImage(OTE, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
-                                enum_el++;
+                                try
+                                {
+                                    El = new OTE();
+                                    El.Draw(g, TextRang[enum_el], _point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enum_el]))
+                                        {
+                                            _point.Y -= 35;
+                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                                        }
+                                    enum_el++;
+                                    El.Dispose();
+                                }
+                                catch { enum_el++; }
                                 break;
                             }
                         case "OTL":
                             {
-                                //if (Adres(adres, mas))
-                                g.DrawImage(OTL, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
-                                enum_el++;
+                                try
+                                {
+                                    El = new OTL();
+                                    El.Draw(g, TextRang[enum_el], _point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enum_el]))
+                                        {
+                                            _point.Y -= 35;
+                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                                        }
+                                    enum_el++;
+                                    El.Dispose();
+                                }
+                                catch { enum_el++; }
                                 break;
                             }
                         case "OTU":
                             {
-                                //if (Adres(adres, mas))
-                                g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
-                                enum_el++;
+                                try
+                                {
+                                    El = new OTU();
+                                    El.Draw(g, TextRang[enum_el], _point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enum_el]))
+                                        {
+                                            _point.Y -= 35;
+                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                                        }
+                                    enum_el++;
+                                    El.Dispose();
+                                }
+                                catch { enum_el++; }
                                 break;
                             }
                         case "ONS":
                             {
-                                g.DrawImage(OTU, new Rectangle(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY, 54, 50));
-                                //g.DrawString($"y: {Start_Y - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, Start_Y - 25 - scrollY);
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
                                 enum_el++;
                                 break;
                             }
                         case "TON":
                             {
-                                g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, Start_Y - 25 - scrollY, 75, 50));
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
-                                enum_el++;
+                                try
+                                {
+                                    El = new Timer();
+                                    El.Draw(g, TextRang[enum_el], _point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enum_el]))
+                                        {
+                                            _point.Y -= 35;
+                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                                        }
+                                    enum_el++;
+                                    El.Dispose();
+                                }
+                                catch { enum_el++; }
                                 break;
                             }
                         case "MOV":
                             {
-                                g.DrawImage(Timer_Move, new Rectangle(left_indent_rang_x + PointOfElemetts[index == rang_text.Length - 1 ? 12 : drow_ind] - 37 + scrollX, Start_Y - 25 - scrollY, 75, 50));
-                                g.DrawString(TextRang[enum_el], new Font("Arial", 10), Brushes.Black, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35, Start_Y - scrollY-40);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[enum_el]))
-                                    {
-                                        g.DrawString(Tegs[TextRang[enum_el]][0], new Font("Arial", 10), Brushes.Blue, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 60);
-                                        g.DrawString(Tegs[TextRang[enum_el]][1], new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 35,  Start_Y - scrollY - 78);
-                                    }
-                                enum_el++;
+                                try
+                                {
+                                    El = new Move();
+                                    El.Draw(g, TextRang[enum_el], _point, Adr);
+                                    if (Tegs != null)
+                                        if (Tegs.ContainsKey(TextRang[enum_el]))
+                                        {
+                                            _point.Y -= 35;
+                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
+                                        }
+                                    enum_el++;
+                                    El.Dispose();
+                                }
+                                catch { enum_el++; }
                                 break;
                             }
                         default:

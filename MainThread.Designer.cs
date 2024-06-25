@@ -44,6 +44,7 @@
             adresesValuesToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
+            OutToLogix = new ToolStripMenuItem();
             ModBusUpdate = new System.Windows.Forms.Timer(components);
             FileUpdate = new System.Windows.Forms.Timer(components);
             openFileDialog2 = new OpenFileDialog();
@@ -51,7 +52,6 @@
             AdresUpdate = new System.Windows.Forms.Timer(components);
             MemoryClear = new System.Windows.Forms.Timer(components);
             Files = new MyTabControl();
-            OutToLogix = new ToolStripMenuItem();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -159,6 +159,12 @@
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
+            // OutToLogix
+            // 
+            OutToLogix.Name = "OutToLogix";
+            OutToLogix.Size = new Size(39, 24);
+            OutToLogix.Text = "->";
+            // 
             // ModBusUpdate
             // 
             ModBusUpdate.Interval = 1000;
@@ -182,7 +188,7 @@
             // MemoryClear
             // 
             MemoryClear.Enabled = true;
-            MemoryClear.Interval = 3000;
+            MemoryClear.Interval = 10000;
             MemoryClear.Tick += MemoryClear_Tick;
             // 
             // Files
@@ -193,12 +199,6 @@
             Files.SelectedIndex = 0;
             Files.Size = new Size(919, 423);
             Files.TabIndex = 2;
-            // 
-            // OutToLogix
-            // 
-            OutToLogix.Name = "OutToLogix";
-            OutToLogix.Size = new Size(39, 24);
-            OutToLogix.Text = "->";
             // 
             // MainThread
             // 

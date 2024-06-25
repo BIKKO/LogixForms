@@ -43,7 +43,6 @@ namespace LogixForms
                                                         {"N40",2000},
                                                         {"B3",7200},
                                                         };
-            
         }
 
         /// <summary>
@@ -113,7 +112,9 @@ namespace LogixForms
             {
                 ClassDraw cd = mainWindows[Files.SelectedIndex];
                 mainWindows.Remove(cd);
+                TabPage tp = Files.SelectedTab;
                 Files.TabPages.Remove(Files.SelectedTab);
+                tp.Dispose();
                 cd.Dispose();
                 GC.Collect();
             }
@@ -173,9 +174,10 @@ namespace LogixForms
                         BeginInvoke(new MethodInvoker(() =>
                         {
                             Dictionary<string, ushort[]> adr = CreateFile.GetData(openFileDialog2.FileName);
+                            int wh = Files.SelectedTab.Width;
                             Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
                             tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                            ref hScroll, ref Files, ref adr, Height, Width, CreateFile.GetTegs(openFileDialog2.FileName));
+                            ref hScroll, ref wh, ref adr, Height, Width, CreateFile.GetTegs(openFileDialog2.FileName));
                             tab_to_drow.StartDrow();
                             mainWindows.Add(tab_to_drow);
                             MouseWheel += tab_to_drow.This_MouseWheel;
@@ -186,13 +188,13 @@ namespace LogixForms
                 else
                 {
                     Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
+                    int wh = Files.SelectedTab.Width;
                     tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                        ref hScroll, ref Files, Height, Width);
+                        ref hScroll, ref wh, Height, Width);
                     tab_to_drow.StartDrow();
                     mainWindows.Add(tab_to_drow);
                     MouseWheel += tab_to_drow.This_MouseWheel;
                 }
-                
             }
         }
 
@@ -321,8 +323,9 @@ namespace LogixForms
                 {
                     BeginInvoke(new MethodInvoker(() =>
                     {
+                        int wh = Files.SelectedTab.Width;
                         ClassDraw tab_to_drow = new ClassDraw(ref pan, TextRangs, ref vscrol,
-                    ref hScroll, ref Files, ref Adr, Height, Width);
+                    ref hScroll, ref wh, ref Adr, Height, Width);
                         MouseWheel += tab_to_drow.This_MouseWheel;
                         tab_to_drow.StartDrow();
                         ConnectedWindows.Add(mainWindows.Count);
@@ -388,9 +391,10 @@ namespace LogixForms
             {
                 BeginInvoke(new MethodInvoker(() =>
                 {
+                    int wh = Files.SelectedTab.Width;
                     List<string> Text = new List<string> { "" };
                     ClassDraw tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                            ref hScroll, ref Files, Height, Width);
+                            ref hScroll, ref wh, Height, Width);
                     tab_to_drow.StartDrow();
                     mainWindows.Add(tab_to_drow);
                     MouseWheel += tab_to_drow.This_MouseWheel;

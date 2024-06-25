@@ -10,7 +10,7 @@
         private HScrollBar HScroll;
         private int scroll_y = 0;//смещение
         private int scroll_x = 0;
-        private MyTabControl SelectedTab;
+        private int SelectedTab;
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
         int Height, Width;
@@ -30,13 +30,13 @@
         /// <param name="widht">Ширина</param>
         /// /// <param name="_Tegs">Список тегов</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll, 
-            ref HScrollBar hScroll, ref MyTabControl MyTab, ref Dictionary<string, ushort[]> AdresDir,
+            ref HScrollBar hScroll, ref int TabWindht, ref Dictionary<string, ushort[]> AdresDir,
             int height, int widht, Dictionary<string, string[]> _Tegs)
         {
             info_file = File;
             VScroll = vScroll;
             HScroll = hScroll;
-            SelectedTab = MyTab;
+            SelectedTab = TabWindht;
             Adr = AdresDir;
             panel = Panel;
             Height = height;
@@ -56,13 +56,13 @@
         /// <param name="widht">Ширина</param>
         /// <param name="_Tegs">Список тегов</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
-            ref HScrollBar hScroll, ref MyTabControl MyTab, int height, int widht, Dictionary<string, string[]> _Tegs)
+            ref HScrollBar hScroll, ref int TabWindht, int height, int widht, Dictionary<string, string[]> _Tegs)
         {
             Tegs = _Tegs;
             info_file = File;
             VScroll = vScroll;
             HScroll = hScroll;
-            SelectedTab = MyTab;
+            SelectedTab = TabWindht;
             Adr = new Dictionary<string, ushort[]>
             {
                 { "T4", new ushort[24] },
@@ -91,13 +91,13 @@
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
-            ref HScrollBar hScroll, ref MyTabControl MyTab, ref Dictionary<string, ushort[]> AdresDir,
+            ref HScrollBar hScroll, ref int TabWindht, ref Dictionary<string, ushort[]> AdresDir,
             int height, int widht)
         {
             info_file = File;
             VScroll = vScroll;
             HScroll = hScroll;
-            SelectedTab = MyTab;
+            SelectedTab = TabWindht;
             Adr = AdresDir;
             panel = Panel;
             Height = height;
@@ -115,12 +115,12 @@
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
-            ref HScrollBar hScroll, ref MyTabControl MyTab, int height, int widht)
+            ref HScrollBar hScroll, ref int TabWindht, int height, int widht)
         {
             info_file = File;
             VScroll = vScroll;
             HScroll = hScroll;
-            SelectedTab = MyTab;
+            SelectedTab = TabWindht;
             Adr = new Dictionary<string, ushort[]>
             {
                 { "T4", new ushort[24] },
@@ -192,9 +192,9 @@
         /// Отрисовка программы
         /// </summary>
         /// <param name="e"></param>
-        private void Draw(PaintEventArgs e)
+        private void Draw(object sender, PaintEventArgs e)
         {
-            HScroll.Maximum = panel.Width - SelectedTab.Width + 36;
+            HScroll.Maximum = panel.Width - SelectedTab + 36;
             HScroll.Minimum = 0;
 
             scroll_y = VScroll.Value;//прокрутка
@@ -209,21 +209,9 @@
                 y = rang.Max;
                 count_rangs++;
             }
-            rang = null;
+            //rang = null;
             VScroll.Maximum = y - panel.Height+60>0? y - panel.Height + 60: 0;
             //g.DrawString($"scroll: {VScroll.Value} MaxScroll: {VScroll.Maximum}", RangsFont, Brushes.Red, 300, 200);
-        }
-
-        /// <summary>
-        /// Нанесение адресов и имен
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PaintText(object sender, PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            g.Clear(Color.White);
-            Draw(e);
         }
 
         /// <summary>
@@ -231,7 +219,8 @@
         /// </summary>
         public async void StartDrow()
         {
-            panel.Paint += PaintText;
+            panel.BackColor = Color.White;
+            panel.Paint += Draw;
             while(true)
             {
                 await Task.Delay(200);
@@ -260,16 +249,18 @@
         /// </summary>
         public void Dispose()
         {
-            rang.Dispose();
-            panel.Paint -= PaintText;
+            panel.Paint -= Draw;
             panel.Dispose();
+            VScroll.Dispose();
+            HScroll.Dispose();
             info_file.Clear();
             info_file = null;
+            if(Tegs != null)
             Tegs.Clear();
             Tegs = null;
             Adr.Clear();
             Adr = null;
-            SelectedTab = null;
+            rang.Dispose();
             GC.Collect();
         }
     }
