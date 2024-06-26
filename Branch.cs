@@ -6,7 +6,7 @@
     struct Branch
     {
         private const byte indent = 15;
-        private const byte top_indent = 100;
+        private const byte top_indent = 120;
         private short count_el;
         private int[] PointOfElemetts = new int[14];
         private const byte wight = 54;

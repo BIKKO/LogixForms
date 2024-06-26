@@ -384,6 +384,7 @@ namespace LogixForms
         public static Dictionary<string, string[]> GetTegs(string path)
         {
             string[] _data = Load(path, Type.TEGS);
+            if (_data == null) return null;
             string[] _buf;
             string name;
             string[] value;

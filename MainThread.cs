@@ -81,13 +81,20 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// Обновление программы с файла
+        /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void FileUpdate_Tick(object sender, EventArgs e)
+        private void MouseWheelUpdate_Tick(object sender, EventArgs e)
         {
-            FileUpdate.Enabled = false;
+            if (mainWindows.Count > 0)
+            {
+                foreach (ClassDraw i in mainWindows) i.EnableScroll = false;
+                foreach (TabPage item in Files.TabPages)
+                {
+                    if(item.Text == Files.TabPages[Files.SelectedIndex].Text) mainWindows[Files.SelectedIndex].EnableScroll = true;
+                }
+            }
         }
 
         /// <summary>
@@ -121,6 +128,38 @@ namespace LogixForms
         }
 
         /// <summary>
+        /// Сохранение программмы на ПК
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.DefaultExt = "RangsSave";
+            saveFileDialog1.Filter = "My files (*.ldf)|*.ldf|txt files (*.txt)|*.txt";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                if (Files.SelectedTab.Text != saveFileDialog1.FileName.Split('\\')[^1]) Files.SelectedTab.Text = saveFileDialog1.FileName.Split('\\')[^1];
+                Stream file = saveFileDialog1.OpenFile();
+                StreamWriter sw = new StreamWriter(file);
+                if (saveFileDialog1.FileName.Contains(".ldf"))
+                {
+                    sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl, CreateFile.CreateTEGS(mainWindows[Files.SelectedIndex].GetTegs)));
+                    sw.Close();
+                    file.Close();
+                    return;
+                }
+                foreach (string rang in mainWindows[Files.SelectedIndex].GetTextRang)
+                    sw.WriteLine(rang);
+                sw.Close();
+                file.Close();
+                file.Dispose();
+                sw.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Открытие файла с ПК
         /// </summary>
         /// <param name="sender"></param>
@@ -132,6 +171,15 @@ namespace LogixForms
             {
                 var tb = new MyTabPage();
                 tb.Text = openFileDialog2.FileName.Split('\\')[^1];
+                int count = 1;
+                foreach (TabPage tab in Files.TabPages)
+                {
+                    if (tab.Text == tb.Text)
+                    {
+                        tb.Text = openFileDialog2.FileName.Split('\\')[^1] + $"({count})";
+                        count++;
+                    }
+                }
 
                 VScrollBar vscrol = new()
                 {
@@ -169,21 +217,31 @@ namespace LogixForms
                 ClassDraw tab_to_drow;
                 if (tb.Text.Contains("ldf"))
                 {
-                    new Thread(()=>
+                    new Thread(() =>
                     {
                         BeginInvoke(new MethodInvoker(() =>
                         {
                             Dictionary<string, ushort[]> adr = CreateFile.GetData(openFileDialog2.FileName);
                             int wh = Files.SelectedTab.Width;
                             Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
-                            tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                            ref hScroll, ref wh, ref adr, Height, Width, CreateFile.GetTegs(openFileDialog2.FileName));
+                            Dictionary<string, string[]> teg = CreateFile.GetTegs(openFileDialog2.FileName);
+                            if (teg != null)
+                                tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                                ref hScroll, ref wh, ref adr, Height, Width, teg);
+                            else
+                                tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                            ref hScroll, ref wh, ref adr, Height, Width);
                             tab_to_drow.StartDrow();
                             mainWindows.Add(tab_to_drow);
                             MouseWheel += tab_to_drow.This_MouseWheel;
+                            teg = null;
                         }
                         ));
-                    }).Start();
+                    })
+                    {
+                        Name = tb.Text,
+                        IsBackground = true,
+                    }.Start();
                 }
                 else
                 {
@@ -195,38 +253,6 @@ namespace LogixForms
                     mainWindows.Add(tab_to_drow);
                     MouseWheel += tab_to_drow.This_MouseWheel;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Сохранение программмы на ПК
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
-            saveFileDialog1.RestoreDirectory = true;
-            saveFileDialog1.DefaultExt = "RangsSave";
-            saveFileDialog1.Filter = "My files (*.ldf)|*.ldf|txt files (*.txt)|*.txt";
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                if (Files.SelectedTab.Text != saveFileDialog1.FileName.Split('\\')[^1]) Files.SelectedTab.Text = saveFileDialog1.FileName.Split('\\')[^1];
-                Stream file = saveFileDialog1.OpenFile();
-                StreamWriter sw = new StreamWriter(file);
-                if (saveFileDialog1.FileName.Contains(".ldf"))
-                {
-                    sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl, CreateFile.CreateTEGS(mainWindows[Files.SelectedIndex].GetTegs)));
-                    sw.Close();
-                    file.Close();
-                    return;
-                }
-                foreach (string rang in mainWindows[Files.SelectedIndex].GetTextRang)
-                    sw.WriteLine(rang);
-                sw.Close();
-                file.Close();
-                file.Dispose();
-                sw.Dispose();
             }
         }
 
@@ -334,12 +360,16 @@ namespace LogixForms
                         AdresUpdate.Enabled = true;
                     }
                     ));
-                }).Start();
+                })
+                {
+                    Name = tb.Text,
+                    IsBackground = true,
+                }.Start();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.");
-                ConnectedWindows.Remove(mainWindows.Count-1);
+                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.\n" + ex.Message);
+                ConnectedWindows.Remove(mainWindows.Count - 1);
                 new ConnectForms(this).Show();
             }
         }
@@ -400,7 +430,11 @@ namespace LogixForms
                     MouseWheel += tab_to_drow.This_MouseWheel;
                 }
                 ));
-            }).Start();
+            })
+            {
+                Name = tb.Text,
+                IsBackground = true,
+            }.Start();
         }
 
         /// <summary>
@@ -412,7 +446,7 @@ namespace LogixForms
         {
             if (ConnectedWindows.Count < 1)
             {
-                FileUpdate.Enabled = false;
+                MouseWheelUpdate.Enabled = false;
                 //ModBusUpdate.Enabled = true;
 
                 if (Application.OpenForms["ConnectForms"] == null)

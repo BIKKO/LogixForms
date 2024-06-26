@@ -214,10 +214,9 @@ namespace LogixForms
         /// <param name="e"></param>
         private void ValueAdres_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Adr.Clear();
-            Adr = null;
             MBAdres.Clear();
             MBAdres = null;
+            dataGridView1.Dispose();
             GC.Collect();
         }
 

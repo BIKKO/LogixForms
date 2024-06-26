@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace LogixForms
 {
@@ -10,7 +9,6 @@ namespace LogixForms
     {
         protected Size _Size = new Size(35, 25);
         protected Font _Font = new Font("Arial", 10);
-        private int[] Timer_control = new int[32];
 
         /// <summary>
         /// Проверка активноти элемента
@@ -39,7 +37,7 @@ namespace LogixForms
                 {
                     Bitmask = 1;
                     ind_1 = int.Parse(k[0]);
-                    adr = Timer_control[ind_1];
+                    adr = Adr["Timer_control"][ind_1];
 
                     if ((adr & Bitmask) == Bitmask) return true;
                     return false;
@@ -48,7 +46,7 @@ namespace LogixForms
                 {
                     Bitmask = 2;
                     ind_1 = int.Parse(k[0]);
-                    adr = Timer_control[ind_1];
+                    adr = Adr["Timer_control"][ind_1];
 
                     if ((adr & Bitmask) == Bitmask) return true;
                     return false;
@@ -57,7 +55,7 @@ namespace LogixForms
                 {
                     Bitmask = 4;
                     ind_1 = int.Parse(k[0]);
-                    adr = Timer_control[ind_1];
+                    adr = Adr["Timer_control"][ind_1];
 
                     if ((adr & Bitmask) == Bitmask) return true;
                     return false;
@@ -73,7 +71,7 @@ namespace LogixForms
                     return false;
                 }
             }
-            catch (Exception)
+            catch
             {
                 return false;
             }
@@ -103,10 +101,15 @@ namespace LogixForms
             return;
         }
 
+        public virtual void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] rang)
+        {
+
+        }
+
         /// <summary>
         /// Уничтожение объекта
         /// </summary>
-        public virtual void Dispose(){ Timer_control = null; }
+        public virtual void Dispose(){ }
     }
 
     /// <summary>
@@ -142,10 +145,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, Brushes.Blue, _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, Brushes.Red, _p);
         }
 
         /// <summary>
@@ -342,10 +346,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, Brushes.Blue, _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, Brushes.Red, _p);
         }
 
         /// <summary>
@@ -364,7 +369,8 @@ namespace LogixForms
     /// </summary>
     public class Timer : ElementDraw
     {
-        private readonly Bitmap En = NodEn.Timer___Move;
+        private readonly Bitmap En = NodEn.Timer___Move, EN_DN_TT = NodEn.EN_DN_TT, EN_DN_TTdis = NodDis.EN_DN_TTdis;
+        private readonly Font iner = new Font("Arial", 8);
 
         /// <summary>
         /// Отрисовка элемента
@@ -373,15 +379,42 @@ namespace LogixForms
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             Point _p = point;
             _p.Y -= 20;
-            _p.X -= 20;
+            _p.X -= 60;
             _Size = new Size(120, 75);
             g.DrawImage(En, new Rectangle(_p, _Size));
             g.DrawString("Timer " + _Adres, _Font, Brushes.Black, _p);
+            _p.Y += 20;
+            _p.X += 60;
+            g.DrawString(r[0]+"\n"+ r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+            _p.Y -= 20;
+            _p.X -= 60;
+
+
+            //EN
+            _p.X += 120;
+
+            _p.Y += 23;
+            _Size = new Size(50, 20);
+            g.DrawImage(EN_DN_TT, new Rectangle(_p, _Size));
+            _p.Y += 2;
+            _p.X += 13;
+            g.DrawString("EN", iner, Brushes.Black, _p);
+            _p.Y -= 2;
+            _p.X -= 13;
+
+            //DN
+            _p.Y += 20;
+            g.DrawImage(EN_DN_TT, new Rectangle(_p, _Size));
+            _p.Y += 2;
+            _p.X += 13;
+            g.DrawString("DN", iner, Brushes.Black, _p);
         }
+
         /// <summary>
         /// Отрисовка Тегов и Комментариев
         /// </summary>
@@ -391,7 +424,7 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
+            point.X -= 50;
             g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
             point.Y -= 15;
             g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
@@ -404,6 +437,8 @@ namespace LogixForms
         {
             base.Dispose();
             En.Dispose();
+            EN_DN_TT.Dispose();
+            EN_DN_TTdis.Dispose();
         }
     }
 
@@ -421,16 +456,21 @@ namespace LogixForms
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             Point _p = point;
-            _p.Y += 10;
-            _p.X -= 20;
-            _Size = new Size(120, 75);
+            _p.Y -= 20;
+            _p.X -= 60;
+            _Size = new Size(120, 65);
             g.DrawImage(En, new Rectangle(_p, _Size));
-            point.Y -= 15;
-            g.DrawString(_Adres, _Font, Brushes.Black, point);
+            g.DrawString("Move ", _Font, Brushes.Black, _p);
+            _p.Y += 20;
+            _p.X += 60;
+
+            g.DrawString(r[0] + "\n" + r[1], _Font, Brushes.Black, _p);
         }
+
         /// <summary>
         /// Отрисовка Тегов и Комментариев
         /// </summary>
@@ -440,7 +480,7 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
+            point.X -= 50;
             g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
             point.Y -= 15;
             g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
@@ -470,14 +510,282 @@ namespace LogixForms
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             Point _p = point;
-            _p.Y += 10;
-            _p.X -= 20;
+            _p.Y -= 20;
+            _p.X -= 60;
             _Size = new Size(120, 75);
             g.DrawImage(En, new Rectangle(_p, _Size));
+            g.DrawString("Add", _Font, Brushes.Black, _p);
+            _p.Y += 20;
+            _p.X += 60;
+
+            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
             point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка ADD
+    /// </summary>
+    public class DIV : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            Point _p = point;
+            _p.Y -= 20;
+            _p.X -= 60;
+            _Size = new Size(120, 75);
+            g.DrawImage(En, new Rectangle(_p, _Size));
+            g.DrawString("DIV", _Font, Brushes.Black, _p);
+            _p.Y += 20;
+            _p.X += 60;
+
+            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка ADD
+    /// </summary>
+    public class MUL : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            Point _p = point;
+            _p.Y -= 20;
+            _p.X -= 60;
+            _Size = new Size(120, 75);
+            g.DrawImage(En, new Rectangle(_p, _Size));
+            g.DrawString("MUL", _Font, Brushes.Black, _p);
+            _p.Y += 20;
+            _p.X += 60;
+
+            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка MOV
+    /// </summary>
+    public class ABS : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            Point _p = point;
+            _p.Y -= 20;
+            _p.X -= 60;
+            _Size = new Size(120, 75);
+            g.DrawImage(En, new Rectangle(_p, _Size));
+            g.DrawString("ABS ", _Font, Brushes.Black, _p);
+            _p.Y += 20;
+            _p.X += 60;
+
+            g.DrawString(r[0] + "\n" + r[1], _Font, Brushes.Black, _p);
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка MOV
+    /// </summary>
+    public class SCP : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            Point _p = point;
+            _p.Y -= 20;
+            _p.X -= 40;
+            _Size = new Size(100, 145);
+            g.DrawImage(En, new Rectangle(_p, _Size));
+            g.DrawString("SCP ", _Font, Brushes.Black, _p);
+            _p.Y += 20;
+            _p.X += 40;
+
+            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2] + "\n" + r[3] + "\n" + r[4] + "\n" + r[5], _Font, Brushes.Black, _p);
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка ONS
+    /// </summary>
+    public class ONS : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.ONS;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        {
+            _Size = new Size(60, 30);
+            g.DrawImage(En, new Rectangle(point, _Size));
+            point.Y -= 15;
+            point.X -= 15;
             g.DrawString(_Adres, _Font, Brushes.Black, point);
         }
         /// <summary>
@@ -492,7 +800,7 @@ namespace LogixForms
             point.X -= 15;
             g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
             point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point); ;
         }
 
         /// <summary>

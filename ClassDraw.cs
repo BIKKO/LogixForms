@@ -1,4 +1,6 @@
-﻿namespace LogixForms
+﻿using System.Windows.Forms;
+
+namespace LogixForms
 {
     /// <summary>
     /// Отрисовка программы
@@ -14,8 +16,9 @@
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
         int Height, Width;
-        private Rang rang;
+        private Rang? rang;
         Dictionary<string, string[]> Tegs;
+        private bool scroll = false;
 
         /// <summary>
         /// Конструктор отрисовки
@@ -28,7 +31,7 @@
         /// <param name="AdresDir">Список адресов</param>
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>
-        /// /// <param name="_Tegs">Список тегов</param>
+        /// <param name="_Tegs">Список тегов</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll, 
             ref HScrollBar hScroll, ref int TabWindht, ref Dictionary<string, ushort[]> AdresDir,
             int height, int widht, Dictionary<string, string[]> _Tegs)
@@ -164,6 +167,11 @@
             Adr = tab;
         }
 
+        public bool EnableScroll
+        {
+            set { if (scroll != value) scroll = value; }
+        }
+
         /// <summary>
         /// Отслеживание колесика мыши
         /// </summary>
@@ -171,21 +179,24 @@
         /// <param name="e"></param>
         public void This_MouseWheel(object sender, MouseEventArgs e)
         {
-            int wheel = 0;//прокрутка вверх или вниз
-            if (e.Delta > 0)
+            if (scroll)
             {
-                //вверх
-                wheel = -(int)(VScroll.Maximum * 0.05);//если рангов > 10 то -1 иначе -10
-                //MessageBox.Show("Test");
+                int wheel = 0;//прокрутка вверх или вниз
+                if (e.Delta > 0)
+                {
+                    //вверх
+                    wheel = -(int)(VScroll.Maximum * 0.05);//если рангов > 10 то -1 иначе -10
+                    //MessageBox.Show("Test");
+                }
+                else
+                {
+                    //вниз
+                    wheel = (int)(VScroll.Maximum * 0.05);//если рангов > 10 то 1 иначе 10
+                }
+                if (VScroll.Maximum >= VScroll.Value + wheel && VScroll.Minimum <= VScroll.Value + wheel)
+                    VScroll.Value += wheel;//не выходим ли за приделы scrollbar
+                wheel = 0;//одиночное сробатование
             }
-            else
-            {
-                //вниз
-                wheel = (int)(VScroll.Maximum * 0.05);//если рангов > 10 то 1 иначе 10
-            }
-            if (VScroll.Maximum >= VScroll.Value + wheel && VScroll.Minimum <= VScroll.Value + wheel)
-                VScroll.Value += wheel;//не выходим ли за приделы scrollbar
-            wheel = 0;//одиночное сробатование
         }
 
         /// <summary>
@@ -210,7 +221,7 @@
                 count_rangs++;
             }
             //rang = null;
-            VScroll.Maximum = y - panel.Height+60>0? y - panel.Height + 60: 0;
+            VScroll.Maximum = y - panel.Height+60>0? y - panel.Height + 160: 0;
             //g.DrawString($"scroll: {VScroll.Value} MaxScroll: {VScroll.Maximum}", RangsFont, Brushes.Red, 300, 200);
         }
 
@@ -223,8 +234,7 @@
             panel.Paint += Draw;
             while(true)
             {
-                await Task.Delay(200);
-
+                await Task.Delay(60);
                 panel.Refresh();
                 panel.Height = Height - 20;
 
@@ -261,7 +271,6 @@
             Adr.Clear();
             Adr = null;
             rang.Dispose();
-            GC.Collect();
         }
     }
 }

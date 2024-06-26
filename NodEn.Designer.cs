@@ -73,6 +73,16 @@ namespace LogixForms {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ONS {
+            get {
+                object obj = ResourceManager.GetObject("ONS", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap OTE {
             get {
                 object obj = ResourceManager.GetObject("OTE", resourceCulture);

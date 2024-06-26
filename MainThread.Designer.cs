@@ -46,7 +46,7 @@
             aboutToolStripMenuItem = new ToolStripMenuItem();
             OutToLogix = new ToolStripMenuItem();
             ModBusUpdate = new System.Windows.Forms.Timer(components);
-            FileUpdate = new System.Windows.Forms.Timer(components);
+            MouseWheelUpdate = new System.Windows.Forms.Timer(components);
             openFileDialog2 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
             AdresUpdate = new System.Windows.Forms.Timer(components);
@@ -170,10 +170,11 @@
             ModBusUpdate.Interval = 1000;
             ModBusUpdate.Tick += ModBusUpdate_Tick;
             // 
-            // FileUpdate
+            // MouseWheelUpdate
             // 
-            FileUpdate.Interval = 2000;
-            FileUpdate.Tick += FileUpdate_Tick;
+            MouseWheelUpdate.Enabled = true;
+            MouseWheelUpdate.Interval = 5;
+            MouseWheelUpdate.Tick += MouseWheelUpdate_Tick;
             // 
             // openFileDialog2
             // 
@@ -223,7 +224,7 @@
         #endregion
         private Panel menu;
         private System.Windows.Forms.Timer ModBusUpdate;
-        private System.Windows.Forms.Timer FileUpdate;
+        private System.Windows.Forms.Timer MouseWheelUpdate;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
