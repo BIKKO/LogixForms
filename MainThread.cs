@@ -1,5 +1,6 @@
 using Microsoft.VisualBasic.Devices;
 using Modbus.Device;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 
@@ -43,6 +44,21 @@ namespace LogixForms
                                                         {"N40",2000},
                                                         {"B3",7200},
                                                         };
+
+            string[] name = Properties.Settings.Default["AdresName"].ToString().Split(',');
+            string[] adr = Properties.Settings.Default["AdresValue"].ToString().Split(',');
+            string[] len = Properties.Settings.Default["AdresLen"].ToString().Split(',');
+
+            if (name.Length > 1)
+            {
+                Adr.Clear();
+                MB_adres.Clear();
+                for (int i = 0; i < name.Length; i++)
+                {
+                    Adr.Add(name[i], new ushort[int.Parse(len[i])]);
+                    MB_adres.Add(name[i], ushort.Parse(adr[i]));
+                }
+            }
         }
 
         /// <summary>
@@ -102,7 +118,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void close_Click(object sender, EventArgs e)
+        private void Close_Click(object sender, EventArgs e)
         {
             try
             {
@@ -132,7 +148,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
             saveFileDialog1.RestoreDirectory = true;
@@ -164,7 +180,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog2.Filter = "My files (*.LDF)|*.ldf|txt files (*.txt)|*.txt|All files (*.*)|*.*";
             if (openFileDialog2.ShowDialog() == DialogResult.OK)
@@ -207,7 +223,7 @@ namespace LogixForms
                 contextMenu.Items.Add(close);
                 tb.ContextMenuStrip = contextMenu;
                 contextMenu = null;
-                close.Click += close_Click;
+                close.Click += Close_Click;
                 pan.Controls.Add(vscrol);
                 pan.Controls.Add(hScroll);
                 tb.Controls.Add(pan);
@@ -263,7 +279,7 @@ namespace LogixForms
         /// <param name="port">Порт</param>
         /// <param name="simulate"></param>
         /// <param name="slave">ID</param>
-        public void con(string ip, string port, byte slave)
+        public void Con(string ip, string port, byte slave)
         {
             try
             {
@@ -338,7 +354,7 @@ namespace LogixForms
                 contextMenu.Items.Add(close);
                 tb.ContextMenuStrip = contextMenu;
                 contextMenu = null;
-                close.Click += close_Click;
+                close.Click += Close_Click;
                 pan.Controls.Add(vscrol);
                 pan.Controls.Add(hScroll);
                 tb.Controls.Add(pan);
@@ -379,7 +395,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        private void NewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var tb = new MyTabPage();
             tb.Text = openFileDialog2.FileName;
@@ -410,7 +426,7 @@ namespace LogixForms
             contextMenu.Items.Add(close);
             tb.ContextMenuStrip = contextMenu;
             contextMenu = null;
-            close.Click += close_Click;
+            close.Click += Close_Click;
             pan.Controls.Add(vscrol);
             pan.Controls.Add(hScroll);
             tb.Controls.Add(pan);
@@ -442,7 +458,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ConnectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (ConnectedWindows.Count < 1)
             {
@@ -462,7 +478,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Application.OpenForms["SettingsLogix"] == null)
             {
@@ -475,7 +491,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Временно ничего нет!");
         }
@@ -485,7 +501,7 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void adresesValuesToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AdresesValuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Files.TabCount > 0 && Application.OpenForms[Files.SelectedTab.Text] == null)
             {
@@ -503,6 +519,13 @@ namespace LogixForms
         {
             Properties.Settings.Default["H"] = Height;
             Properties.Settings.Default["W"] = Width;
+
+            Properties.Settings.Default["AdresName"] = string.Join(",",MB_adres.Keys);
+            Properties.Settings.Default["AdresValue"] = string.Join(",",MB_adres.Values);
+            int[] buf = new int[Adr.Count];
+            for (int i = 0; i < Adr.Count; i++) buf[i] = Adr[Adr.Keys.ToArray()[i]].Length;
+            Properties.Settings.Default["AdresLen"] = string.Join(",",string.Join(",",buf));
+
             Properties.Settings.Default.Save();
         }
     }

@@ -111,7 +111,7 @@
             openToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.O;
             openToolStripMenuItem.Size = new Size(242, 26);
             openToolStripMenuItem.Text = "Open";
-            openToolStripMenuItem.Click += openToolStripMenuItem_Click;
+            openToolStripMenuItem.Click += OpenToolStripMenuItem_Click;
             // 
             // newToolStripMenuItem
             // 
@@ -119,7 +119,7 @@
             newToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.N;
             newToolStripMenuItem.Size = new Size(242, 26);
             newToolStripMenuItem.Text = "New";
-            newToolStripMenuItem.Click += newToolStripMenuItem_Click;
+            newToolStripMenuItem.Click += NewToolStripMenuItem_Click;
             // 
             // saveToolStripMenuItem
             // 
@@ -127,7 +127,7 @@
             saveToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
             saveToolStripMenuItem.Size = new Size(242, 26);
             saveToolStripMenuItem.Text = "Save";
-            saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
+            saveToolStripMenuItem.Click += SaveToolStripMenuItem_Click;
             // 
             // connectToolStripMenuItem
             // 
@@ -135,7 +135,7 @@
             connectToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.C;
             connectToolStripMenuItem.Size = new Size(242, 26);
             connectToolStripMenuItem.Text = "Connect";
-            connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
+            connectToolStripMenuItem.Click += ConnectToolStripMenuItem_Click;
             // 
             // adresesValuesToolStripMenuItem
             // 
@@ -143,21 +143,21 @@
             adresesValuesToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D;
             adresesValuesToolStripMenuItem.Size = new Size(242, 26);
             adresesValuesToolStripMenuItem.Text = "Adreses values";
-            adresesValuesToolStripMenuItem.Click += adresesValuesToolStripMenuItem_Click;
+            adresesValuesToolStripMenuItem.Click += AdresesValuesToolStripMenuItem_Click;
             // 
             // settingsToolStripMenuItem
             // 
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(76, 24);
             settingsToolStripMenuItem.Text = "Settings";
-            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+            settingsToolStripMenuItem.Click += SettingsToolStripMenuItem_Click;
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(64, 24);
             aboutToolStripMenuItem.Text = "About";
-            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
+            aboutToolStripMenuItem.Click += AboutToolStripMenuItem_Click;
             // 
             // OutToLogix
             // 

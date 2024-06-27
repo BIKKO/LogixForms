@@ -46,5 +46,41 @@ namespace LogixForms.Properties {
                 this["H"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AdresName {
+            get {
+                return ((string)(this["AdresName"]));
+            }
+            set {
+                this["AdresName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AdresValue {
+            get {
+                return ((string)(this["AdresValue"]));
+            }
+            set {
+                this["AdresValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AdresLen {
+            get {
+                return ((string)(this["AdresLen"]));
+            }
+            set {
+                this["AdresLen"] = value;
+            }
+        }
     }
 }
