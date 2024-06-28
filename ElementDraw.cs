@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace LogixForms
 {
@@ -399,15 +400,15 @@ namespace LogixForms
         {
             Point _p = point;
             _p.Y -= 20;
-            _p.X -= 60;
+            _p.X -= 20;
             _Size = new Size(120, 75);
             g.DrawImage(En, new Rectangle(_p, _Size));
             g.DrawString("Timer " + _Adres, _Font, Brushes.Black, _p);
             _p.Y += 20;
-            _p.X += 60;
+            _p.X += 20;
             g.DrawString(r[0]+"\n"+ r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
             _p.Y -= 20;
-            _p.X -= 60;
+            _p.X -= 20;
 
 
             //EN
@@ -473,7 +474,7 @@ namespace LogixForms
     /// <summary>
     /// Отрисовка MOV
     /// </summary>
-    public class Move : ElementDraw
+    public class MOV : ElementDraw
     {
         private readonly Bitmap En = NodEn.Timer___Move;
 
@@ -489,14 +490,23 @@ namespace LogixForms
         {
             Point _p = point;
             _p.Y -= 20;
-            _p.X -= 60;
-            _Size = new Size(120, 65);
+            _p.X -= 45;
+            _Size = new Size(120, 85);
             g.DrawImage(En, new Rectangle(_p, _Size));
             g.DrawString("Move ", _Font, Brushes.Black, _p);
-            _p.Y += 20;
+            _p.Y += 10;
             _p.X += 60;
-
-            g.DrawString(r[0] + "\n" + r[1], _Font, Brushes.Black, _p);
+            int u;
+            if (int.TryParse(r[0], out u))
+            {
+                string[] buf = r[1].Split(":");
+                string name = buf[0];
+                int str = int.Parse(buf[1]);
+                g.DrawString("?\n" + r[0] + "\n" + r[1] + "\n" + Adr[name][str], _Font, Brushes.Black, _p);
+            }
+            else
+                g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n" 
+                    + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
         }
 
         /// <summary>
@@ -541,16 +551,36 @@ namespace LogixForms
         /// <param name="r">Список данных</param>
         public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
-            Point _p = point;
-            _p.Y -= 20;
-            _p.X -= 60;
-            _Size = new Size(120, 75);
-            g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("Add", _Font, Brushes.Black, _p);
-            _p.Y += 20;
-            _p.X += 60;
+            try
+            {
 
-            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+                Point _p = point;
+                _p.Y -= 20;
+                _p.X -= 45;
+                _Size = new Size(120, 85);
+                g.DrawImage(En, new Rectangle(_p, _Size));
+                g.DrawString("ADD ", _Font, Brushes.Black, _p);
+                _p.Y += 10;
+                _p.X += 60;
+                int u;
+                if (int.TryParse(r[0], out u))
+                {
+                    string[] buf = r[1].Split(":");
+                    string name = buf[0];
+                    int str = int.Parse(buf[1]);
+                    g.DrawString("?\n" + r[0] + "\n" + r[1] + "\n" + Adr[name][str], _Font, Brushes.Black, _p);
+                }
+                else
+                {
+
+                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                        + r[1] + "\n" + Adr[r[2].Split(":")[0]][int.Parse(r[2].Split(":")[1])], _Font, Brushes.Black, _p);
+                }
+            }
+            catch
+            {
+                Debug.Print("jjj");
+            }
         }
 
         /// <summary>
@@ -597,7 +627,7 @@ namespace LogixForms
         {
             Point _p = point;
             _p.Y -= 20;
-            _p.X -= 60;
+            _p.X -= 45;
             _Size = new Size(120, 75);
             g.DrawImage(En, new Rectangle(_p, _Size));
             g.DrawString("DIV", _Font, Brushes.Black, _p);
@@ -651,7 +681,7 @@ namespace LogixForms
         {
             Point _p = point;
             _p.Y -= 20;
-            _p.X -= 60;
+            _p.X -= 45;
             _Size = new Size(120, 75);
             g.DrawImage(En, new Rectangle(_p, _Size));
             g.DrawString("MUL", _Font, Brushes.Black, _p);
@@ -705,14 +735,23 @@ namespace LogixForms
         {
             Point _p = point;
             _p.Y -= 20;
-            _p.X -= 60;
-            _Size = new Size(120, 75);
+            _p.X -= 45;
+            _Size = new Size(120, 85);
             g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("ABS ", _Font, Brushes.Black, _p);
-            _p.Y += 20;
+            g.DrawString("Move ", _Font, Brushes.Black, _p);
+            _p.Y += 10;
             _p.X += 60;
-
-            g.DrawString(r[0] + "\n" + r[1], _Font, Brushes.Black, _p);
+            int u;
+            if (int.TryParse(r[0], out u))
+            {
+                string[] buf = r[1].Split(":");
+                string name = buf[0];
+                int str = int.Parse(buf[1]);
+                g.DrawString("?\n" + r[0] + "\n" + r[1] + "\n" + Adr[name][str], _Font, Brushes.Black, _p);
+            }
+            else
+                g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                    + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
         }
 
         /// <summary>

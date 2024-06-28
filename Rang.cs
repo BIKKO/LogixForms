@@ -501,7 +501,7 @@ namespace LogixForms
                         case "MOV":
                             try
                             {
-                                El = new Move();
+                                El = new MOV();
                                 string[] adress = { TextRang[index + 1], TextRang[index + 2] };
                                 El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
                                 if (Tegs != null)
@@ -834,6 +834,7 @@ namespace LogixForms
                                         }
                                     index += 4;
                                     El.Dispose();
+                                    drow_ind++;
                                 }
                                 catch { enum_el++; }
                                 break;
@@ -842,7 +843,7 @@ namespace LogixForms
                             {
                                 try
                                 {
-                                    El = new Move();
+                                    El = new MOV();
                                     string[] adress = { TextRang[index + 1], TextRang[index + 2] };
                                     El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
                                     if (Tegs != null)
@@ -870,7 +871,11 @@ namespace LogixForms
                                     }
                                 index += 3;
                             }
-                            catch { index += 3; }
+                            catch 
+                            {
+                                index += 3;
+                                MessageBox.Show("Test");
+                            }
                             break;
                         case "DIV":
                             {
