@@ -8,16 +8,16 @@ namespace LogixForms
     public class ClassDraw
     {
         private List<string> info_file;
-        private VScrollBar VScroll;
-        private HScrollBar HScroll;
+        private readonly VScrollBar VScroll;
+        private readonly HScrollBar HScroll;
         private int scroll_y = 0;//смещение
         private int scroll_x = 0;
         private int SelectedTab;
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
-        int Height, Width;
+        private int Height, Width;
         private Rang? rang;
-        Dictionary<string, string[]> Tegs;
+        private Dictionary<string, string[]> Tegs;
         private bool scroll = false;
 
         /// <summary>
@@ -167,6 +167,9 @@ namespace LogixForms
             Adr = tab;
         }
 
+        /// <summary>
+        /// Отключение от соытия прокрутки колесика мыши
+        /// </summary>
         public bool EnableScroll
         {
             set { if (scroll != value) scroll = value; }

@@ -9,12 +9,12 @@ namespace LogixForms
     public class Rang
     {
         
-        private ElementDraw El;
+        private ElementDraw? El;
         //private readonly ElementDraw[] elements = new ElementDraw[] { new XIC(), new XIO(), new OTE(), new OTU(), new OTL(), new Timer(), new Move(), new Add() };
         private readonly Pen pen_line = new Pen(Brushes.Blue);
         private readonly Pen PenOfPoint = new Pen(Brushes.Yellow, 7);
         private readonly Regex mask = new Regex(@"((\s?[A-Z]\d?\d?\d?:\d?\d?\d?)(/\b?\b?)?\s?)|[0.0-9999.0]");// Выделение мномоник
-        private readonly Regex maskAdr = new Regex(@"\s?([A-Z]{3})\s?");// Выделение Адрес
+        //private readonly Regex maskAdr = new Regex(@"\s?([A-Z]{3})\s?");// Выделение Адрес
         private const int left_indent_rang_x = 70;
         private const int top_indent_rang = 150;
         private int startY;
@@ -27,11 +27,8 @@ namespace LogixForms
         private int MaxYBranch;
         private ushort Number;
         private Dictionary<string, ushort[]> Adr;
-        Dictionary<string, string[]> Tegs;
-        Dictionary<string, ElementDraw> _El;
-
-
-        private string[] TextRang;
+        private Dictionary<string, string[]>? Tegs;
+        private string[]? TextRang;
 
         /// <summary>
         /// Инициализация конструктора ранга
@@ -238,7 +235,6 @@ namespace LogixForms
                 }
                 drow_ind++;
             }
-            branch.Dispose();
             g.DrawLine(pen_line, left_indent_rang_x + scrollX, startY - scrollY - 50, left_indent_rang_x + scrollX, Max - scrollY);
             g.DrawString(Number.ToString(), new Font("Arial", 12), Brushes.DimGray, (int)(left_indent_rang_x * .4) + scrollX, startY + top_indent_rang - 10 - scrollY);
         }
@@ -341,7 +337,7 @@ namespace LogixForms
 
             int enumer_el = 0;
             int count_of_branch = 0;
-            Point p = new Point();
+            Point p = new();
             bool BranchStart = false;
             int branch = 0;
             int x_branch = 0;
@@ -372,21 +368,6 @@ namespace LogixForms
                 else
                 {
                     if (BranchStart) branch++;
-
-                    //try
-                    //{
-                    //    Point point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                    //    El = _El[el];
-                    //    El.Draw(g, TextRang[enumer_el], point, Adr);
-                    //    if (Tegs != null)
-                    //        if (Tegs.ContainsKey(TextRang[enumer_el]))
-                    //        {
-                    //            point.Y -= 35;
-                    //            El.DrawTegAndCom(g, point, Tegs[TextRang[enumer_el]][0], Tegs[TextRang[enumer_el]][1]);
-                    //        }
-                    //    enumer_el++;
-                    //}
-                    //catch { enumer_el++; }
                     Point point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-20, top_indent_rang + startY - scrollY-13);
                     switch (el)
                     {

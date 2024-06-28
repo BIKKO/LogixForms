@@ -8,21 +8,18 @@ namespace LogixForms
 {
     public partial class MainThread : Form
     {
-        // значени€ адресов
         private static Dictionary<string, ushort[]> Adr;
         protected static Dictionary<string, ushort> MB_adres;
-        public ModbusIpMaster master;
         private List<ClassDraw> mainWindows = new List<ClassDraw>();
         private List<int> ConnectedWindows = new List<int>();
+        public ModbusIpMaster master;
         private TcpClient client;
         private byte slave = 1;
-
 
         public MainThread()
         {
             InitializeComponent();//инициализаци€ формы
-            Height = int.Parse(Properties.Settings.Default["H"].ToString());
-            Width = int.Parse(Properties.Settings.Default["W"].ToString());
+
             AdresUpdate.Enabled = false;
             Adr = new Dictionary<string, ushort[]>
             {
@@ -45,11 +42,14 @@ namespace LogixForms
                                                         {"B3",7200},
                                                         };
 
+            //ѕолучение данных из файла сохранени€
+            Height = int.Parse(Properties.Settings.Default["H"].ToString());
+            Width = int.Parse(Properties.Settings.Default["W"].ToString());
             string[] name = Properties.Settings.Default["AdresName"].ToString().Split(',');
             string[] adr = Properties.Settings.Default["AdresValue"].ToString().Split(',');
             string[] len = Properties.Settings.Default["AdresLen"].ToString().Split(',');
 
-            if (name.Length > 1)
+            if (name.Length > 1 && adr.Length > 1 && len.Length > 1)
             {
                 Adr.Clear();
                 MB_adres.Clear();

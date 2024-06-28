@@ -214,8 +214,6 @@ namespace LogixForms
         /// <param name="e"></param>
         private void ValueAdres_FormClosing(object sender, FormClosingEventArgs e)
         {
-            MBAdres.Clear();
-            MBAdres = null;
             dataGridView1.Dispose();
             GC.Collect();
         }
@@ -254,6 +252,11 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Обновление таблицы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void timer1_Tick(object sender, EventArgs e)
         {
             CreateTabl();

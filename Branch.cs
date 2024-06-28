@@ -114,11 +114,6 @@
             }
         }
 
-        public void Dispose()
-        {
-            PointOfElemetts = null;
-        }
-
         /// <summary>
         /// добавление елемента в ветку
         /// </summary>

@@ -29,7 +29,7 @@
         }
 
         /// <summary>
-        /// 
+        /// Создание таблицы
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
