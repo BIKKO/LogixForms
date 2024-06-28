@@ -129,7 +129,10 @@ namespace LogixForms
         public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
+            {
+                g.FillRectangle(Brushes.LightGreen, new Rectangle(point.X - 20, point.Y + 8, 75, 10));
                 g.DrawImage(Dis, new Rectangle(point, _Size));
+            }
             else
                 g.DrawImage(En, new Rectangle(point, _Size));
             point.Y -= 15;
@@ -180,7 +183,10 @@ namespace LogixForms
         public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (!Adres(_Adres, Adr))
+            {
+                g.FillRectangle(Brushes.LightGreen, new Rectangle(point.X - 20, point.Y + 8, 75, 10));
                 g.DrawImage(Dis, new Rectangle(point, _Size));
+            }
             else
                 g.DrawImage(En, new Rectangle(point, _Size));
             point.Y -= 15;
@@ -230,7 +236,10 @@ namespace LogixForms
         public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
+            {
+                g.FillRectangle(Brushes.LightGreen, new Rectangle(point.X - 20, point.Y + 8, 75, 10));
                 g.DrawImage(Dis, new Rectangle(point, _Size));
+            }
             else
                 g.DrawImage(En, new Rectangle(point, _Size));
             point.Y -= 15;
@@ -280,7 +289,10 @@ namespace LogixForms
         public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
+            {
+                g.FillRectangle(Brushes.LightGreen, new Rectangle(point.X - 20, point.Y + 8, 75, 10));
                 g.DrawImage(Dis, new Rectangle(point, _Size));
+            }
             else
                 g.DrawImage(En, new Rectangle(point, _Size));
             point.Y -= 15;
@@ -330,7 +342,10 @@ namespace LogixForms
         public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
+            {
+                g.FillRectangle(Brushes.LightGreen, new Rectangle(point.X - 20, point.Y + 8, 75, 10));
                 g.DrawImage(Dis, new Rectangle(point, _Size));
+            }
             else
                 g.DrawImage(En, new Rectangle(point, _Size));
             point.Y -= 15;
@@ -367,7 +382,7 @@ namespace LogixForms
     /// <summary>
     /// Отрисовк TON
     /// </summary>
-    public class Timer : ElementDraw
+    public class TON : ElementDraw
     {
         private readonly Bitmap En = NodEn.Timer___Move, EN_DN_TT = NodEn.EN_DN_TT, EN_DN_TTdis = NodDis.EN_DN_TTdis;
         private readonly Font iner = new Font("Arial", 8);
@@ -403,7 +418,14 @@ namespace LogixForms
             g.DrawImage(EN_DN_TT, new Rectangle(_p, _Size));
             _p.Y += 2;
             _p.X += 13;
-            g.DrawString("EN", iner, Brushes.Black, _p);
+            if ((Adr["Timer_control"][int.Parse(_Adres.Replace("T4:", ""))] & 1) != 0)
+            {
+                //g.FillRectangle(Brushes.LightGreen, new Rectangle(_p.X - 20, _p.Y + 8, 75, 10));
+                g.DrawString("EN", iner, Brushes.LightGreen, _p);
+            }
+            else
+                g.DrawString("EN", iner, Brushes.Black, _p);
+
             _p.Y -= 2;
             _p.X -= 13;
 
@@ -412,7 +434,13 @@ namespace LogixForms
             g.DrawImage(EN_DN_TT, new Rectangle(_p, _Size));
             _p.Y += 2;
             _p.X += 13;
-            g.DrawString("DN", iner, Brushes.Black, _p);
+            if ((Adr["Timer_control"][int.Parse(_Adres.Replace("T4:", ""))] & 2) != 0)
+            {
+                //g.FillRectangle(Brushes.LightGreen, new Rectangle(_p.X - 20, _p.Y + 8, 75, 10));
+                g.DrawString("DN", iner, Brushes.LightGreen, _p);
+            }
+            else
+                g.DrawString("DN", iner, Brushes.Black, _p);
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿namespace LogixForms
+﻿using System.Diagnostics;
+
+namespace LogixForms
 {
     public partial class SettingsLogix : Form
     {
@@ -18,14 +20,32 @@
         /// </summary>
         public void UpdateGrid()
         {
-            dataGridView1.RowCount = adres.Count;
-            name_adr = adres.Keys.ToArray();
-            for (int i = 0; i < adres.Count; i++)
+                dataGridView1.RowCount = adres.Count;
+                name_adr = adres.Keys.ToArray();
+                for (int i = 0; i < adres.Count; i++)
+                {
+                    dataGridView1.Rows[i].Cells[1].Value = name_adr[i];
+                    dataGridView1.Rows[i].Cells[2].Value = adres_adr[name_adr[i]];
+                    dataGridView1.Rows[i].Cells[3].Value = adres[name_adr[i]].Length;
+                }
+            try
             {
-                dataGridView1.Rows[i].Cells[1].Value = name_adr[i];
-                dataGridView1.Rows[i].Cells[2].Value = adres_adr[name_adr[i]];
-                dataGridView1.Rows[i].Cells[3].Value = adres[name_adr[i]].Length;
             }
+            catch
+            {
+                Debug.Print("Адреса утеряны!!!");
+            }
+            #if DEBUG
+            #else
+                dataGridView1.RowCount = adres.Count;
+                name_adr = adres.Keys.ToArray();
+                for (int i = 0; i < adres.Count; i++)
+                {
+                    dataGridView1.Rows[i].Cells[1].Value = name_adr[i];
+                    dataGridView1.Rows[i].Cells[2].Value = adres_adr[name_adr[i]];
+                    dataGridView1.Rows[i].Cells[3].Value = adres[name_adr[i]].Length;
+                }
+            #endif
         }
 
         /// <summary>

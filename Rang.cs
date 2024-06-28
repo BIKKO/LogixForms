@@ -429,7 +429,7 @@ namespace LogixForms
                             {
                                 try
                                 {
-                                    El = new OTU();
+                                    El = new OTL();
                                     El.Draw(g, TextRang[index + 1], point, Adr);
                                     if (Tegs != null)
                                         if (Tegs.ContainsKey(TextRang[index + 1]))
@@ -483,7 +483,7 @@ namespace LogixForms
                             {
                                 try
                                 {
-                                    El = new Timer();
+                                    El = new TON();
                                     string[] adress = { TextRang[index + 2], TextRang[index + 3], TextRang[index + 4] };
                                     El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
                                     if (Tegs != null)
@@ -823,7 +823,7 @@ namespace LogixForms
                             {
                                 try
                                 {
-                                    El = new Timer();
+                                    El = new TON();
                                     string[] adress = { TextRang[index + 2], TextRang[index + 3], TextRang[index + 4] };
                                     El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
                                     if (Tegs != null)
@@ -964,8 +964,6 @@ namespace LogixForms
         /// </summary>
         public void Dispose()
         {
-            Adr.Clear();
-            Adr = null;
             if (Tegs != null)
             {
                 Tegs.Clear();

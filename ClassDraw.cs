@@ -271,8 +271,6 @@ namespace LogixForms
             if(Tegs != null)
             Tegs.Clear();
             Tegs = null;
-            Adr.Clear();
-            Adr = null;
             rang.Dispose();
         }
     }

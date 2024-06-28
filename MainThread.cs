@@ -1,6 +1,4 @@
-using Microsoft.VisualBasic.Devices;
 using Modbus.Device;
-using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 
@@ -21,6 +19,7 @@ namespace LogixForms
             InitializeComponent();//инициализация формы
 
             AdresUpdate.Enabled = false;
+            AdresUpdate.Interval = 500;
             Adr = new Dictionary<string, ushort[]>
             {
                 { "T4", new ushort[24] },
@@ -46,8 +45,8 @@ namespace LogixForms
             Height = int.Parse(Properties.Settings.Default["H"].ToString());
             Width = int.Parse(Properties.Settings.Default["W"].ToString());
             string[] name = Properties.Settings.Default["AdresName"].ToString().Split(',');
-            string[] adr = Properties.Settings.Default["AdresValue"].ToString().Split(',');
             string[] len = Properties.Settings.Default["AdresLen"].ToString().Split(',');
+            string[] adr = Properties.Settings.Default["AdresValue"].ToString().Split(',');
 
             if (name.Length > 1 && adr.Length > 1 && len.Length > 1)
             {
@@ -68,11 +67,37 @@ namespace LogixForms
         /// <param name="e"></param>
         private void AdresUpdate_Tick(object sender, EventArgs e)
         {
-            string[] adreskey = Adr.Keys.ToArray();
-            foreach (string adkey in adreskey)
+            try
             {
-                //Thread.Sleep(100);
-                Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                string[] adreskey = Adr.Keys.ToArray();
+                foreach (string adkey in adreskey)
+                {
+                    Thread.Sleep(1);
+                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                }
+            }
+            catch
+            {
+                AdresUpdate.Enabled = false;
+                string[] name = Properties.Settings.Default["AdresName"].ToString().Split(',');
+                string[] len = Properties.Settings.Default["AdresLen"].ToString().Split(',');
+                if (name.Length > 1 && len.Length > 1)
+                {
+                    Adr.Clear();
+                    MB_adres.Clear();
+                    for (int i = 0; i < name.Length; i++)
+                    {
+                        Adr.Add(name[i], new ushort[int.Parse(len[i])]);
+                    }
+                }
+
+                if (MessageBox.Show("Соединенрие потеряно!\nПереподключиться?", "Ошибка подключения", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                {
+                    Close_Click(sender, e);
+                    ConnectToolStripMenuItem_Click(sender, e);
+                }
+                else Close_Click(sender, e);
+
             }
         }
 
@@ -324,7 +349,7 @@ namespace LogixForms
                 {
                     Adr[adkey] = master.ReadHoldingRegisters(1, MB_adres[adkey], (ushort)Adr[adkey].Length);
                 }
-
+                AdresUpdate.Enabled = true;
                 var tb = new TabPage();
                 tb.Text = ip + ':' + port;
 
@@ -462,13 +487,10 @@ namespace LogixForms
         {
             if (ConnectedWindows.Count < 1)
             {
-                MouseWheelUpdate.Enabled = false;
-                //ModBusUpdate.Enabled = true;
 
                 if (Application.OpenForms["ConnectForms"] == null)
                 {
                     new ConnectForms(this).Show();
-                    //con();
                 }
             }
         }

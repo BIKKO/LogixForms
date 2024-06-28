@@ -182,8 +182,7 @@
             // 
             // AdresUpdate
             // 
-            AdresUpdate.Enabled = true;
-            AdresUpdate.Interval = 300;
+            AdresUpdate.Interval = 200;
             AdresUpdate.Tick += AdresUpdate_Tick;
             // 
             // MemoryClear
