@@ -19,7 +19,7 @@ namespace LogixForms
             InitializeComponent();//инициализация формы
 
             AdresUpdate.Enabled = false;
-            AdresUpdate.Interval = 500;
+            AdresUpdate.Interval = 400;
             Adr = new Dictionary<string, ushort[]>
             {
                 { "T4", new ushort[24] },
@@ -65,14 +65,14 @@ namespace LogixForms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AdresUpdate_Tick(object sender, EventArgs e)
+        private async void AdresUpdate_Tick(object sender, EventArgs e)
         {
             try
             {
                 string[] adreskey = Adr.Keys.ToArray();
                 foreach (string adkey in adreskey)
                 {
-                    Thread.Sleep(1);
+                    await Task.Delay(5);
                     Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
                 }
             }
@@ -81,10 +81,11 @@ namespace LogixForms
                 AdresUpdate.Enabled = false;
                 string[] name = Properties.Settings.Default["AdresName"].ToString().Split(',');
                 string[] len = Properties.Settings.Default["AdresLen"].ToString().Split(',');
+                //string[] adr = Properties.Settings.Default["AdresValue"].ToString().Split(',');
                 if (name.Length > 1 && len.Length > 1)
                 {
                     Adr.Clear();
-                    MB_adres.Clear();
+                    //MB_adres.Clear();
                     for (int i = 0; i < name.Length; i++)
                     {
                         Adr.Add(name[i], new ushort[int.Parse(len[i])]);
@@ -160,6 +161,7 @@ namespace LogixForms
             {
                 ClassDraw cd = mainWindows[Files.SelectedIndex];
                 mainWindows.Remove(cd);
+                Application.OpenForms[Files.SelectedTab.Text].Close();
                 TabPage tp = Files.SelectedTab;
                 Files.TabPages.Remove(Files.SelectedTab);
                 tp.Dispose();

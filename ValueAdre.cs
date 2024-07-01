@@ -21,8 +21,8 @@ namespace LogixForms
             master = _master;
             MBAdres = _MBAdres;
             ConActiv = _ConActiv;
+            
         }
-
 
         /// <summary>
         /// Создание и изменение таблицы значаний

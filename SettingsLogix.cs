@@ -20,6 +20,9 @@ namespace LogixForms
         /// </summary>
         public void UpdateGrid()
         {
+            #if DEBUG
+            try
+            {
                 dataGridView1.RowCount = adres.Count;
                 name_adr = adres.Keys.ToArray();
                 for (int i = 0; i < adres.Count; i++)
@@ -28,14 +31,11 @@ namespace LogixForms
                     dataGridView1.Rows[i].Cells[2].Value = adres_adr[name_adr[i]];
                     dataGridView1.Rows[i].Cells[3].Value = adres[name_adr[i]].Length;
                 }
-            try
-            {
             }
             catch
             {
                 Debug.Print("Адреса утеряны!!!");
             }
-            #if DEBUG
             #else
                 dataGridView1.RowCount = adres.Count;
                 name_adr = adres.Keys.ToArray();

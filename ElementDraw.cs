@@ -406,7 +406,7 @@ namespace LogixForms
             g.DrawString("Timer " + _Adres, _Font, Brushes.Black, _p);
             _p.Y += 20;
             _p.X += 20;
-            g.DrawString(r[0]+"\n"+ r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+            g.DrawString(r[0]+"\n"+ Adr["T4"][int.Parse(_Adres.Replace("T4:", ""))] + "\n" + Adr["T4_c"][int.Parse(_Adres.Replace("T4:", ""))], _Font, Brushes.Black, _p);
             _p.Y -= 20;
             _p.X -= 20;
 
