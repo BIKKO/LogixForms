@@ -35,11 +35,12 @@
             label1 = new Label();
             label4 = new Label();
             Port = new TextBox();
+            ConfigSel = new CheckBox();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(91, 62);
+            button1.Location = new Point(91, 84);
             button1.Name = "button1";
             button1.Size = new Size(109, 34);
             button1.TabIndex = 0;
@@ -49,7 +50,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(208, 62);
+            button2.Location = new Point(208, 84);
             button2.Name = "button2";
             button2.Size = new Size(109, 34);
             button2.TabIndex = 1;
@@ -92,11 +93,22 @@
             Port.TabIndex = 9;
             Port.Text = "502";
             // 
+            // ConfigSel
+            // 
+            ConfigSel.AutoSize = true;
+            ConfigSel.Location = new Point(16, 54);
+            ConfigSel.Name = "ConfigSel";
+            ConfigSel.Size = new Size(212, 24);
+            ConfigSel.TabIndex = 11;
+            ConfigSel.Text = "Запросить конфигурацию";
+            ConfigSel.UseVisualStyleBackColor = true;
+            // 
             // ConnectForms
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(331, 108);
+            ClientSize = new Size(331, 130);
+            Controls.Add(ConfigSel);
             Controls.Add(label4);
             Controls.Add(Port);
             Controls.Add(label1);
@@ -120,5 +132,6 @@
         private Label label1;
         private Label label4;
         private TextBox Port;
+        private CheckBox ConfigSel;
     }
 }

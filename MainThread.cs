@@ -1,6 +1,9 @@
 using Modbus.Device;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
+using System.Windows.Forms;
 
 namespace LogixForms
 {
@@ -13,6 +16,9 @@ namespace LogixForms
         public ModbusIpMaster master;
         private TcpClient client;
         private byte slave = 1;
+        private int RangAdr;
+        private int CfgAdr;
+        private Dictionary<byte, string> DataType;
 
         public MainThread()
         {
@@ -20,6 +26,24 @@ namespace LogixForms
 
             AdresUpdate.Enabled = false;
             AdresUpdate.Interval = 400;
+            RangAdr = 8000;
+
+            DataType = new Dictionary<byte, string>
+            {
+                { 1,"B" },
+                { 2,"T" },
+                { 3,"C" },
+                { 4,"R" },
+                { 5,"N" },
+                { 6,"F" },
+                { 7,"S" },
+                { 8,"L" },
+                { 9,"MG" },
+                { 10,"RI" },
+                { 11,"T_c" },
+                { 12,"Timer_control" },
+            };
+
             Adr = new Dictionary<string, ushort[]>
             {
                 { "T4", new ushort[24] },
@@ -31,6 +55,7 @@ namespace LogixForms
                 { "N40", new ushort[70] },
                 { "B3", new ushort[70] }
             };
+
             MB_adres = new Dictionary<string, ushort>() { {"T4",1300},
                                                         {"T4_c",7000},
                                                         {"Timer_control",6800},
@@ -42,11 +67,13 @@ namespace LogixForms
                                                         };
 
             //Получение данных из файла сохранения
-            Height = int.Parse(Properties.Settings.Default["H"].ToString());
-            Width = int.Parse(Properties.Settings.Default["W"].ToString());
-            string[] name = Properties.Settings.Default["AdresName"].ToString().Split(',');
-            string[] len = Properties.Settings.Default["AdresLen"].ToString().Split(',');
-            string[] adr = Properties.Settings.Default["AdresValue"].ToString().Split(',');
+            Height = Properties.Settings.Default.H;
+            Width = Properties.Settings.Default.W;
+            string[] name = Properties.Settings.Default.AdresName.Split(',');
+            string[] len = Properties.Settings.Default.AdresLen.Split(',');
+            string[] adr = Properties.Settings.Default.AdresValue.Split(",");
+            RangAdr = Properties.Settings.Default.RangAdr;
+            CfgAdr = Properties.Settings.Default.CfgAdr;
 
             if (name.Length > 1 && adr.Length > 1 && len.Length > 1)
             {
@@ -161,7 +188,8 @@ namespace LogixForms
             {
                 ClassDraw cd = mainWindows[Files.SelectedIndex];
                 mainWindows.Remove(cd);
-                Application.OpenForms[Files.SelectedTab.Text].Close();
+                if(Application.OpenForms[Files.SelectedTab.Text] != null)
+                    Application.OpenForms[Files.SelectedTab.Text].Close();
                 TabPage tp = Files.SelectedTab;
                 Files.TabPages.Remove(Files.SelectedTab);
                 tp.Dispose();
@@ -306,10 +334,12 @@ namespace LogixForms
         /// <param name="port">Порт</param>
         /// <param name="simulate"></param>
         /// <param name="slave">ID</param>
-        public void Con(string ip, string port, byte slave)
+        public void Con(string ip, string port, bool cfg)
         {
             try
             {
+                if (cfg) GetInfoCFG(ip, port);
+
                 List<string> TextRangs = new List<string>();
                 client = new TcpClient(ip, int.Parse(port));
                 //TcpClients.Add(client);
@@ -317,9 +347,10 @@ namespace LogixForms
 
                 ushort[] inputs;
 
+
                 for (int j = 0; j < 100; j++)
                 {
-                    inputs = master.ReadHoldingRegisters(1, (ushort)(j + 8000), 120);
+                    inputs = master.ReadHoldingRegisters(1, (ushort)(j + RangAdr), 120);
                     string g = "";
                     int len = 0;
                     int buf;
@@ -418,6 +449,44 @@ namespace LogixForms
         }
 
         /// <summary>
+        /// Получение данных конфигурации
+        /// </summary>
+        /// <param name="ip">IP адрес</param>
+        /// <param name="port">Порт</param>
+        private void GetInfoCFG(string ip, string port)
+        {
+            client = new TcpClient(ip, int.Parse(port));
+            master = ModbusIpMaster.CreateIp(client);
+
+            ushort[] inputs;
+            string name;
+            ushort mbadr;
+            ushort len;
+
+            Adr.Clear();
+            MB_adres.Clear();
+
+            for (int i = 0; i < 100; i++)
+            {
+                inputs = master.ReadHoldingRegisters(5, (ushort)(i + CfgAdr), 3);
+                if (inputs[0] == 0xffff && inputs[2] == 0)
+                {
+                    RangAdr = inputs[1];
+                    continue;
+                }
+                if (inputs[0] == 0) return;
+                name = DataType[(byte)(inputs[0] >> 8)];
+                if ((inputs[0] & 0xff) != 0) name += inputs[0] & 0xff;
+                else if (name == "T_c") name = "T4_c";
+                mbadr = inputs[1];
+                len = inputs[2];
+
+                Adr.Add(name, new ushort[len]);
+                MB_adres.Add(name, mbadr);
+            }
+        }
+
+        /// <summary>
         /// Создание пустого окна
         /// </summary>
         /// <param name="sender"></param>
@@ -506,7 +575,7 @@ namespace LogixForms
         {
             if (Application.OpenForms["SettingsLogix"] == null)
             {
-                new SettingsLogix(Adr, MB_adres).Show();
+                new SettingsLogix(ref Adr, ref MB_adres, ref RangAdr, ref CfgAdr).Show();
             }
         }
 
@@ -541,14 +610,16 @@ namespace LogixForms
         /// <param name="e"></param>
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Properties.Settings.Default["H"] = Height;
-            Properties.Settings.Default["W"] = Width;
+            Properties.Settings.Default.H = Height;
+            Properties.Settings.Default.W = Width;
+            Properties.Settings.Default.RangAdr = RangAdr;
+            Properties.Settings.Default.CfgAdr = CfgAdr;
 
-            Properties.Settings.Default["AdresName"] = string.Join(",",MB_adres.Keys);
-            Properties.Settings.Default["AdresValue"] = string.Join(",",MB_adres.Values);
+            Properties.Settings.Default.AdresName = string.Join(",",MB_adres.Keys);
+            Properties.Settings.Default.AdresValue = string.Join(",",MB_adres.Values);
             int[] buf = new int[Adr.Count];
             for (int i = 0; i < Adr.Count; i++) buf[i] = Adr[Adr.Keys.ToArray()[i]].Length;
-            Properties.Settings.Default["AdresLen"] = string.Join(",",string.Join(",",buf));
+            Properties.Settings.Default.AdresLen = string.Join(",",string.Join(",",buf));
 
             Properties.Settings.Default.Save();
         }

@@ -54,7 +54,7 @@
                 MessageBox.Show("Не верно указан IP адрес: встречено не число");
             }
 
-            form1.Con(ip_and_port, Port.Text, (byte)slave);
+            form1.Con(ip_and_port, Port.Text, ConfigSel.Checked);
             Close();
         }
     }

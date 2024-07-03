@@ -31,7 +31,10 @@
             components = new System.ComponentModel.Container();
             tabControl1 = new TabControl();
             Common = new TabPage();
+            label1 = new Label();
             Adreses = new TabPage();
+            LoadCFG = new Button();
+            UPLoad = new Button();
             AddBut = new Button();
             Delite = new Button();
             dataGridView1 = new DataGridView();
@@ -40,7 +43,8 @@
             MB_Adres = new DataGridViewTextBoxColumn();
             Len = new DataGridViewTextBoxColumn();
             timer1 = new System.Windows.Forms.Timer(components);
-            label1 = new Label();
+            openFileDialog1 = new OpenFileDialog();
+            saveFileDialog1 = new SaveFileDialog();
             tabControl1.SuspendLayout();
             Common.SuspendLayout();
             Adreses.SuspendLayout();
@@ -69,8 +73,20 @@
             Common.Text = "Общие";
             Common.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point);
+            label1.Location = new Point(111, 123);
+            label1.Name = "label1";
+            label1.Size = new Size(454, 57);
+            label1.TabIndex = 0;
+            label1.Text = "Временно ничего нет!";
+            // 
             // Adreses
             // 
+            Adreses.Controls.Add(LoadCFG);
+            Adreses.Controls.Add(UPLoad);
             Adreses.Controls.Add(AddBut);
             Adreses.Controls.Add(Delite);
             Adreses.Controls.Add(dataGridView1);
@@ -81,6 +97,26 @@
             Adreses.TabIndex = 1;
             Adreses.Text = "Адреса";
             Adreses.UseVisualStyleBackColor = true;
+            // 
+            // LoadCFG
+            // 
+            LoadCFG.Location = new Point(364, 279);
+            LoadCFG.Name = "LoadCFG";
+            LoadCFG.Size = new Size(125, 27);
+            LoadCFG.TabIndex = 5;
+            LoadCFG.Text = "Загрузить";
+            LoadCFG.UseVisualStyleBackColor = true;
+            LoadCFG.Click += Load_Click;
+            // 
+            // UPLoad
+            // 
+            UPLoad.Location = new Point(236, 279);
+            UPLoad.Name = "UPLoad";
+            UPLoad.Size = new Size(125, 27);
+            UPLoad.TabIndex = 4;
+            UPLoad.Text = "Выгрузить";
+            UPLoad.UseVisualStyleBackColor = true;
+            UPLoad.Click += UPload_Click;
             // 
             // AddBut
             // 
@@ -107,6 +143,8 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
@@ -128,7 +166,7 @@
             Выбор.MinimumWidth = 6;
             Выбор.Name = "Выбор";
             Выбор.TrueValue = "1";
-            Выбор.Width = 24;
+            Выбор.Width = 6;
             // 
             // Names
             // 
@@ -156,15 +194,9 @@
             timer1.Enabled = true;
             timer1.Interval = 1000;
             // 
-            // label1
+            // openFileDialog1
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(111, 123);
-            label1.Name = "label1";
-            label1.Size = new Size(454, 57);
-            label1.TabIndex = 0;
-            label1.Text = "Временно ничего нет!";
+            openFileDialog1.FileName = "openFileDialog1";
             // 
             // SettingsLogix
             // 
@@ -198,5 +230,9 @@
         private DataGridViewTextBoxColumn MB_Adres;
         private System.Windows.Forms.Timer timer1;
         private Label label1;
+        private Button LoadCFG;
+        private Button UPLoad;
+        private OpenFileDialog openFileDialog1;
+        private SaveFileDialog saveFileDialog1;
     }
 }

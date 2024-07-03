@@ -82,5 +82,29 @@ namespace LogixForms.Properties {
                 this["AdresLen"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8000")]
+        public int RangAdr {
+            get {
+                return ((int)(this["RangAdr"]));
+            }
+            set {
+                this["RangAdr"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int CfgAdr {
+            get {
+                return ((int)(this["CfgAdr"]));
+            }
+            set {
+                this["CfgAdr"] = value;
+            }
+        }
     }
 }
