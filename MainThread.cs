@@ -9,16 +9,19 @@ namespace LogixForms
 {
     public partial class MainThread : Form
     {
-        private static Dictionary<string, ushort[]> Adr;
-        protected static Dictionary<string, ushort> MB_adres;
+        private static Dictionary<string, ushort[]>? Adr;
+        protected static Dictionary<string, ushort>? MB_adres;
         private List<ClassDraw> mainWindows = new List<ClassDraw>();
         private List<int> ConnectedWindows = new List<int>();
-        public ModbusIpMaster master;
-        private TcpClient client;
+        public ModbusIpMaster? master;
+        private TcpClient? client;
         private byte slave = 1;
         private int RangAdr;
         private int CfgAdr;
-        private Dictionary<byte, string> DataType;
+        private readonly Dictionary<byte, string> DataType;
+#if DEBUG
+        bool DebugFlag = false;
+#endif
 
         public MainThread()
         {
@@ -88,18 +91,60 @@ namespace LogixForms
         }
 
         /// <summary>
+        /// ƒоступ к значению адреса регистра расположени€ рангов
+        /// </summary>
+        public int RangsADR
+        {
+            get { return RangAdr; }
+            set { RangAdr = value; }
+        }
+
+        /// <summary>
+        /// ƒоступ к значению адреса регистра расположени€ конфигурации
+        /// </summary>
+        public int ConfigAdr
+        {
+            get { return CfgAdr; }
+            set { CfgAdr = value; }
+        }
+        
+        /// <summary>
+        /// ƒоступ к значени€м адресов
+        /// </summary>
+        public Dictionary<string, ushort[]> Data
+        {
+            get { return Adr; }
+            set { Adr = value; }
+        }
+        
+        /// <summary>
+        /// ƒоступ к значени€м адресов регистров
+        /// </summary>
+        public Dictionary<string, ushort> ModBusAdres
+        {
+            get { return MB_adres; }
+            set { MB_adres = value; }
+        }
+
+        /// <summary>
         /// ќбновление значений адресов в пам€ти с устройтва
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void AdresUpdate_Tick(object sender, EventArgs e)
+        private void AdresUpdate_Tick(object sender, EventArgs e)
         {
             try
             {
-                string[] adreskey = Adr.Keys.ToArray();
+#if DEBUG
+                if(DebugFlag) 
+                    DebugFlag = false;
+#endif
+                string[]? adreskey = Adr.Keys.ToArray();
+                if (adreskey == null) Debug.Print("Null");
+                else
                 foreach (string adkey in adreskey)
                 {
-                    await Task.Delay(5);
+                    Task.Delay(5);
                     Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
                 }
             }
@@ -194,6 +239,9 @@ namespace LogixForms
                 Files.TabPages.Remove(Files.SelectedTab);
                 tp.Dispose();
                 cd.Dispose();
+                AdresUpdate.Enabled = false;
+                ModBusUpdate.Enabled = false;
+                master = null;
                 GC.Collect();
             }
         }
@@ -575,7 +623,7 @@ namespace LogixForms
         {
             if (Application.OpenForms["SettingsLogix"] == null)
             {
-                new SettingsLogix(ref Adr, ref MB_adres, ref RangAdr, ref CfgAdr).Show();
+                new SettingsLogix(this).Show();
             }
         }
 

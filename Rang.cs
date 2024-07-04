@@ -605,6 +605,7 @@ namespace LogixForms
                             break;
                         default:
                             {
+                                if(El != null)
                                 El.Dispose();
                                 break;
                             }

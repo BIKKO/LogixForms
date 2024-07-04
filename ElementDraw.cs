@@ -579,7 +579,7 @@ namespace LogixForms
             }
             catch
             {
-                Debug.Print("jjj");
+                Debug.Print("DrawEl - ADD");
             }
         }
 
