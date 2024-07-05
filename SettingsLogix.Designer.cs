@@ -31,7 +31,14 @@
             components = new System.ComponentModel.Container();
             tabControl1 = new TabControl();
             Common = new TabPage();
+            groupBox2 = new GroupBox();
+            SaveSet = new Button();
+            CancelSet = new Button();
+            groupBox1 = new GroupBox();
+            SaveNet = new Button();
+            CancelNet = new Button();
             label1 = new Label();
+            TimerDel = new TextBox();
             Adreses = new TabPage();
             LoadCFG = new Button();
             UPLoad = new Button();
@@ -47,6 +54,8 @@
             saveFileDialog1 = new SaveFileDialog();
             tabControl1.SuspendLayout();
             Common.SuspendLayout();
+            groupBox2.SuspendLayout();
+            groupBox1.SuspendLayout();
             Adreses.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -64,7 +73,8 @@
             // 
             // Common
             // 
-            Common.Controls.Add(label1);
+            Common.Controls.Add(groupBox2);
+            Common.Controls.Add(groupBox1);
             Common.Location = new Point(4, 29);
             Common.Name = "Common";
             Common.Padding = new Padding(3);
@@ -73,15 +83,93 @@
             Common.Text = "Общие";
             Common.UseVisualStyleBackColor = true;
             // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(SaveSet);
+            groupBox2.Controls.Add(CancelSet);
+            groupBox2.Dock = DockStyle.Fill;
+            groupBox2.Location = new Point(327, 3);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(344, 314);
+            groupBox2.TabIndex = 1;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Общие настройки";
+            // 
+            // SaveSet
+            // 
+            SaveSet.Enabled = false;
+            SaveSet.Location = new Point(138, 281);
+            SaveSet.Name = "SaveSet";
+            SaveSet.Size = new Size(97, 28);
+            SaveSet.TabIndex = 5;
+            SaveSet.Tag = "Set";
+            SaveSet.Text = "Сохранить";
+            SaveSet.UseVisualStyleBackColor = true;
+            SaveSet.Click += Save_Click;
+            // 
+            // CancelSet
+            // 
+            CancelSet.Enabled = false;
+            CancelSet.Location = new Point(241, 281);
+            CancelSet.Name = "CancelSet";
+            CancelSet.Size = new Size(97, 28);
+            CancelSet.TabIndex = 4;
+            CancelSet.Tag = "Set";
+            CancelSet.Text = "Отмена";
+            CancelSet.UseVisualStyleBackColor = true;
+            CancelSet.Click += Cancel_Click;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(SaveNet);
+            groupBox1.Controls.Add(CancelNet);
+            groupBox1.Controls.Add(label1);
+            groupBox1.Controls.Add(TimerDel);
+            groupBox1.Dock = DockStyle.Left;
+            groupBox1.Location = new Point(3, 3);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(324, 314);
+            groupBox1.TabIndex = 0;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Настройки сети";
+            // 
+            // SaveNet
+            // 
+            SaveNet.Location = new Point(118, 281);
+            SaveNet.Name = "SaveNet";
+            SaveNet.Size = new Size(97, 28);
+            SaveNet.TabIndex = 3;
+            SaveNet.Tag = "Net";
+            SaveNet.Text = "Сохранить";
+            SaveNet.UseVisualStyleBackColor = true;
+            SaveNet.Click += Save_Click;
+            // 
+            // CancelNet
+            // 
+            CancelNet.Location = new Point(221, 281);
+            CancelNet.Name = "CancelNet";
+            CancelNet.Size = new Size(97, 28);
+            CancelNet.TabIndex = 2;
+            CancelNet.Tag = "Net";
+            CancelNet.Text = "Отмена";
+            CancelNet.UseVisualStyleBackColor = true;
+            CancelNet.Click += Cancel_Click;
+            // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(111, 123);
+            label1.Location = new Point(6, 28);
             label1.Name = "label1";
-            label1.Size = new Size(454, 57);
-            label1.TabIndex = 0;
-            label1.Text = "Временно ничего нет!";
+            label1.Size = new Size(131, 20);
+            label1.TabIndex = 1;
+            label1.Text = "Интервал опроса";
+            // 
+            // TimerDel
+            // 
+            TimerDel.Location = new Point(6, 52);
+            TimerDel.Name = "TimerDel";
+            TimerDel.Size = new Size(71, 27);
+            TimerDel.TabIndex = 0;
             // 
             // Adreses
             // 
@@ -211,7 +299,9 @@
             Load += SettingsLogix_Load;
             tabControl1.ResumeLayout(false);
             Common.ResumeLayout(false);
-            Common.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             Adreses.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
@@ -230,10 +320,17 @@
         private DataGridViewTextBoxColumn Len;
         private DataGridViewTextBoxColumn MB_Adres;
         private System.Windows.Forms.Timer timer1;
-        private Label label1;
         private Button LoadCFG;
         private Button UPLoad;
         private OpenFileDialog openFileDialog1;
         private SaveFileDialog saveFileDialog1;
+        private GroupBox groupBox2;
+        private GroupBox groupBox1;
+        private Button SaveNet;
+        private Button CancelNet;
+        private Label label1;
+        private TextBox TimerDel;
+        private Button SaveSet;
+        private Button CancelSet;
     }
 }

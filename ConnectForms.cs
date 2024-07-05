@@ -30,11 +30,13 @@
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
+            byte s;
             try
             {
-                ip_and_port = IP.Text;
-                string[] ip_buf = ip_and_port.Split('.');
-                if (ip_buf.Length == 4)
+                string[] ip_buf = { };
+                    ip_and_port = IP.Text;
+                    ip_buf = ip_and_port.Split('.');
+                if (ip_buf.Length == 4 && byte.TryParse(textBox1.Text, out s))
                 {
                     foreach (string ip in ip_buf)
                     {
@@ -44,18 +46,34 @@
                 }
                 else
                 {
-                    MessageBox.Show("Не верно указан IP адрес: 255.255.255.255");
-                    IP.Clear();
-                    IP.Focus();
+                    if (ip_buf.Length != 4)
+                    {
+                        MessageBox.Show("Не верно указан IP адрес: 255.255.255.255");
+                        IP.Clear();
+                        IP.Focus();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не верно указан SlaveID");
+                    }
+                    return;
                 }
             }
             catch (Exception)
             {
                 MessageBox.Show("Не верно указан IP адрес: встречено не число");
+                return;
             }
-
-            form1.Con(ip_and_port, Port.Text, ConfigSel.Checked);
-            Close();
+            if (s != null && s != 0)
+            {
+                form1.Con(ip_and_port, Port.Text, ConfigSel.Checked, s);
+                Close();
+            }
+            else
+            {
+                MessageBox.Show("Не вышло!");
+                return;
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ namespace LogixForms
         private int RangAdr;
         private int CfgAdr;
         private readonly Dictionary<byte, string> DataType;
+        private bool Con_flag = false;
 #if DEBUG
         bool DebugFlag = false;
 #endif
@@ -28,7 +29,7 @@ namespace LogixForms
             InitializeComponent();//инициализация формы
 
             AdresUpdate.Enabled = false;
-            AdresUpdate.Interval = 400;
+            AdresUpdate.Interval = 350;
             RangAdr = 8000;
 
             DataType = new Dictionary<byte, string>
@@ -90,6 +91,17 @@ namespace LogixForms
             }
         }
 
+        public Color SetColorDraw
+        {
+            set { toolStripTextBox1.BackColor = value; }
+        }
+
+        public int AdrUpdateTime
+        {
+            get { return AdresUpdate.Interval; }
+            set { AdresUpdate.Interval = value; }
+        }
+
         /// <summary>
         /// Доступ к значению адреса регистра расположения рангов
         /// </summary>
@@ -144,13 +156,17 @@ namespace LogixForms
                 else
                 foreach (string adkey in adreskey)
                 {
+                    if(Con_flag) toolStripTextBox2.BackColor = Color.Red;
+                    else toolStripTextBox2.BackColor = Color.Yellow;
                     Task.Delay(5);
                     Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
                 }
+                Con_flag = !Con_flag;
             }
             catch
             {
                 AdresUpdate.Enabled = false;
+                toolStripTextBox2.BackColor = Color.White;
                 string[] name = Properties.Settings.Default["AdresName"].ToString().Split(',');
                 string[] len = Properties.Settings.Default["AdresLen"].ToString().Split(',');
                 //string[] adr = Properties.Settings.Default["AdresValue"].ToString().Split(',');
@@ -231,6 +247,7 @@ namespace LogixForms
             }
             finally
             {
+                toolStripTextBox2.BackColor = Color.White;
                 ClassDraw cd = mainWindows[Files.SelectedIndex];
                 mainWindows.Remove(cd);
                 if(Application.OpenForms[Files.SelectedTab.Text] != null)
@@ -242,6 +259,7 @@ namespace LogixForms
                 AdresUpdate.Enabled = false;
                 ModBusUpdate.Enabled = false;
                 master = null;
+                Con_flag = false;
                 GC.Collect();
             }
         }
@@ -336,7 +354,7 @@ namespace LogixForms
                 ClassDraw tab_to_drow;
                 if (tb.Text.Contains("ldf"))
                 {
-                    new Thread(() =>
+                    new Task(() =>
                     {
                         BeginInvoke(new MethodInvoker(() =>
                         {
@@ -346,28 +364,24 @@ namespace LogixForms
                             Dictionary<string, string[]> teg = CreateFile.GetTegs(openFileDialog2.FileName);
                             if (teg != null)
                                 tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                                ref hScroll, ref wh, ref adr, Height, Width, teg);
+                                ref hScroll, ref wh, ref adr, Height, Width, teg, this);
                             else
                                 tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                            ref hScroll, ref wh, ref adr, Height, Width);
+                            ref hScroll, ref wh, ref adr, Height, Width, this);
                             tab_to_drow.StartDrow();
                             mainWindows.Add(tab_to_drow);
                             MouseWheel += tab_to_drow.This_MouseWheel;
                             teg = null;
                         }
                         ));
-                    })
-                    {
-                        Name = tb.Text,
-                        IsBackground = true,
-                    }.Start();
+                    }).Start();
                 }
                 else
                 {
                     Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
                     int wh = Files.SelectedTab.Width;
                     tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                        ref hScroll, ref wh, Height, Width);
+                        ref hScroll, ref wh, Height, Width, this);
                     tab_to_drow.StartDrow();
                     mainWindows.Add(tab_to_drow);
                     MouseWheel += tab_to_drow.This_MouseWheel;
@@ -382,12 +396,12 @@ namespace LogixForms
         /// <param name="port">Порт</param>
         /// <param name="simulate"></param>
         /// <param name="slave">ID</param>
-        public void Con(string ip, string port, bool cfg)
+        public void Con(string ip, string port, bool cfg, byte slave)
         {
             try
             {
                 if (cfg) GetInfoCFG(ip, port);
-
+                this.slave = slave;
                 List<string> TextRangs = new List<string>();
                 client = new TcpClient(ip, int.Parse(port));
                 //TcpClients.Add(client);
@@ -398,7 +412,7 @@ namespace LogixForms
 
                 for (int j = 0; j < 100; j++)
                 {
-                    inputs = master.ReadHoldingRegisters(1, (ushort)(j + RangAdr), 120);
+                    inputs = master.ReadHoldingRegisters(slave, (ushort)(j + RangAdr), 120);
                     string g = "";
                     int len = 0;
                     int buf;
@@ -428,7 +442,7 @@ namespace LogixForms
                 string[] adreskey = Adr.Keys.ToArray();
                 foreach (string adkey in adreskey)
                 {
-                    Adr[adkey] = master.ReadHoldingRegisters(1, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
                 }
                 AdresUpdate.Enabled = true;
                 var tb = new TabPage();
@@ -467,13 +481,13 @@ namespace LogixForms
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
 
-                new Thread(() =>
+                new Task(() =>
                 {
                     BeginInvoke(new MethodInvoker(() =>
                     {
                         int wh = Files.SelectedTab.Width;
                         ClassDraw tab_to_drow = new ClassDraw(ref pan, TextRangs, ref vscrol,
-                    ref hScroll, ref wh, ref Adr, Height, Width);
+                    ref hScroll, ref wh, ref Adr, Height, Width, this);
                         MouseWheel += tab_to_drow.This_MouseWheel;
                         tab_to_drow.StartDrow();
                         ConnectedWindows.Add(mainWindows.Count);
@@ -482,11 +496,7 @@ namespace LogixForms
                         AdresUpdate.Enabled = true;
                     }
                     ));
-                })
-                {
-                    Name = tb.Text,
-                    IsBackground = true,
-                }.Start();
+                }).Start();
             }
             catch (Exception ex)
             {
@@ -577,24 +587,20 @@ namespace LogixForms
             Files.TabPages.Add(tb);
             Files.SelectTab(Files.TabCount - 1);
 
-            new Thread(() =>
+            new Task(() =>
             {
                 BeginInvoke(new MethodInvoker(() =>
                 {
                     int wh = Files.SelectedTab.Width;
                     List<string> Text = new List<string> { "" };
                     ClassDraw tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                            ref hScroll, ref wh, Height, Width);
+                            ref hScroll, ref wh, Height, Width, this);
                     tab_to_drow.StartDrow();
                     mainWindows.Add(tab_to_drow);
                     MouseWheel += tab_to_drow.This_MouseWheel;
                 }
                 ));
-            })
-            {
-                Name = tb.Text,
-                IsBackground = true,
-            }.Start();
+            }).Start();
         }
 
         /// <summary>

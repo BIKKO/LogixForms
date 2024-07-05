@@ -44,7 +44,8 @@
             adresesValuesToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
-            OutToLogix = new ToolStripMenuItem();
+            toolStripTextBox1 = new ToolStripTextBox();
+            toolStripTextBox2 = new ToolStripTextBox();
             ModBusUpdate = new System.Windows.Forms.Timer(components);
             MouseWheelUpdate = new System.Windows.Forms.Timer(components);
             openFileDialog2 = new OpenFileDialog();
@@ -90,10 +91,10 @@
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem, OutToLogix });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem, toolStripTextBox1, toolStripTextBox2 });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(919, 28);
+            menuStrip1.Size = new Size(919, 31);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -101,7 +102,7 @@
             // 
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, newToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem, adresesValuesToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(46, 24);
+            fileToolStripMenuItem.Size = new Size(46, 27);
             fileToolStripMenuItem.Text = "File";
             // 
             // openToolStripMenuItem
@@ -148,22 +149,32 @@
             // settingsToolStripMenuItem
             // 
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            settingsToolStripMenuItem.Size = new Size(76, 24);
+            settingsToolStripMenuItem.Size = new Size(76, 27);
             settingsToolStripMenuItem.Text = "Settings";
             settingsToolStripMenuItem.Click += SettingsToolStripMenuItem_Click;
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(64, 24);
+            aboutToolStripMenuItem.Size = new Size(64, 27);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += AboutToolStripMenuItem_Click;
             // 
-            // OutToLogix
+            // toolStripTextBox1
             // 
-            OutToLogix.Name = "OutToLogix";
-            OutToLogix.Size = new Size(39, 24);
-            OutToLogix.Text = "->";
+            toolStripTextBox1.BackColor = Color.White;
+            toolStripTextBox1.Enabled = false;
+            toolStripTextBox1.Name = "toolStripTextBox1";
+            toolStripTextBox1.ReadOnly = true;
+            toolStripTextBox1.Size = new Size(15, 27);
+            // 
+            // toolStripTextBox2
+            // 
+            toolStripTextBox2.BackColor = Color.White;
+            toolStripTextBox2.Enabled = false;
+            toolStripTextBox2.Name = "toolStripTextBox2";
+            toolStripTextBox2.ReadOnly = true;
+            toolStripTextBox2.Size = new Size(15, 27);
             // 
             // ModBusUpdate
             // 
@@ -240,7 +251,8 @@
         private Button XIO_el;
         private Button XIC_el;
         private ToolStripMenuItem adresesValuesToolStripMenuItem;
-        private ToolStripMenuItem OutToLogix;
+        private ToolStripTextBox toolStripTextBox1;
+        private ToolStripTextBox toolStripTextBox2;
     }
 
 }

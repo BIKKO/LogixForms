@@ -19,6 +19,9 @@ namespace LogixForms
         private Rang? rang;
         private Dictionary<string, string[]> Tegs;
         private bool scroll = false;
+        private bool Draw_flag = false;
+        private MainThread owner;
+        private bool Start = false;
 
         /// <summary>
         /// Конструктор отрисовки
@@ -34,7 +37,7 @@ namespace LogixForms
         /// <param name="_Tegs">Список тегов</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll, 
             ref HScrollBar hScroll, ref int TabWindht, ref Dictionary<string, ushort[]> AdresDir,
-            int height, int widht, Dictionary<string, string[]> _Tegs)
+            int height, int widht, Dictionary<string, string[]> _Tegs, MainThread main)
         {
             info_file = File;
             VScroll = vScroll;
@@ -45,6 +48,7 @@ namespace LogixForms
             Height = height;
             Width = widht;
             Tegs = _Tegs;
+            owner = main;
         }
 
         /// <summary>
@@ -59,7 +63,7 @@ namespace LogixForms
         /// <param name="widht">Ширина</param>
         /// <param name="_Tegs">Список тегов</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
-            ref HScrollBar hScroll, ref int TabWindht, int height, int widht, Dictionary<string, string[]> _Tegs)
+            ref HScrollBar hScroll, ref int TabWindht, int height, int widht, Dictionary<string, string[]> _Tegs, MainThread main)
         {
             Tegs = _Tegs;
             info_file = File;
@@ -80,6 +84,7 @@ namespace LogixForms
             panel = Panel;
             Height = height;
             Width = widht;
+            owner = main;
         }
 
         /// <summary>
@@ -95,7 +100,7 @@ namespace LogixForms
         /// <param name="widht">Ширина</param>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
             ref HScrollBar hScroll, ref int TabWindht, ref Dictionary<string, ushort[]> AdresDir,
-            int height, int widht)
+            int height, int widht, MainThread main)
         {
             info_file = File;
             VScroll = vScroll;
@@ -105,6 +110,7 @@ namespace LogixForms
             panel = Panel;
             Height = height;
             Width = widht;
+            owner = main;
         }
 
         /// <summary>
@@ -118,7 +124,7 @@ namespace LogixForms
         /// <param name="height">Высота</param>
         /// <param name="widht">Ширина</param>>
         public ClassDraw(ref MyPanel Panel, List<string> File, ref VScrollBar vScroll,
-            ref HScrollBar hScroll, ref int TabWindht, int height, int widht)
+            ref HScrollBar hScroll, ref int TabWindht, int height, int widht, MainThread main)
         {
             info_file = File;
             VScroll = vScroll;
@@ -138,6 +144,7 @@ namespace LogixForms
             panel = Panel;
             Height = height;
             Width = widht;
+            owner = main;
         }
 
         /// <summary>
@@ -235,9 +242,12 @@ namespace LogixForms
         {
             panel.BackColor = Color.White;
             panel.Paint += Draw;
-            while(true)
+            Start = true;
+            while(Start)
             {
                 await Task.Delay(60);
+                if (Draw_flag) owner.SetColorDraw = Color.Lime;
+                else owner.SetColorDraw = Color.White;
                 panel.Refresh();
                 panel.Height = Height - 20;
 
@@ -254,6 +264,7 @@ namespace LogixForms
                         HScroll.Visible = true;
                 }
                 Width = panel.Width;
+                Draw_flag = !Draw_flag;
             }
         }
 
@@ -262,6 +273,9 @@ namespace LogixForms
         /// </summary>
         public void Dispose()
         {
+            Start = false;
+            Draw_flag = false;
+            owner.SetColorDraw = Color.White;
             panel.Paint -= Draw;
             panel.Dispose();
             VScroll.Dispose();

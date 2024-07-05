@@ -21,6 +21,8 @@ namespace LogixForms
             rangadr = owner.RangsADR;
             cfg = owner.ConfigAdr;
             this.owner = owner;
+
+            TimerDel.Text = owner.AdrUpdateTime.ToString();
         }
 
         /// <summary>
@@ -102,7 +104,7 @@ namespace LogixForms
                         else
                         {
                             row.Cells[0].Value = true;
-                            rows.Add(e.RowIndex-2);
+                            rows.Add(e.RowIndex - 2);
                         }
                     }
                     else continue;
@@ -271,7 +273,7 @@ namespace LogixForms
                         string[] key = Data.Keys.ToArray();
                         for (int i = 0; i < key.Length; i++)
                         {
-                            string buf = dataGridView1.Rows[i+2].Cells[1].Value.ToString();
+                            string buf = dataGridView1.Rows[i + 2].Cells[1].Value.ToString();
                             if (buf == key[i].ToString())
                             {
                                 buf_data.Add(key[i], Data[key[i]]);
@@ -310,6 +312,33 @@ namespace LogixForms
                     }
                 }
             }
+        }
+
+        private void Save_Click(object sender, EventArgs e)
+        {
+            var but = sender as Button;
+            int u;
+            if (but.Name == "SaveNet")
+            {
+                if (int.TryParse(TimerDel.Text, out u))
+                {
+                    owner.AdrUpdateTime = u;
+                }
+                else
+                {
+                    TimerDel.Text = owner.AdrUpdateTime.ToString();
+                }
+            }
+            else
+            {
+
+            }
+        }
+
+        private void Cancel_Click(object sender, EventArgs e)
+        {
+            var but = sender as Button;
+
         }
     }
 }

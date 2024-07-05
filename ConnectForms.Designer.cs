@@ -36,11 +36,13 @@
             label4 = new Label();
             Port = new TextBox();
             ConfigSel = new CheckBox();
+            label2 = new Label();
+            textBox1 = new TextBox();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(91, 84);
+            button1.Location = new Point(96, 122);
             button1.Name = "button1";
             button1.Size = new Size(109, 34);
             button1.TabIndex = 0;
@@ -50,7 +52,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(208, 84);
+            button2.Location = new Point(213, 122);
             button2.Name = "button2";
             button2.Size = new Size(109, 34);
             button2.TabIndex = 1;
@@ -96,18 +98,37 @@
             // ConfigSel
             // 
             ConfigSel.AutoSize = true;
-            ConfigSel.Location = new Point(16, 54);
+            ConfigSel.Location = new Point(21, 92);
             ConfigSel.Name = "ConfigSel";
             ConfigSel.Size = new Size(212, 24);
             ConfigSel.TabIndex = 11;
             ConfigSel.Text = "Запросить конфигурацию";
             ConfigSel.UseVisualStyleBackColor = true;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 62);
+            label2.Name = "label2";
+            label2.Size = new Size(59, 20);
+            label2.TabIndex = 13;
+            label2.Text = "SlaveID";
+            // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(77, 59);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(21, 27);
+            textBox1.TabIndex = 12;
+            textBox1.Text = "1";
+            // 
             // ConnectForms
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(331, 130);
+            ClientSize = new Size(331, 168);
+            Controls.Add(label2);
+            Controls.Add(textBox1);
             Controls.Add(ConfigSel);
             Controls.Add(label4);
             Controls.Add(Port);
@@ -133,5 +154,7 @@
         private Label label4;
         private TextBox Port;
         private CheckBox ConfigSel;
+        private Label label2;
+        private TextBox textBox1;
     }
 }

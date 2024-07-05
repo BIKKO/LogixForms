@@ -879,4 +879,431 @@ namespace LogixForms
             En.Dispose();
         }
     }
+
+    /// <summary>
+    /// Отрисовка GEQ
+    /// </summary>
+    public class GEQ : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            try
+            {
+
+                Point _p = point;
+                _p.Y -= 20;
+                _p.X -= 45;
+                _Size = new Size(120, 85);
+                g.DrawImage(En, new Rectangle(_p, _Size));
+                g.DrawString("GEQ >=", _Font, Brushes.Black, _p);
+                _p.Y += 10;
+                _p.X += 60;
+                int u;
+                if (int.TryParse(r[1], out u))
+                {
+                    string[] buf = r[0].Split(":");
+                    string name = buf[0];
+                    int str = int.Parse(buf[1]);
+                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+                }
+                else
+                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            }
+            catch
+            {
+                Debug.Print("DrawEl - GEQ" + _Adres);
+            }
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка GRT
+    /// </summary>
+    public class GRT : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            try
+            {
+
+                Point _p = point;
+                _p.Y -= 20;
+                _p.X -= 45;
+                _Size = new Size(120, 85);
+                g.DrawImage(En, new Rectangle(_p, _Size));
+                g.DrawString("GRT >", _Font, Brushes.Black, _p);
+                _p.Y += 10;
+                _p.X += 60;
+                int u;
+                if (int.TryParse(r[1], out u))
+                {
+                    string[] buf = r[0].Split(":");
+                    string name = buf[0];
+                    int str = int.Parse(buf[1]);
+                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+                }
+                else
+                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            }
+            catch
+            {
+                Debug.Print("DrawEl - GRT" + _Adres);
+            }
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка EQU
+    /// </summary>
+    public class EQU : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            try
+            {
+
+                Point _p = point;
+                _p.Y -= 20;
+                _p.X -= 45;
+                _Size = new Size(120, 85);
+                g.DrawImage(En, new Rectangle(_p, _Size));
+                g.DrawString("EQU ==", _Font, Brushes.Black, _p);
+                _p.Y += 10;
+                _p.X += 60;
+                int u;
+                if (int.TryParse(r[1], out u))
+                {
+                    string[] buf = r[0].Split(":");
+                    string name = buf[0];
+                    int str = int.Parse(buf[1]);
+                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+                }
+                else
+                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            }
+            catch
+            {
+                Debug.Print("DrawEl - EQU" + _Adres);
+            }
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка NEQ
+    /// </summary>
+    public class NEQ : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            try
+            {
+
+                Point _p = point;
+                _p.Y -= 20;
+                _p.X -= 45;
+                _Size = new Size(120, 85);
+                g.DrawImage(En, new Rectangle(_p, _Size));
+                g.DrawString("NEQ !=", _Font, Brushes.Black, _p);
+                _p.Y += 10;
+                _p.X += 60;
+                int u;
+                if (int.TryParse(r[1], out u))
+                {
+                    string[] buf = r[0].Split(":");
+                    string name = buf[0];
+                    int str = int.Parse(buf[1]);
+                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+                }
+                else
+                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            }
+            catch
+            {
+                Debug.Print("DrawEl - NEQ" + _Adres);
+            }
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка LES
+    /// </summary>
+    public class LES : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            try
+            {
+
+                Point _p = point;
+                _p.Y -= 20;
+                _p.X -= 45;
+                _Size = new Size(120, 85);
+                g.DrawImage(En, new Rectangle(_p, _Size));
+                g.DrawString("LES <", _Font, Brushes.Black, _p);
+                _p.Y += 10;
+                _p.X += 60;
+                int u;
+                if (int.TryParse(r[1], out u))
+                {
+                    string[] buf = r[0].Split(":");
+                    string name = buf[0];
+                    int str = int.Parse(buf[1]);
+                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+                }
+                else
+                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            }
+            catch
+            {
+                Debug.Print("DrawEl - LES" + _Adres);
+            }
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Отрисовка LEQ
+    /// </summary>
+    public class LEQ : ElementDraw
+    {
+        private readonly Bitmap En = NodEn.Timer___Move;
+
+        /// <summary>
+        /// Отрисовка элемента
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="_Adres">Адрес</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Adr">Таблица данных</param>
+        /// <param name="r">Список данных</param>
+        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        {
+            try
+            {
+
+                Point _p = point;
+                _p.Y -= 20;
+                _p.X -= 45;
+                _Size = new Size(120, 85);
+                g.DrawImage(En, new Rectangle(_p, _Size));
+                g.DrawString("LEQ <=", _Font, Brushes.Black, _p);
+                _p.Y += 10;
+                _p.X += 60;
+                int u;
+                if (int.TryParse(r[1], out u))
+                {
+                    string[] buf = r[0].Split(":");
+                    string name = buf[0];
+                    int str = int.Parse(buf[1]);
+                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+                }
+                else
+                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
+                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            }
+            catch
+            {
+                Debug.Print("DrawEl - LEQ" + _Adres);
+            }
+        }
+
+        /// <summary>
+        /// Отрисовка Тегов и Комментариев
+        /// </summary>
+        /// <param name="g">Инструмент отрисовки</param>
+        /// <param name="point">Точка отрисовки</param>
+        /// <param name="Teg">Тег</param>
+        /// <param name="Com">Сомментарий</param>
+        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        {
+            point.X -= 50;
+            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
+            point.Y -= 15;
+            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+        }
+
+        /// <summary>
+        /// Уничтожение объекта
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            En.Dispose();
+        }
+    }
+
 }
