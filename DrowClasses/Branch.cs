@@ -1,4 +1,4 @@
-﻿namespace LogixForms
+﻿namespace LogixForms.DrowClasses
 {
     /// <summary>
     /// Конструктор и отрисовка ветви
@@ -80,10 +80,10 @@
         {
             if (count_el == 0)
             {
-                g.DrawLine(line, p.X - indent +scrollX, p.Y + top_indent - scrollY, p.X + indent  + scrollX, p.Y + top_indent - scrollY);   //горизонт
+                g.DrawLine(line, p.X - indent + scrollX, p.Y + top_indent - scrollY, p.X + indent + scrollX, p.Y + top_indent - scrollY);   //горизонт
                 //g.DrawString($"y: {p.Y + top_indent}\nx:{p.X + indent + (wight * count_el)}", new Font("Arial", 10), Brushes.Red, p.X + indent + scrollX+20, p.Y + top_indent - scrollY);
-                g.DrawLine(line, p.X - indent + scrollX, p.Y - scrollY, p.X - indent + scrollX, p.Y + top_indent*h - scrollY);
-                g.DrawLine(line, p.X + indent + scrollX, p.Y- scrollY, p.X + indent + scrollX, p.Y + top_indent*h - scrollY);
+                g.DrawLine(line, p.X - indent + scrollX, p.Y - scrollY, p.X - indent + scrollX, p.Y + top_indent * h - scrollY);
+                g.DrawLine(line, p.X + indent + scrollX, p.Y - scrollY, p.X + indent + scrollX, p.Y + top_indent * h - scrollY);
                 g.DrawEllipse(point, p.X + scrollX, p.Y + top_indent - 2 - scrollY, 4, 4);
             }
             else
@@ -93,14 +93,14 @@
                 {
                     if (PointOfElemetts[i] == p.X - 70)
                     {
-                        count = (byte)(i+count_el + 1);
+                        count = (byte)(i + count_el + 1);
                         break;
                     }
                 }
                 g.DrawLine(line, p.X + scrollX, p.Y + top_indent - scrollY, PointOfElemetts[count] + 70 + scrollX, p.Y + top_indent - scrollY);   //горизонт
                 //g.DrawString($"y: {p.Y + top_indent}\nx:{PointOfElemetts[count] + 70}", new Font("Arial", 10), Brushes.Red, PointOfElemetts[count] + 70 + scrollX + 20, p.Y + top_indent - scrollY);
-                g.DrawLine(line, p.X + scrollX, p.Y - scrollY, p.X+scrollX, p.Y + top_indent-scrollY);//left
-                g.DrawLine(line, PointOfElemetts[count] + 70 + scrollX, p.Y-scrollY, PointOfElemetts[count] + 70+scrollX, p.Y + top_indent-scrollY);//right
+                g.DrawLine(line, p.X + scrollX, p.Y - scrollY, p.X + scrollX, p.Y + top_indent - scrollY);//left
+                g.DrawLine(line, PointOfElemetts[count] + 70 + scrollX, p.Y - scrollY, PointOfElemetts[count] + 70 + scrollX, p.Y + top_indent - scrollY);//right
                 count = 0;
                 foreach (var item in PointOfElemetts)
                 {
@@ -256,7 +256,7 @@
         /// <param name="b"></param>
         /// <returns></returns>
         public static bool operator <(Branch a, int b) => a.count_el < b;
-        
+
         /// <summary>
         /// Получение кол-ва эл.
         /// </summary>
@@ -276,7 +276,7 @@
             get { return h; }
             set
             {
-                if(value >0) h = value;
+                if (value > 0) h = value;
             }
         }
     }

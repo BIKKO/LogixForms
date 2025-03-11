@@ -32,6 +32,14 @@
             tabControl1 = new TabControl();
             Common = new TabPage();
             groupBox2 = new GroupBox();
+            label5 = new Label();
+            label4 = new Label();
+            numericUpDown1 = new NumericUpDown();
+            comboBox1 = new ComboBox();
+            label3 = new Label();
+            label2 = new Label();
+            CollorButCom = new Button();
+            CollorButTag = new Button();
             SaveSet = new Button();
             CancelSet = new Button();
             groupBox1 = new GroupBox();
@@ -52,9 +60,12 @@
             timer1 = new System.Windows.Forms.Timer(components);
             openFileDialog1 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
+            colorDialog1 = new ColorDialog();
+            colorDialog2 = new ColorDialog();
             tabControl1.SuspendLayout();
             Common.SuspendLayout();
             groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             groupBox1.SuspendLayout();
             Adreses.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
@@ -85,6 +96,14 @@
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(label5);
+            groupBox2.Controls.Add(label4);
+            groupBox2.Controls.Add(numericUpDown1);
+            groupBox2.Controls.Add(comboBox1);
+            groupBox2.Controls.Add(label3);
+            groupBox2.Controls.Add(label2);
+            groupBox2.Controls.Add(CollorButCom);
+            groupBox2.Controls.Add(CollorButTag);
             groupBox2.Controls.Add(SaveSet);
             groupBox2.Controls.Add(CancelSet);
             groupBox2.Dock = DockStyle.Fill;
@@ -94,6 +113,79 @@
             groupBox2.TabIndex = 1;
             groupBox2.TabStop = false;
             groupBox2.Text = "Общие настройки";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(84, 172);
+            label5.Name = "label5";
+            label5.Size = new Size(60, 20);
+            label5.TabIndex = 13;
+            label5.Text = "Размер";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(185, 130);
+            label4.Name = "label4";
+            label4.Size = new Size(57, 20);
+            label4.TabIndex = 12;
+            label4.Text = "Шрифт";
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Location = new Point(14, 170);
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(51, 27);
+            numericUpDown1.TabIndex = 11;
+            numericUpDown1.ValueChanged += numericUpDown1_ValueChanged;
+            // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(14, 127);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(165, 28);
+            comboBox1.TabIndex = 10;
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(47, 74);
+            label3.Name = "label3";
+            label3.Size = new Size(132, 20);
+            label3.TabIndex = 9;
+            label3.Text = "Цвет Коментария";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(47, 33);
+            label2.Name = "label2";
+            label2.Size = new Size(76, 20);
+            label2.TabIndex = 8;
+            label2.Text = "Цвет Тега";
+            // 
+            // CollorButCom
+            // 
+            CollorButCom.BackColor = Color.FromArgb(255, 192, 128);
+            CollorButCom.Location = new Point(6, 67);
+            CollorButCom.Name = "CollorButCom";
+            CollorButCom.Size = new Size(35, 35);
+            CollorButCom.TabIndex = 7;
+            CollorButCom.UseVisualStyleBackColor = false;
+            CollorButCom.Click += CollorButCom_Click;
+            // 
+            // CollorButTag
+            // 
+            CollorButTag.BackColor = Color.FromArgb(255, 192, 128);
+            CollorButTag.Location = new Point(6, 26);
+            CollorButTag.Name = "CollorButTag";
+            CollorButTag.Size = new Size(35, 35);
+            CollorButTag.TabIndex = 6;
+            CollorButTag.UseVisualStyleBackColor = false;
+            CollorButTag.Click += CollorBut_Click;
             // 
             // SaveSet
             // 
@@ -242,7 +334,6 @@
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowHeadersVisible = false;
             dataGridView1.RowHeadersWidth = 51;
-            dataGridView1.RowTemplate.Height = 29;
             dataGridView1.Size = new Size(668, 270);
             dataGridView1.TabIndex = 0;
             dataGridView1.CellClick += dataGridView1_CellClick;
@@ -300,6 +391,8 @@
             tabControl1.ResumeLayout(false);
             Common.ResumeLayout(false);
             groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             Adreses.ResumeLayout(false);
@@ -332,5 +425,15 @@
         private TextBox TimerDel;
         private Button SaveSet;
         private Button CancelSet;
+        private Button CollorButTag;
+        private ColorDialog colorDialog1;
+        private Button CollorButCom;
+        private ColorDialog colorDialog2;
+        private Label label5;
+        private Label label4;
+        private NumericUpDown numericUpDown1;
+        private ComboBox comboBox1;
+        private Label label3;
+        private Label label2;
     }
 }

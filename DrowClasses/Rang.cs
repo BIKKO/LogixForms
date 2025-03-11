@@ -1,16 +1,15 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
 
-namespace LogixForms
+namespace LogixForms.DrowClasses
 {
     /// <summary>
     /// Отрисовка рангов
     /// </summary>
     public class Rang
     {
-        
+
         private ElementDraw? El;
-        //private readonly ElementDraw[] elements = new ElementDraw[] { new XIC(), new XIO(), new OTE(), new OTU(), new OTL(), new Timer(), new Move(), new Add() };
         private readonly Pen pen_line = new Pen(Brushes.Blue);
         private readonly Pen PenOfPoint = new Pen(Brushes.Yellow, 7);
         private readonly Regex mask = new Regex(@"((\s?[A-Z]\d?\d?\d?:\d?\d?\d?)(/\b?\b?)?\s?)|[0.0-9999.0]");// Выделение мномоник
@@ -54,7 +53,7 @@ namespace LogixForms
             g = graf;
             MaxYRangs = top_indent_rang + startY;
             MaxYBranch = 0;
-            
+
             ReadyStart();
         }
 
@@ -300,16 +299,16 @@ namespace LogixForms
                         if (branch < inf[1]) branch = branch - branch + Math.Max(branch.Count, inf[1]);
                         branch.DrowBranch();
                         BranchStart = Convert.ToBoolean(inf[2]);
-                        drow_ind = Math.Max(drow_ind+1, inf[3]);
+                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
                         if (count_of_branch == inf[4]) return inf;
                         continue;
                     }
                 }
-                else if(el == "BND")
+                else if (el == "BND")
                 {
                     int ind3 = drow_ind;
                     MaxYBranch = Math.Max(MaxYBranch, Start_Y);
-                    return new int[] { index, count_el_in_branch, 0, ind3, count_of_branch-1};
+                    return new int[] { index, count_el_in_branch, 0, ind3, count_of_branch - 1 };
                 }
                 else
                 {
@@ -368,7 +367,7 @@ namespace LogixForms
                 else
                 {
                     if (BranchStart) branch++;
-                    Point point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-20, top_indent_rang + startY - scrollY-13);
+                    Point point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 20, top_indent_rang + startY - scrollY - 13);
                     switch (el)
                     {
                         case "XIO":
@@ -376,7 +375,7 @@ namespace LogixForms
                                 try
                                 {
                                     El = new XIO();
-                                    El.Draw(g, TextRang[index+1], point, Adr);
+                                    El.Draw(g, TextRang[index + 1], point, Adr);
                                     if (Tegs != null)
                                         if (Tegs.ContainsKey(TextRang[index + 1]))
                                         {
@@ -699,8 +698,8 @@ namespace LogixForms
                             break;
                         default:
                             {
-                                if(El != null)
-                                El.Dispose();
+                                if (El != null)
+                                    El.Dispose();
                                 break;
                             }
                     }
@@ -801,7 +800,7 @@ namespace LogixForms
                     //catch { enum_el++; }
 
 
-                    Point _point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX-20, Start_Y - scrollY-13);
+                    Point _point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 20, Start_Y - scrollY - 13);
                     switch (el)
                     {
                         case "XIO":
@@ -966,7 +965,7 @@ namespace LogixForms
                                     }
                                 index += 3;
                             }
-                            catch 
+                            catch
                             {
                                 index += 3;
                                 MessageBox.Show("Test");
@@ -986,7 +985,7 @@ namespace LogixForms
                                     }
                                 index += 2;
                             }
-                            catch 
+                            catch
                             {
                                 index += 2;
                                 MessageBox.Show("Test");
@@ -1168,8 +1167,8 @@ namespace LogixForms
                         default:
                             {
                                 index++;
-                                if(El != null)
-                                El.Dispose();
+                                if (El != null)
+                                    El.Dispose();
                                 break;
                             }
                     }

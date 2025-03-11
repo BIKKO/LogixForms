@@ -1,3 +1,4 @@
+using LogixForms.DrowClasses;
 using Modbus.Device;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -20,6 +21,7 @@ namespace LogixForms
         private int CfgAdr;
         private readonly Dictionary<byte, string> DataType;
         private bool Con_flag = false;
+        private List<Thread> opens;
 #if DEBUG
         bool DebugFlag = false;
 #endif
@@ -69,6 +71,8 @@ namespace LogixForms
                                                         {"N40",2000},
                                                         {"B3",7200},
                                                         };
+
+            opens = new List<Thread>();
 
             //Получение данных из файла сохранения
             Height = Properties.Settings.Default.H;
@@ -282,7 +286,10 @@ namespace LogixForms
                 StreamWriter sw = new StreamWriter(file);
                 if (saveFileDialog1.FileName.Contains(".ldf"))
                 {
-                    sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl, CreateFile.CreateTEGS(mainWindows[Files.SelectedIndex].GetTegs)));
+                    if(mainWindows[Files.SelectedIndex].GetTegs != null)
+                        sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl, CreateFile.CreateTEGS(mainWindows[Files.SelectedIndex].GetTegs)));
+                    else
+                        sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl));
                     sw.Close();
                     file.Close();
                     return;
@@ -306,8 +313,10 @@ namespace LogixForms
             openFileDialog2.Filter = "My files (*.LDF)|*.ldf|txt files (*.txt)|*.txt|All files (*.*)|*.*";
             if (openFileDialog2.ShowDialog() == DialogResult.OK)
             {
-                var tb = new MyTabPage();
-                tb.Text = openFileDialog2.FileName.Split('\\')[^1];
+                var tb = new MyTabPage
+                {
+                    Text = openFileDialog2.FileName.Split('\\')[^1]
+                };
                 int count = 1;
                 foreach (TabPage tab in Files.TabPages)
                 {
@@ -352,9 +361,10 @@ namespace LogixForms
                 Files.SelectTab(Files.TabCount - 1);
                 List<string> Text;
                 ClassDraw tab_to_drow;
+                Thread t;
                 if (tb.Text.Contains("ldf"))
                 {
-                    new Task(() =>
+                    t = new Thread(() =>
                     {
                         BeginInvoke(new MethodInvoker(() =>
                         {
@@ -374,17 +384,26 @@ namespace LogixForms
                             teg = null;
                         }
                         ));
-                    }).Start();
+                    });
+                    opens.Add(t);
+                    t.Start();
                 }
                 else
                 {
-                    Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
-                    int wh = Files.SelectedTab.Width;
-                    tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                        ref hScroll, ref wh, Height, Width, this);
-                    tab_to_drow.StartDrow();
-                    mainWindows.Add(tab_to_drow);
-                    MouseWheel += tab_to_drow.This_MouseWheel;
+                    t = new Thread(() =>
+                    { BeginInvoke(new MethodInvoker(() => 
+                    { 
+                        Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
+                        int wh = Files.SelectedTab.Width;
+                        tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                            ref hScroll, ref wh, Height, Width, this);
+                        tab_to_drow.StartDrow();
+                        mainWindows.Add(tab_to_drow);
+                        MouseWheel += tab_to_drow.This_MouseWheel;
+                    })); 
+                    });
+
+                    opens.Add(t);t.Start();
                 }
             }
         }
@@ -400,53 +419,66 @@ namespace LogixForms
         {
             try
             {
-                if (cfg) GetInfoCFG(ip, port);
-                this.slave = slave;
-                List<string> TextRangs = new List<string>();
-                client = new TcpClient(ip, int.Parse(port));
-                //TcpClients.Add(client);
-                master = ModbusIpMaster.CreateIp(client);
-
-                ushort[] inputs;
-
-
-                for (int j = 0; j < 100; j++)
+                List<string> TextRangs = null;
+                Thread mb = new Thread(() =>
                 {
-                    inputs = master.ReadHoldingRegisters(slave, (ushort)(j + RangAdr), 120);
-                    string g = "";
-                    int len = 0;
-                    int buf;
-
-                    for (int i = 0; i < 240; i++)
+                    BeginInvoke(new MethodInvoker(() =>
                     {
-                        if (inputs[i] != 0)
+                        if (cfg) GetInfoCFG(ip, port);
+                        this.slave = slave;
+                        TextRangs = new List<string>();
+                        client = new TcpClient(ip, int.Parse(port));
+                        //TcpClients.Add(client);
+                        master = ModbusIpMaster.CreateIp(client);
+
+                        ushort[] inputs;
+
+
+                        for (int j = 0; j < 100; j++)
                         {
-                            buf = (inputs[i] & 0xff);
-                            if (buf != 0)
+                            inputs = master.ReadHoldingRegisters(slave, (ushort)(j + RangAdr), 120);
+                            string g = "";
+                            int len = 0;
+                            int buf;
+
+                            for (int i = 0; i < 240; i++)
                             {
-                                g += (char)((char)inputs[i] & 0xff);
-                                len++;
+                                if (inputs[i] != 0)
+                                {
+                                    buf = (inputs[i] & 0xff);
+                                    if (buf != 0)
+                                    {
+                                        g += (char)((char)inputs[i] & 0xff);
+                                        len++;
+                                    }
+                                    buf = (inputs[i] >> 8);
+                                    if (buf != 0)
+                                    {
+                                        g += (char)((char)inputs[i] >> 8);
+                                        len++;
+                                    }
+                                }
+                                else break;
                             }
-                            buf = (inputs[i] >> 8);
-                            if (buf != 0)
-                            {
-                                g += (char)((char)inputs[i] >> 8);
-                                len++;
-                            }
+                            if (len != 0) TextRangs.Add(g);
+                            else break;
                         }
-                        else break;
-                    }
-                    if (len != 0) TextRangs.Add(g);
-                    else break;
-                }
-                string[] adreskey = Adr.Keys.ToArray();
-                foreach (string adkey in adreskey)
-                {
-                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
-                }
+
+                        string[] adreskey = Adr.Keys.ToArray();
+                        foreach (string adkey in adreskey)
+                        {
+                            Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                        }
+                    }));
+                });
+                mb.Start();
+                mb.Join();
                 AdresUpdate.Enabled = true;
-                var tb = new TabPage();
-                tb.Text = ip + ':' + port;
+
+                var tb = new TabPage
+                {
+                    Text = ip + ':' + port
+                };
 
                 VScrollBar vscrol = new()
                 {
@@ -480,8 +512,8 @@ namespace LogixForms
                 tb.Controls.Add(pan);
                 Files.TabPages.Add(tb);
                 Files.SelectTab(Files.TabCount - 1);
-
-                new Task(() =>
+                Thread t;
+                t = new Thread(() =>
                 {
                     BeginInvoke(new MethodInvoker(() =>
                     {
@@ -496,7 +528,9 @@ namespace LogixForms
                         AdresUpdate.Enabled = true;
                     }
                     ));
-                }).Start();
+                });
+                opens.Add(t);
+                t.Start(); ;
             }
             catch (Exception ex)
             {

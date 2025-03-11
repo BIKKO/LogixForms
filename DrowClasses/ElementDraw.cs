@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace LogixForms
+namespace LogixForms.DrowClasses
 {
     /// <summary>
     /// Родительский класс отрисовок элементов
@@ -9,7 +11,9 @@ namespace LogixForms
     public abstract class ElementDraw
     {
         protected Size _Size = new Size(35, 25);
-        protected Font _Font = new Font("Arial", 10);
+        protected System.Drawing.Font _Font = new System.Drawing.Font(Properties.Settings.Default.FontStyle, Properties.Settings.Default.FontSize);
+        protected Color Tag = Properties.Settings.Default.CollorTag;
+        protected Color Com = Properties.Settings.Default.CollorCom;
 
         /// <summary>
         /// Проверка активноти элемента
@@ -97,7 +101,7 @@ namespace LogixForms
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public virtual void DrawTegAndCom(Graphics g,Point point, string Teg, string Com)
+        public virtual void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
             return;
         }
@@ -110,7 +114,7 @@ namespace LogixForms
         /// <summary>
         /// Уничтожение объекта
         /// </summary>
-        public virtual void Dispose(){ }
+        public virtual void Dispose() { }
     }
 
     /// <summary>
@@ -151,9 +155,9 @@ namespace LogixForms
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, Brushes.Blue, _p);
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
             _p.Y -= 15;
-            g.DrawString(Com, _Font, Brushes.Red, _p);
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -203,10 +207,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -256,10 +261,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point); ;
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -309,10 +315,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -364,9 +371,9 @@ namespace LogixForms
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, Brushes.Blue, _p);
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
             _p.Y -= 15;
-            g.DrawString(Com, _Font, Brushes.Red, _p);
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -386,7 +393,7 @@ namespace LogixForms
     public class TON : ElementDraw
     {
         private readonly Bitmap En = NodEn.Timer___Move, EN_DN_TT = NodEn.EN_DN_TT, EN_DN_TTdis = NodDis.EN_DN_TTdis;
-        private readonly Font iner = new Font("Arial", 8);
+        private readonly System.Drawing.Font iner = new System.Drawing.Font("Arial", 8);
 
         /// <summary>
         /// Отрисовка элемента
@@ -398,22 +405,19 @@ namespace LogixForms
         /// <param name="r">Список данных</param>
         public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
+            string text = "Timer " + _Adres + "\n     "+r[0] + "\n     " +
+                Adr["T4"][int.Parse(_Adres.Replace("T4:", ""))] + "\n     " + Adr["T4_c"][int.Parse(_Adres.Replace("T4:", ""))];
+
             Point _p = point;
             _p.Y -= 20;
             _p.X -= 20;
-            _Size = new Size(120, 75);
+            _Size = g.MeasureString(text, _Font).ToSize();
             g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("Timer " + _Adres, _Font, Brushes.Black, _p);
-            _p.Y += 20;
-            _p.X += 20;
-            g.DrawString(r[0]+"\n"+ Adr["T4"][int.Parse(_Adres.Replace("T4:", ""))] + "\n" + Adr["T4_c"][int.Parse(_Adres.Replace("T4:", ""))], _Font, Brushes.Black, _p);
-            _p.Y -= 20;
-            _p.X -= 20;
+            g.DrawString(text, _Font, Brushes.Black, _p);
+            _p.X += _Size.Width;
 
 
             //EN
-            _p.X += 120;
-
             _p.Y += 23;
             _Size = new Size(50, 20);
             g.DrawImage(EN_DN_TT, new Rectangle(_p, _Size));
@@ -421,7 +425,6 @@ namespace LogixForms
             _p.X += 13;
             if ((Adr["Timer_control"][int.Parse(_Adres.Replace("T4:", ""))] & 1) != 0)
             {
-                //g.FillRectangle(Brushes.LightGreen, new Rectangle(_p.X - 20, _p.Y + 8, 75, 10));
                 g.DrawString("EN", iner, Brushes.LightGreen, _p);
             }
             else
@@ -437,7 +440,6 @@ namespace LogixForms
             _p.X += 13;
             if ((Adr["Timer_control"][int.Parse(_Adres.Replace("T4:", ""))] & 2) != 0)
             {
-                //g.FillRectangle(Brushes.LightGreen, new Rectangle(_p.X - 20, _p.Y + 8, 75, 10));
                 g.DrawString("DN", iner, Brushes.LightGreen, _p);
             }
             else
@@ -453,10 +455,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -488,25 +491,29 @@ namespace LogixForms
         /// <param name="r">Список данных</param>
         public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
+            string text;
+            
             Point _p = point;
-            _p.Y -= 20;
-            _p.X -= 45;
-            _Size = new Size(120, 85);
-            g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("Move ", _Font, Brushes.Black, _p);
-            _p.Y += 10;
-            _p.X += 60;
             int u;
             if (int.TryParse(r[0], out u))
             {
                 string[] buf = r[1].Split(":");
                 string name = buf[0];
                 int str = int.Parse(buf[1]);
-                g.DrawString("?\n" + r[0] + "\n" + r[1] + "\n" + Adr[name][str], _Font, Brushes.Black, _p);
+
+                text = "Move \n     ?\n     " + r[0] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                _Size = g.MeasureString(text, _Font).ToSize();
+                g.DrawImage(En, new Rectangle(_p, _Size));
             }
             else
-                g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n" 
-                    + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            {
+                text = "Move \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                    + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                _Size = g.MeasureString(text, _Font).ToSize();
+                g.DrawImage(En, new Rectangle(_p, _Size));
+            }
+            g.DrawString(text, _Font, Brushes.Black, _p);
         }
 
         /// <summary>
@@ -518,10 +525,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -553,29 +561,30 @@ namespace LogixForms
         {
             try
             {
+                string text;
 
                 Point _p = point;
-                _p.Y -= 20;
-                _p.X -= 45;
-                _Size = new Size(120, 85);
-                g.DrawImage(En, new Rectangle(_p, _Size));
-                g.DrawString("ADD ", _Font, Brushes.Black, _p);
-                _p.Y += 10;
-                _p.X += 60;
+                text = "ADD ";
                 int u;
                 if (int.TryParse(r[0], out u))
                 {
                     string[] buf = r[1].Split(":");
                     string name = buf[0];
                     int str = int.Parse(buf[1]);
-                    g.DrawString("?\n" + r[0] + "\n" + r[1] + "\n" + Adr[name][str], _Font, Brushes.Black, _p);
+                    text += "?\n     " + r[0] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
+                    
                 }
                 else
                 {
 
-                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                        + r[1] + "\n" + Adr[r[2].Split(":")[0]][int.Parse(r[2].Split(":")[1])], _Font, Brushes.Black, _p);
+                    text += r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                        + r[1] + "\n     " + Adr[r[2].Split(":")[0]][int.Parse(r[2].Split(":")[1])];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
                 }
+                g.DrawString(text, _Font, Brushes.Black, _p);
             }
             catch
             {
@@ -592,10 +601,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -625,16 +635,14 @@ namespace LogixForms
         /// <param name="r">Список данных</param>
         public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
+            string text = "DIV\n     " + r[0] + "\n     " + r[1] + "\n     " + r[2];
             Point _p = point;
             _p.Y -= 20;
             _p.X -= 45;
-            _Size = new Size(120, 75);
+            _Size = g.MeasureString(text, _Font).ToSize();
             g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("DIV", _Font, Brushes.Black, _p);
-            _p.Y += 20;
-            _p.X += 60;
 
-            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+            g.DrawString(text, _Font, Brushes.Black, _p);
         }
 
         /// <summary>
@@ -646,10 +654,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -682,13 +691,11 @@ namespace LogixForms
             Point _p = point;
             _p.Y -= 20;
             _p.X -= 45;
+            string text = "MUL\n     " + r[0] + "\n     " + r[1] + "\n     " + r[2];
             _Size = new Size(120, 75);
             g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("MUL", _Font, Brushes.Black, _p);
-            _p.Y += 20;
-            _p.X += 60;
 
-            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2], _Font, Brushes.Black, _p);
+            g.DrawString(text, _Font, Brushes.Black, _p);
         }
 
         /// <summary>
@@ -700,10 +707,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -733,25 +741,29 @@ namespace LogixForms
         /// <param name="r">Список данных</param>
         public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
+            string text;
+
             Point _p = point;
-            _p.Y -= 20;
-            _p.X -= 45;
-            _Size = new Size(120, 85);
-            g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("Move ", _Font, Brushes.Black, _p);
-            _p.Y += 10;
-            _p.X += 60;
             int u;
             if (int.TryParse(r[0], out u))
             {
                 string[] buf = r[1].Split(":");
                 string name = buf[0];
                 int str = int.Parse(buf[1]);
-                g.DrawString("?\n" + r[0] + "\n" + r[1] + "\n" + Adr[name][str], _Font, Brushes.Black, _p);
+
+                text = "ABS \n     ?\n     " + r[0] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                _Size = g.MeasureString(text, _Font).ToSize();
+                g.DrawImage(En, new Rectangle(_p, _Size));
             }
             else
-                g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                    + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+            {
+                text = "ABS \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                    + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                _Size = g.MeasureString(text, _Font).ToSize();
+                g.DrawImage(En, new Rectangle(_p, _Size));
+            }
+            g.DrawString(text, _Font, Brushes.Black, _p);
         }
 
         /// <summary>
@@ -763,10 +775,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -796,16 +809,15 @@ namespace LogixForms
         /// <param name="r">Список данных</param>
         public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
+            string text = "SCP \n     " + r[0] + "\n     " + r[1] + "\n     " + r[2] + "\n     " +
+                r[3] + "\n     " + r[4] + "\n     " + r[5];
             Point _p = point;
             _p.Y -= 20;
             _p.X -= 40;
-            _Size = new Size(100, 145);
+            _Size = g.MeasureString(text, _Font).ToSize();
             g.DrawImage(En, new Rectangle(_p, _Size));
-            g.DrawString("SCP ", _Font, Brushes.Black, _p);
-            _p.Y += 20;
-            _p.X += 40;
 
-            g.DrawString(r[0] + "\n" + r[1] + "\n" + r[2] + "\n" + r[3] + "\n" + r[4] + "\n" + r[5], _Font, Brushes.Black, _p);
+            g.DrawString(text, _Font, Brushes.Black, _p);
         }
 
         /// <summary>
@@ -817,10 +829,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -864,10 +877,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 15;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point); ;
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -899,26 +913,29 @@ namespace LogixForms
         {
             try
             {
+                string text;
 
                 Point _p = point;
-                _p.Y -= 20;
-                _p.X -= 45;
-                _Size = new Size(120, 85);
-                g.DrawImage(En, new Rectangle(_p, _Size));
-                g.DrawString("GEQ >=", _Font, Brushes.Black, _p);
-                _p.Y += 10;
-                _p.X += 60;
                 int u;
                 if (int.TryParse(r[1], out u))
                 {
                     string[] buf = r[0].Split(":");
                     string name = buf[0];
                     int str = int.Parse(buf[1]);
-                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+
+                    text = "GEQ >= \n     ?\n     " + r[1] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 else
-                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+                {
+                    text = "GEQ >= \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                        + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
+                }
+                g.DrawString(text, _Font, Brushes.Black, _p);
             }
             catch
             {
@@ -935,10 +952,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 15;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -970,26 +988,29 @@ namespace LogixForms
         {
             try
             {
+                string text;
 
                 Point _p = point;
-                _p.Y -= 20;
-                _p.X -= 45;
-                _Size = new Size(120, 85);
-                g.DrawImage(En, new Rectangle(_p, _Size));
-                g.DrawString("GRT >", _Font, Brushes.Black, _p);
-                _p.Y += 10;
-                _p.X += 60;
                 int u;
                 if (int.TryParse(r[1], out u))
                 {
                     string[] buf = r[0].Split(":");
                     string name = buf[0];
                     int str = int.Parse(buf[1]);
-                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+
+                    text = "GRT > \n     ?\n     " + r[1] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 else
-                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+                {
+                    text = "GRT > \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                        + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
+                }
+                g.DrawString(text, _Font, Brushes.Black, _p);
             }
             catch
             {
@@ -1006,10 +1027,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 50;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -1041,26 +1063,29 @@ namespace LogixForms
         {
             try
             {
+                string text;
 
                 Point _p = point;
-                _p.Y -= 20;
-                _p.X -= 45;
-                _Size = new Size(120, 85);
-                g.DrawImage(En, new Rectangle(_p, _Size));
-                g.DrawString("EQU ==", _Font, Brushes.Black, _p);
-                _p.Y += 10;
-                _p.X += 60;
                 int u;
                 if (int.TryParse(r[1], out u))
                 {
                     string[] buf = r[0].Split(":");
                     string name = buf[0];
                     int str = int.Parse(buf[1]);
-                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+
+                    text = "EQU == \n     ?\n     " + r[1] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 else
-                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+                {
+                    text = "EQU == \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                        + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
+                }
+                g.DrawString(text, _Font, Brushes.Black, _p);
             }
             catch
             {
@@ -1077,10 +1102,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 50;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -1112,26 +1138,29 @@ namespace LogixForms
         {
             try
             {
+                string text;
 
                 Point _p = point;
-                _p.Y -= 20;
-                _p.X -= 45;
-                _Size = new Size(120, 85);
-                g.DrawImage(En, new Rectangle(_p, _Size));
-                g.DrawString("NEQ !=", _Font, Brushes.Black, _p);
-                _p.Y += 10;
-                _p.X += 60;
                 int u;
                 if (int.TryParse(r[1], out u))
                 {
                     string[] buf = r[0].Split(":");
                     string name = buf[0];
                     int str = int.Parse(buf[1]);
-                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+
+                    text = "NEQ != \n     ?\n     " + r[1] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 else
-                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+                {
+                    text = "NEQ != \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                        + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
+                }
+                g.DrawString(text, _Font, Brushes.Black, _p);
             }
             catch
             {
@@ -1148,10 +1177,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 50;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -1183,26 +1213,29 @@ namespace LogixForms
         {
             try
             {
+                string text;
 
                 Point _p = point;
-                _p.Y -= 20;
-                _p.X -= 45;
-                _Size = new Size(120, 85);
-                g.DrawImage(En, new Rectangle(_p, _Size));
-                g.DrawString("LES <", _Font, Brushes.Black, _p);
-                _p.Y += 10;
-                _p.X += 60;
                 int u;
                 if (int.TryParse(r[1], out u))
                 {
                     string[] buf = r[0].Split(":");
                     string name = buf[0];
                     int str = int.Parse(buf[1]);
-                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+
+                    text = "LES < \n     ?\n     " + r[1] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 else
-                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+                {
+                    text = "LES < \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                        + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
+                }
+                g.DrawString(text, _Font, Brushes.Black, _p);
             }
             catch
             {
@@ -1219,10 +1252,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 50;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>
@@ -1290,10 +1324,11 @@ namespace LogixForms
         /// <param name="Com">Сомментарий</param>
         public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            point.X -= 50;
-            g.DrawString(Teg, new Font("Arial", 10), Brushes.Blue, point);
-            point.Y -= 15;
-            g.DrawString(Com, new Font("Arial", 10), Brushes.Red, point);
+            Point _p = point;
+            _p.X -= 50;
+            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
+            _p.Y -= 15;
+            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
         }
 
         /// <summary>

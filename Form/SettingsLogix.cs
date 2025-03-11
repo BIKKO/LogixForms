@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace LogixForms
@@ -23,6 +24,17 @@ namespace LogixForms
             this.owner = owner;
 
             TimerDel.Text = owner.AdrUpdateTime.ToString();
+
+            CollorButTag.BackColor = Properties.Settings.Default.CollorTag;
+            CollorButCom.BackColor = Properties.Settings.Default.CollorCom;
+
+            comboBox1.DataSource = new InstalledFontCollection().Families.Select(s => s.Name).ToList();
+
+            numericUpDown1.Value = Properties.Settings.Default.FontSize;
+            comboBox1.SelectedItem = Properties.Settings.Default.FontStyle;
+
+            SaveSet.Enabled = false;
+            CancelSet.Enabled = false;
         }
 
         /// <summary>
@@ -33,7 +45,7 @@ namespace LogixForms
 #if DEBUG
             try
             {
-                dataGridView1.RowCount = Data.Count+2;
+                dataGridView1.RowCount = Data.Count + 2;
                 name_adr = Data.Keys.ToArray();
 
                 dataGridView1.Rows[0].Cells[1].Value = "Ранги";
@@ -44,9 +56,9 @@ namespace LogixForms
 
                 for (int i = 0; i < Data.Count; i++)
                 {
-                    dataGridView1.Rows[i+2].Cells[1].Value = name_adr[i];
-                    dataGridView1.Rows[i+2].Cells[2].Value = mb_adres[name_adr[i]];
-                    dataGridView1.Rows[i+2].Cells[3].Value = Data[name_adr[i]].Length;
+                    dataGridView1.Rows[i + 2].Cells[1].Value = name_adr[i];
+                    dataGridView1.Rows[i + 2].Cells[2].Value = mb_adres[name_adr[i]];
+                    dataGridView1.Rows[i + 2].Cells[3].Value = Data[name_adr[i]].Length;
                 }
             }
             catch
@@ -331,14 +343,81 @@ namespace LogixForms
             }
             else
             {
+                Properties.Settings.Default.CollorCom = CollorButCom.BackColor;
+                Properties.Settings.Default.CollorTag = CollorButTag.BackColor;
 
+                Properties.Settings.Default.FontSize = (int)numericUpDown1.Value;
+                Properties.Settings.Default.FontStyle = comboBox1.SelectedItem.ToString();
+
+                SaveSet.Enabled = false;
+                CancelSet.Enabled = false;
             }
         }
 
         private void Cancel_Click(object sender, EventArgs e)
         {
             var but = sender as Button;
+            if (but.Name == "CancelSet")
+            {
+                CollorButTag.BackColor = Properties.Settings.Default.CollorTag;
+                CollorButCom.BackColor = Properties.Settings.Default.CollorCom;
 
+                numericUpDown1.Value = Properties.Settings.Default.FontSize;
+                comboBox1.SelectedItem = Properties.Settings.Default.FontStyle;
+
+                SaveSet.Enabled = false;
+                CancelSet.Enabled = false;
+            }
+        }
+
+        private void CollorBut_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                CollorButTag.BackColor = colorDialog1.Color;
+
+                SaveSet.Enabled = true;
+                CancelSet.Enabled = true;
+            }
+        }
+
+        private void CollorButCom_Click(object sender, EventArgs e)
+        {
+            if (colorDialog2.ShowDialog() == DialogResult.OK)
+            {
+                CollorButCom.BackColor = colorDialog2.Color;
+
+                SaveSet.Enabled = true;
+                CancelSet.Enabled = true;
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedItem != Properties.Settings.Default.FontStyle)
+            {
+                SaveSet.Enabled = true;
+                CancelSet.Enabled = true;
+            }
+            else
+            {
+                SaveSet.Enabled = false;
+                CancelSet.Enabled = false;
+            }
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            if ((int)numericUpDown1.Value != Properties.Settings.Default.FontSize)
+            {
+                SaveSet.Enabled = true;
+                CancelSet.Enabled = true;
+            }
+            else
+            {
+                SaveSet.Enabled = false;
+                CancelSet.Enabled = false;
+            }
         }
     }
 }

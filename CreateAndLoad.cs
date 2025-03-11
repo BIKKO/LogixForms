@@ -235,7 +235,7 @@ namespace LogixForms
             string[] _keys = _Tegs.Keys.ToArray();
             for (int ind = 0; ind < _keys.Length; ind++)
             {
-                _out[ind] = "{" + string.Format("{0},{1},[{2}]", _keys[ind], _Tegs[_keys[ind]][0], _Tegs[_keys[ind]][1])+ "}";
+                _out[ind] = "{" + string.Format("{0},{1},[{2}]", _keys[ind], _Tegs[_keys[ind]][0], _Tegs[_keys[ind]][1]) + "}";
             }
             return _out;
         }
@@ -391,9 +391,9 @@ namespace LogixForms
             Dictionary<string, string[]> _out = new Dictionary<string, string[]>();
             foreach (string str in _data)
             {
-                _buf = str.Replace("{","").Replace("}","").Split(',');
+                _buf = str.Replace("{", "").Replace("}", "").Split(',');
                 name = _buf[0];
-                value = new string[] { _buf[1], _buf[2].Replace("[","").Replace("]","") };
+                value = new string[] { _buf[1], _buf[2].Replace("[", "").Replace("]", "") };
                 _out.Add(name, value);
             }
             return _out;
