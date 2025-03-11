@@ -341,12 +341,13 @@ namespace LogixForms.DrowClasses
             int branch = 0;
             int x_branch = 0;
             int drow_ind = 0;
+            int st = PointOfElemetts[0];
             for (int index = 0; index < TextRang.Length; index++)
             {
                 string el = TextRang[index];
                 if (el == "BST")
                 {
-                    p = new Point(left_indent_rang_x + PointOfElemetts[drow_ind], startY + top_indent_rang);
+                    p = new Point(left_indent_rang_x, startY + top_indent_rang);
                     x_branch = drow_ind + 1;
                     branch = 0;
                     BranchStart = true;
@@ -354,7 +355,7 @@ namespace LogixForms.DrowClasses
                 }
                 else if (el == "NXB")
                 {
-                    int[] inf = DrawElemInSap(index + 1, p.Y + top_indent, x_branch, p, count_of_branch, branch);
+                    int[] inf = DrawElemInSap(index + 1, p.Y + top_indent, x_branch, new Point(p.X + st, p.Y), count_of_branch, branch);
                     enumer_el = inf[2];
                     index = inf[0];
                     if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
@@ -367,344 +368,389 @@ namespace LogixForms.DrowClasses
                 else
                 {
                     if (BranchStart) branch++;
-                    Point point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 20, top_indent_rang + startY - scrollY - 13);
-                    switch (el)
-                    {
-                        case "XIO":
-                            {
-                                try
-                                {
-                                    El = new XIO();
-                                    El.Draw(g, TextRang[index + 1], point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enumer_el++; }
-                                break;
-                            }
-                        case "XIC":
-                            {
-                                try
-                                {
-                                    El = new XIC();
-                                    El.Draw(g, TextRang[index + 1], point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enumer_el++; }
-                                break;
-                            }
-                        case "OTE":
-                            {
-                                try
-                                {
-                                    El = new OTE();
-                                    El.Draw(g, TextRang[index + 1], point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enumer_el++; }
-                                break;
-                            }
-                        case "OTL":
-                            {
-                                try
-                                {
-                                    El = new OTL();
-                                    El.Draw(g, TextRang[index + 1], point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enumer_el++; }
-                                break;
-                            }
-                        case "OTU":
-                            {
-                                try
-                                {
-                                    El = new OTU();
-                                    El.Draw(g, TextRang[index + 1], point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enumer_el++; }
-                                break;
-                            }
-                        case "ONS":
-                            {
-                                try
-                                {
-                                    El = new ONS();
-                                    El.Draw(g, TextRang[index + 1], point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { index++; }
-                                break;
-                            }
-                        case "TON":
-                            {
-                                try
-                                {
-                                    El = new TON();
-                                    string[] adress = { TextRang[index + 2], TextRang[index + 3], TextRang[index + 4] };
-                                    El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index += 4;
-                                    El.Dispose();
-                                }
-                                catch { index += 4; }
-                                break;
-                            }
-                        case "MOV":
-                            try
-                            {
-                                El = new MOV();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "ADD":
-                            try
-                            {
-                                El = new Add();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 3;
-                            }
-                            catch { index += 3; }
-                            break;
-                        case "GEQ":
-                            try
-                            {
-                                El = new GEQ();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "GRT":
-                            try
-                            {
-                                El = new GRT();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "EQU":
-                            try
-                            {
-                                El = new EQU();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "NEQ":
-                            try
-                            {
-                                El = new NEQ();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "LES":
-                            try
-                            {
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "LEQ":
-                            try
-                            {
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "DIV":
-                            {
-                                try
-                                {
-                                    El = new DIV();
-                                    string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
-                                    El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index += 3;
-                                    El.Dispose();
-                                }
-                                catch { index += 3; }
-                                break;
-                            }
-                        case "MUL":
-                            {
-                                try
-                                {
-                                    El = new MUL();
-                                    string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
-                                    El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            point.Y -= 35;
-                                            El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index += 3;
-                                    El.Dispose();
-                                }
-                                catch { index += 3; }
-                                break;
-                            }
-                        case "ABS":
-                            try
-                            {
-                                El = new ABS();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "SCP":
-                            try
-                            {
-                                El = new SCP();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3], TextRang[index + 4], TextRang[index + 5], TextRang[index + 6] };
-                                El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        point.Y -= 35;
-                                        El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 6;
-                            }
-                            catch { index += 6; }
-                            break;
-                        case "MSG":
-                            index += 15;
-                            break;
-                        default:
-                            {
-                                if (El != null)
-                                    El.Dispose();
-                                break;
-                            }
-                    }
+                    Point point = new Point(left_indent_rang_x + st + scrollX - 20, top_indent_rang + startY - scrollY - 13);
+                    DrEl(ref enumer_el, ref st, ref index, el, point);
                 }
                 drow_ind++;
+            }
+        }
+
+        private void DrEl(ref int enumer_el, ref int st, ref int index, string el, Point point)
+        {
+            switch (el)
+            {
+                case "XIO":
+                    {
+                        try
+                        {
+                            El = new XIO();
+                            int[] width = new int[2];
+                            width[0] = El.Draw(g, TextRang[index + 1], point, Adr);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index++;
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                        }
+                        catch { enumer_el++; }
+                        break;
+                    }
+                case "XIC":
+                    {
+                        try
+                        {
+                            El = new XIC();
+                            int[] width = new int[2];
+                            width[0] = El.Draw(g, TextRang[index + 1], point, Adr);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index++;
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                        }
+                        catch { enumer_el++; }
+                        break;
+                    }
+                case "OTE":
+                    {
+                        try
+                        {
+                            El = new OTE();
+                            int[] width = new int[2];
+                            width[0] = El.Draw(g, TextRang[index + 1], point, Adr);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index++;
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                        }
+                        catch { enumer_el++; }
+                        break;
+                    }
+                case "OTL":
+                    {
+                        try
+                        {
+                            El = new OTL();
+                            int[] width = new int[2];
+                            width[0] = El.Draw(g, TextRang[index + 1], point, Adr);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index++;
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                        }
+                        catch { enumer_el++; }
+                        break;
+                    }
+                case "OTU":
+                    {
+                        try
+                        {
+                            El = new OTU();
+                            int[] width = new int[2];
+                            width[0] = El.Draw(g, TextRang[index + 1], point, Adr);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index++;
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                        }
+                        catch { enumer_el++; }
+                        break;
+                    }
+                case "ONS":
+                    {
+                        try
+                        {
+                            El = new ONS();
+                            int[] width = new int[2];
+                            width[0] = El.Draw(g, TextRang[index + 1], point, Adr);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index++;
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                        }
+                        catch { index++; }
+                        break;
+                    }
+                case "TON":
+                    {
+                        try
+                        {
+                            El = new TON();
+                            int[] width = new int[2];
+                            string[] adress = { TextRang[index + 2], TextRang[index + 3], TextRang[index + 4] };
+                            width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                            index += 4;
+                        }
+                        catch { index += 4; }
+                        break;
+                    }
+                case "MOV":
+                    try
+                    {
+                        El = new MOV();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "ADD":
+                    try
+                    {
+                        El = new Add();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 3;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 3; }
+                    break;
+                case "GEQ":
+                    try
+                    {
+                        El = new GEQ();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "GRT":
+                    try
+                    {
+                        El = new GRT();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "EQU":
+                    try
+                    {
+                        El = new EQU();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "NEQ":
+                    try
+                    {
+                        El = new NEQ();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "LES":
+                    try
+                    {
+                        El = new LES();
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        int[] width = new int[2];
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "LEQ":
+                    try
+                    {
+                        El = new LEQ();
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        int[] width = new int[2];
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "DIV":
+                    {
+                        try
+                        {
+                            El = new DIV();
+                            int[] width = new int[2];
+                            string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
+                            width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index += 3;
+                            st += Math.Max(width[0], width[1]);
+                            El.Dispose();
+                        }
+                        catch { index += 3; }
+                        break;
+                    }
+                case "MUL":
+                    {
+                        try
+                        {
+                            int[] width = new int[2];
+                            El = new MUL();
+                            string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
+                            width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                            if (Tegs != null)
+                                if (Tegs.ContainsKey(TextRang[index + 1]))
+                                {
+                                    point.Y -= 35;
+                                    width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                                }
+                            index += 3;
+                            El.Dispose();
+                            st += Math.Max(width[0], width[1]);
+                        }
+                        catch { index += 3; }
+                        break;
+                    }
+                case "ABS":
+                    try
+                    {
+                        El = new ABS();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 2;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 2; }
+                    break;
+                case "SCP":
+                    try
+                    {
+                        El = new SCP();
+                        int[] width = new int[2];
+                        string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3], TextRang[index + 4], TextRang[index + 5], TextRang[index + 6] };
+                        width[0] = El.DrawEl(g, TextRang[index + 1], point, Adr, adress);
+                        if (Tegs != null)
+                            if (Tegs.ContainsKey(TextRang[index + 1]))
+                            {
+                                point.Y -= 35;
+                                width[1] = El.DrawTegAndCom(g, point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
+                            }
+                        index += 6;
+                        st += Math.Max(width[0], width[1]);
+                    }
+                    catch { index += 6; }
+                    break;
+                case "MSG":
+                    index += 15;
+                    break;
+                default:
+                    {
+                        if (El != null)
+                            El.Dispose();
+                        break;
+                    }
             }
         }
 
@@ -730,12 +776,13 @@ namespace LogixForms.DrowClasses
             int x_branch = Start_X;
             int drow_ind = Start_X;
             int count_el_in_branch = 0;
+            int st = PointOfElemetts[drow_ind];
             for (int index = IndexStart; index < TextRang.Length; index++)
             {
                 string el = TextRang[index];
                 if (el == "BST")
                 {
-                    p = new Point(left_indent_rang_x + PointOfElemetts[drow_ind], Start_Y);
+                    p = new Point(left_indent_rang_x + st, Start_Y);
                     x_branch = drow_ind + 1;
                     branch = 0;
                     BranchStart = true;
@@ -748,7 +795,7 @@ namespace LogixForms.DrowClasses
                     int[] inf;
                     if (count_of_branch < 2)
                     {
-                        inf = DrawElemInSap(index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, CountInBranch);
+                        inf = DrawElemInSap(index + 1, Start_Y + top_indent, x_branch, new Point(p.X, p.Y), count_of_branch, CountInBranch);
                         enum_el = inf[2];
                         branch = CountInBranch;
                         count_of_branch--;
@@ -778,400 +825,16 @@ namespace LogixForms.DrowClasses
                 {
                     int ind3 = drow_ind;
                     MaxYBranch = Math.Max(MaxYBranch, Start_Y);
-                    return new int[] { index, count_el_in_branch, enum_el, ind3, count_of_branch - 1 };
+                    return [index, count_el_in_branch, enum_el, ind3, count_of_branch - 1];
                 }
                 else
                 {
                     count_el_in_branch++;
                     if (BranchStart) branch++;
-                    //try
-                    //{
-                    //    Point _point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX, Start_Y - 25 - scrollY);
-                    //    El = _El[el];
-                    //    El.Draw(g, TextRang[enum_el], _point, Adr);
-                    //    if (Tegs != null)
-                    //        if (Tegs.ContainsKey(TextRang[enum_el]))
-                    //        {
-                    //            _point.Y -= 35;
-                    //            El.DrawTegAndCom(g, _point, Tegs[TextRang[enum_el]][0], Tegs[TextRang[enum_el]][1]);
-                    //        }
-                    //    enum_el++;
-                    //}
-                    //catch { enum_el++; }
 
 
-                    Point _point = new Point(left_indent_rang_x + PointOfElemetts[drow_ind] + scrollX - 20, Start_Y - scrollY - 13);
-                    switch (el)
-                    {
-                        case "XIO":
-                            {
-                                try
-                                {
-                                    El = new XIO();
-                                    El.Draw(g, TextRang[index + 1], _point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enum_el++; }
-                                break;
-                            }
-                        case "XIC":
-                            {
-                                try
-                                {
-                                    El = new XIC();
-                                    El.Draw(g, TextRang[index + 1], _point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enum_el++; }
-                                break;
-                            }
-                        case "OTE":
-                            {
-                                try
-                                {
-                                    El = new OTE();
-                                    El.Draw(g, TextRang[index + 1], _point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enum_el++; }
-                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                                break;
-                            }
-                        case "OTL":
-                            {
-                                try
-                                {
-                                    El = new OTL();
-                                    El.Draw(g, TextRang[index + 1], _point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enum_el++; }
-                                //g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                                break;
-                            }
-                        case "OTU":
-                            {
-                                try
-                                {
-                                    El = new OTU();
-                                    El.Draw(g, TextRang[index + 1], _point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enum_el++; }//g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                                break;
-                            }
-                        case "ONS":
-                            {
-                                try
-                                {
-                                    El = new ONS();
-                                    El.Draw(g, TextRang[index + 1], _point, Adr);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index++;
-                                    El.Dispose();
-                                }
-                                catch { enum_el++; }//g.DrawString($"y: {((4 * top_indent_rang) / 4) + startY - 25}", new Font("Arial", 10), Brushes.Red, left_indent_rang_x + PointOfElemetts[drow_ind] - 27 + scrollX + 20, ((4 * top_indent_rang) / 4) + startY - scrollY - 25);
-                                break;
-                            }
-                        case "TON":
-                            {
-                                try
-                                {
-                                    El = new TON();
-                                    string[] adress = { TextRang[index + 2], TextRang[index + 3], TextRang[index + 4] };
-                                    El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index += 4;
-                                    El.Dispose();
-                                    drow_ind++;
-                                }
-                                catch { enum_el++; }
-                                break;
-                            }
-                        case "MOV":
-                            {
-                                try
-                                {
-                                    El = new MOV();
-                                    string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                    El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index += 2;
-                                }
-                                catch { enum_el++; }
-                                break;
-                            }
-                        case "ADD":
-                            try
-                            {
-                                El = new Add();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 3;
-                            }
-                            catch
-                            {
-                                index += 3;
-                                MessageBox.Show("Test");
-                            }
-                            break;
-                        case "GEQ":
-                            try
-                            {
-                                El = new GEQ();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch
-                            {
-                                index += 2;
-                                MessageBox.Show("Test");
-                            }
-                            break;
-                        case "GRT":
-                            try
-                            {
-                                El = new GRT();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch
-                            {
-                                index += 2;
-                                MessageBox.Show("Test");
-                            }
-                            break;
-                        case "EQU":
-                            try
-                            {
-                                El = new EQU();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch
-                            {
-                                index += 2;
-                                MessageBox.Show("Test");
-                            }
-                            break;
-                        case "NEQ":
-                            try
-                            {
-                                El = new NEQ();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch
-                            {
-                                index += 2;
-                                MessageBox.Show("Test");
-                            }
-                            break;
-                        case "LES":
-                            try
-                            {
-                                El = new LES();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch
-                            {
-                                index += 2;
-                                MessageBox.Show("Test");
-                            }
-                            break;
-                        case "LEQ":
-                            try
-                            {
-                                El = new LEQ();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch
-                            {
-                                index += 2;
-                                MessageBox.Show("Test");
-                            }
-                            break;
-                        case "DIV":
-                            {
-                                try
-                                {
-                                    El = new DIV();
-                                    string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
-                                    El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index += 3;
-                                    El.Dispose();
-                                }
-                                catch { index += 3; }
-                                break;
-                            }
-                        case "MUL":
-                            {
-                                try
-                                {
-                                    El = new MUL();
-                                    string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3] };
-                                    El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                    if (Tegs != null)
-                                        if (Tegs.ContainsKey(TextRang[index + 1]))
-                                        {
-                                            _point.Y -= 35;
-                                            El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                        }
-                                    index += 3;
-                                    El.Dispose();
-                                }
-                                catch { index += 3; }
-                                break;
-                            }
-                        case "ABS":
-                            try
-                            {
-                                El = new ABS();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 2;
-                            }
-                            catch { index += 2; }
-                            break;
-                        case "SCP":
-                            try
-                            {
-                                El = new SCP();
-                                string[] adress = { TextRang[index + 1], TextRang[index + 2], TextRang[index + 3], TextRang[index + 4], TextRang[index + 5], TextRang[index + 6] };
-                                El.DrawEl(g, TextRang[index + 1], _point, Adr, adress);
-                                if (Tegs != null)
-                                    if (Tegs.ContainsKey(TextRang[index + 1]))
-                                    {
-                                        _point.Y -= 35;
-                                        El.DrawTegAndCom(g, _point, Tegs[TextRang[index + 1]][0], Tegs[TextRang[index + 1]][1]);
-                                    }
-                                index += 6;
-                            }
-                            catch { index += 6; }
-                            break;
-                        case "MSG":
-                            index += 15;
-                            break;
-                        default:
-                            {
-                                index++;
-                                if (El != null)
-                                    El.Dispose();
-                                break;
-                            }
-                    }
+                    Point _point = new Point(left_indent_rang_x + st + scrollX - 20, Start_Y - scrollY - 13);
+                    DrEl(ref enum_el, ref st, ref index, el, _point);
                 }
                 drow_ind++;
             }

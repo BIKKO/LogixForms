@@ -89,9 +89,9 @@ namespace LogixForms.DrowClasses
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public virtual void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        public virtual int Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
-            return;
+            return 0;
         }
 
         /// <summary>
@@ -101,16 +101,15 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public virtual void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public virtual int DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
         {
-            return;
+            return 0;
         }
 
-        public virtual void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] rang)
+        public virtual int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] rang)
         {
-
+            return 0;
         }
-
         /// <summary>
         /// Уничтожение объекта
         /// </summary>
@@ -131,7 +130,8 @@ namespace LogixForms.DrowClasses
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+
+        public override int Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
             {
@@ -143,6 +143,8 @@ namespace LogixForms.DrowClasses
             point.Y -= 15;
             point.X -= 15;
             g.DrawString(_Adres, _Font, Brushes.Black, point);
+
+            return Math.Max(_Size.Width, g.MeasureString(_Adres, _Font).ToSize().Width);
         }
         /// <summary>
         /// Отрисовка Тегов и Комментариев
@@ -151,13 +153,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -185,7 +191,7 @@ namespace LogixForms.DrowClasses
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        public override int Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (!Adres(_Adres, Adr))
             {
@@ -197,21 +203,27 @@ namespace LogixForms.DrowClasses
             point.Y -= 15;
             point.X -= 15;
             g.DrawString(_Adres, _Font, Brushes.Black, point);
+
+            return Math.Max(_Size.Width, g.MeasureString(_Adres, _Font).ToSize().Width);
         }
         /// <summary>
         /// Отрисовка Тегов и Комментариев
         /// </summary>
         /// <param name="g">Инструмент отрисовки</param>
         /// <param name="point">Точка отрисовки</param>
-        /// <param name="Teg">Тег</param>
-        /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        /// <param name="_Teg">Тег</param>
+        /// <param name="_Com">Сомментарий</param>
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -239,7 +251,7 @@ namespace LogixForms.DrowClasses
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        public override int Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
             {
@@ -251,6 +263,8 @@ namespace LogixForms.DrowClasses
             point.Y -= 15;
             point.X -= 15;
             g.DrawString(_Adres, _Font, Brushes.Black, point);
+
+            return Math.Max(_Size.Width, g.MeasureString(_Adres, _Font).ToSize().Width);
         }
         /// <summary>
         /// Отрисовка Тегов и Комментариев
@@ -258,14 +272,18 @@ namespace LogixForms.DrowClasses
         /// <param name="g">Инструмент отрисовки</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
-        /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        /// <param name="_Com">Сомментарий</param>
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -293,7 +311,7 @@ namespace LogixForms.DrowClasses
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        public override int Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
             {
@@ -305,6 +323,8 @@ namespace LogixForms.DrowClasses
             point.Y -= 15;
             point.X -= 15;
             g.DrawString(_Adres, _Font, Brushes.Black, point);
+
+            return Math.Max(_Size.Width, g.MeasureString(_Adres, _Font).ToSize().Width);
         }
         /// <summary>
         /// Отрисовка Тегов и Комментариев
@@ -313,13 +333,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -347,7 +371,7 @@ namespace LogixForms.DrowClasses
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        public override int Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             if (Adres(_Adres, Adr))
             {
@@ -359,6 +383,8 @@ namespace LogixForms.DrowClasses
             point.Y -= 15;
             point.X -= 15;
             g.DrawString(_Adres, _Font, Brushes.Black, point);
+
+            return Math.Max(_Size.Width, g.MeasureString(_Adres, _Font).ToSize().Width);
         }
         /// <summary>
         /// Отрисовка Тегов и Комментариев
@@ -367,13 +393,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -403,10 +433,12 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             string text = "Timer " + _Adres + "\n     "+r[0] + "\n     " +
                 Adr["T4"][int.Parse(_Adres.Replace("T4:", ""))] + "\n     " + Adr["T4_c"][int.Parse(_Adres.Replace("T4:", ""))];
+
+            int w = 0;
 
             Point _p = point;
             _p.Y -= 20;
@@ -419,6 +451,7 @@ namespace LogixForms.DrowClasses
 
             //EN
             _p.Y += 23;
+            w += _Size.Width;
             _Size = new Size(50, 20);
             g.DrawImage(EN_DN_TT, new Rectangle(_p, _Size));
             _p.Y += 2;
@@ -444,6 +477,8 @@ namespace LogixForms.DrowClasses
             }
             else
                 g.DrawString("DN", iner, Brushes.Black, _p);
+
+            return w + _Size.Width;
         }
 
         /// <summary>
@@ -453,13 +488,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -489,7 +528,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             string text;
             
@@ -514,6 +553,8 @@ namespace LogixForms.DrowClasses
                 g.DrawImage(En, new Rectangle(_p, _Size));
             }
             g.DrawString(text, _Font, Brushes.Black, _p);
+
+            return _Size.Width;
         }
 
         /// <summary>
@@ -523,13 +564,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -557,7 +602,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             try
             {
@@ -585,10 +630,13 @@ namespace LogixForms.DrowClasses
                     g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 g.DrawString(text, _Font, Brushes.Black, _p);
+
+                return _Size.Width;
             }
             catch
             {
                 Debug.Print("DrawEl - ADD");
+                return 0;
             }
         }
 
@@ -599,13 +647,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -633,7 +685,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             string text = "DIV\n     " + r[0] + "\n     " + r[1] + "\n     " + r[2];
             Point _p = point;
@@ -643,6 +695,8 @@ namespace LogixForms.DrowClasses
             g.DrawImage(En, new Rectangle(_p, _Size));
 
             g.DrawString(text, _Font, Brushes.Black, _p);
+
+            return _Size.Width;
         }
 
         /// <summary>
@@ -652,13 +706,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -686,7 +744,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             Point _p = point;
             _p.Y -= 20;
@@ -696,6 +754,8 @@ namespace LogixForms.DrowClasses
             g.DrawImage(En, new Rectangle(_p, _Size));
 
             g.DrawString(text, _Font, Brushes.Black, _p);
+
+            return _Size.Width;
         }
 
         /// <summary>
@@ -705,13 +765,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -739,7 +803,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             string text;
 
@@ -764,6 +828,8 @@ namespace LogixForms.DrowClasses
                 g.DrawImage(En, new Rectangle(_p, _Size));
             }
             g.DrawString(text, _Font, Brushes.Black, _p);
+
+            return _Size.Width;
         }
 
         /// <summary>
@@ -773,13 +839,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -807,7 +877,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             string text = "SCP \n     " + r[0] + "\n     " + r[1] + "\n     " + r[2] + "\n     " +
                 r[3] + "\n     " + r[4] + "\n     " + r[5];
@@ -818,6 +888,8 @@ namespace LogixForms.DrowClasses
             g.DrawImage(En, new Rectangle(_p, _Size));
 
             g.DrawString(text, _Font, Brushes.Black, _p);
+
+            return _Size.Width;
         }
 
         /// <summary>
@@ -827,13 +899,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -860,13 +936,15 @@ namespace LogixForms.DrowClasses
         /// <param name="_Adres">Адрес</param>
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
-        public override void Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
+        public override int Draw(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr)
         {
             _Size = new Size(60, 30);
             g.DrawImage(En, new Rectangle(point, _Size));
             point.Y -= 15;
             point.X -= 15;
             g.DrawString(_Adres, _Font, Brushes.Black, point);
+
+            return Math.Max(_Size.Width, g.MeasureString(_Adres, _Font).ToSize().Width);
         }
         /// <summary>
         /// Отрисовка Тегов и Комментариев
@@ -875,13 +953,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -909,7 +991,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             try
             {
@@ -936,10 +1018,13 @@ namespace LogixForms.DrowClasses
                     g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 g.DrawString(text, _Font, Brushes.Black, _p);
+
+                return _Size.Width;
             }
             catch
             {
                 Debug.Print("DrawEl - GEQ" + _Adres);
+                return 0;
             }
         }
 
@@ -950,13 +1035,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
             _p.X -= 15;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -984,7 +1073,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             try
             {
@@ -1011,10 +1100,13 @@ namespace LogixForms.DrowClasses
                     g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 g.DrawString(text, _Font, Brushes.Black, _p);
+
+                return _Size.Width;
             }
             catch
             {
                 Debug.Print("DrawEl - GRT" + _Adres);
+                return 0;
             }
         }
 
@@ -1025,13 +1117,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
-            _p.X -= 50;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            _p.X -= 15;
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -1059,7 +1155,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             try
             {
@@ -1086,10 +1182,13 @@ namespace LogixForms.DrowClasses
                     g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 g.DrawString(text, _Font, Brushes.Black, _p);
+
+                return _Size.Width;
             }
             catch
             {
                 Debug.Print("DrawEl - EQU" + _Adres);
+                return 0;
             }
         }
 
@@ -1100,13 +1199,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
-            _p.X -= 50;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            _p.X -= 15;
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -1134,7 +1237,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             try
             {
@@ -1161,10 +1264,13 @@ namespace LogixForms.DrowClasses
                     g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 g.DrawString(text, _Font, Brushes.Black, _p);
+
+                return _Size.Width;
             }
             catch
             {
                 Debug.Print("DrawEl - NEQ" + _Adres);
+                return 0;
             }
         }
 
@@ -1175,13 +1281,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
-            _p.X -= 50;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            _p.X -= 15;
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -1209,7 +1319,7 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             try
             {
@@ -1236,10 +1346,14 @@ namespace LogixForms.DrowClasses
                     g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 g.DrawString(text, _Font, Brushes.Black, _p);
+
+
+                return _Size.Width;
             }
             catch
             {
                 Debug.Print("DrawEl - LES" + _Adres);
+                return 0;
             }
         }
 
@@ -1250,13 +1364,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
-            _p.X -= 50;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            _p.X -= 15;
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
@@ -1284,34 +1402,41 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Adr">Таблица данных</param>
         /// <param name="r">Список данных</param>
-        public override void DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
+        public override int DrawEl(Graphics g, string _Adres, Point point, Dictionary<string, ushort[]> Adr, string[] r)
         {
             try
             {
+                string text;
 
                 Point _p = point;
-                _p.Y -= 20;
-                _p.X -= 45;
-                _Size = new Size(120, 85);
-                g.DrawImage(En, new Rectangle(_p, _Size));
-                g.DrawString("LEQ <=", _Font, Brushes.Black, _p);
-                _p.Y += 10;
-                _p.X += 60;
                 int u;
                 if (int.TryParse(r[1], out u))
                 {
                     string[] buf = r[0].Split(":");
                     string name = buf[0];
                     int str = int.Parse(buf[1]);
-                    g.DrawString(r[0] + "\n" + Adr[name][str] + "\n" + r[1] + "\n" + r[1], _Font, Brushes.Black, _p);
+
+                    text = "LES < \n     ?\n     " + r[1] + "\n     " + r[1] + "\n     " + Adr[name][str];
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
                 }
                 else
-                    g.DrawString(r[0] + "\n" + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n"
-                        + r[1] + "\n" + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])], _Font, Brushes.Black, _p);
+                {
+                    text = "LES < \n     " + r[0] + "\n     " + Adr[r[0].Split(":")[0]][int.Parse(r[0].Split(":")[1])] + "\n     "
+                        + r[1] + "\n     " + Adr[r[1].Split(":")[0]][int.Parse(r[1].Split(":")[1])];
+
+                    _Size = g.MeasureString(text, _Font).ToSize();
+                    g.DrawImage(En, new Rectangle(_p, _Size));
+                }
+                g.DrawString(text, _Font, Brushes.Black, _p);
+
+
+                return _Size.Width;
             }
             catch
             {
-                Debug.Print("DrawEl - LEQ" + _Adres);
+                Debug.Print("DrawEl - LES" + _Adres);
+                return 0;
             }
         }
 
@@ -1322,13 +1447,17 @@ namespace LogixForms.DrowClasses
         /// <param name="point">Точка отрисовки</param>
         /// <param name="Teg">Тег</param>
         /// <param name="Com">Сомментарий</param>
-        public override void DrawTegAndCom(Graphics g, Point point, string Teg, string Com)
+        public override int DrawTegAndCom(Graphics g, Point point, string _Teg, string _Com)
         {
             Point _p = point;
-            _p.X -= 50;
-            g.DrawString(Teg, _Font, new SolidBrush(Tag), _p);
-            _p.Y -= 15;
-            g.DrawString(Com, _Font, new SolidBrush(this.Com), _p);
+            _p.X -= 15;
+            g.DrawString(_Teg, _Font, new SolidBrush(Tag), _p);
+            int w_text = g.MeasureString(_Teg, _Font).ToSize().Height;
+            _p.Y -= w_text;
+            g.DrawString(_Com, _Font, new SolidBrush(Com), _p);
+
+            return Math.Max(g.MeasureString(_Teg, _Font).ToSize().Width,
+                g.MeasureString(_Com, _Font).ToSize().Width);
         }
 
         /// <summary>
