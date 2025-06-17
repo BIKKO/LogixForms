@@ -30,6 +30,9 @@ namespace LogixForms
         bool DebugFlag = false;
 #endif
 
+        /// <summary>
+        /// Инициализация класса
+        /// </summary>
         public MainThread()
         {
             InitializeComponent();//инициализация формы
@@ -148,6 +151,266 @@ namespace LogixForms
         }
 
         /// <summary>
+        /// Получение данных конфигурации
+        /// </summary>
+        /// <param name="ip">IP адрес</param>
+        /// <param name="port">Порт</param>
+        private void GetInfoCFG(string ip, string port)
+        {
+            client = new TcpClient(ip, int.Parse(port));
+            master = ModbusIpMaster.CreateIp(client);
+
+            ushort[] inputs;
+            string name;
+            ushort mbadr;
+            ushort len;
+
+            Adr.Clear();
+            MB_adres.Clear();
+
+            for (int i = 0; i < 100; i++)
+            {
+                inputs = master.ReadHoldingRegisters(5, (ushort)(i + CfgAdr), 3);
+                if (inputs[0] == 0xffff && inputs[2] == 0)
+                {
+                    RangAdr = inputs[1];
+                    continue;
+                }
+                if (inputs[0] == 0) return;
+                name = DataType[(byte)(inputs[0] >> 8)];
+                if ((inputs[0] & 0xff) != 0) name += inputs[0] & 0xff;
+                else if (name == "T_c") name = "T4_c";
+                mbadr = inputs[1];
+                len = inputs[2];
+
+                Adr.Add(name, new ushort[len]);
+                MB_adres.Add(name, mbadr);
+            }
+        }
+
+        /// <summary>
+        /// Поис ошибок перед сохранением изменений в тексте ранга
+        /// </summary>
+        /// <param name="Text">Новый текст ранга</param>
+        /// <returns>Проверенный текст ранга</returns>
+        /// <exception cref="Exception">Ошибки в синтаксисе текста</exception>
+        private string SerchErr(string Text)
+        {
+            string[] mnimonk =
+            {
+                "XIO",
+                "XIC",
+                "OTE",
+                "OTL",
+                "OTU",
+                "ONS",
+                "TON",
+                "MOV",
+                "ADD",
+                "GEQ",
+                "GRT",
+                "EQU",
+                "NEQ",
+                "LES",
+                "LEQ",
+                "DIV",
+                "MUL",
+                "ABS",
+                "SCP",
+                "MSG",
+                "BST",
+                "NXB",
+                "BND",
+            };
+            byte branch_start_count = 0;
+            byte branch_end_count = 0;
+            byte branch_next_count = 0;
+
+            if (Text[0] != ' ' && Text[^1] != ' ') throw new Exception("Ошибка пробелов");
+            foreach (string item in Text.Trim().Split(" "))
+            {
+                if (mnimonk.Contains(item))
+                {
+                    if (item == "BST") branch_start_count++;
+                    if (item == "BND") branch_end_count++;
+                    if (item == "NXB") branch_next_count++;
+                }
+                else
+                {
+
+                }
+            }
+            if (branch_start_count != branch_end_count) throw new Exception("Ошибка ветвей(ветвь без начала или конца)");
+            if (branch_start_count > 0 && branch_next_count == 0) throw new Exception("Ошибка ветвей(ветвь без перехода)");
+
+            return Text.ToUpper();
+        }
+
+        /// <summary>
+        /// Создание нового окна
+        /// </summary>
+        /// <param name="Name">Имя файла</param>
+        /// <param name="Text">Текст ранга</param>
+        /// <param name="adr">Список адресов</param>
+        /// <param name="teg">Теги и коментарии</param>
+        /// <param name="tag">Полный путь к файлу, сохраняемы в tabpage в поле tag</param>
+        private void CreateWin(string Name, List<string> Text, Dictionary<string, ushort[]> adr = null, Dictionary<string, string[]> teg = null, string tag = null)
+        {
+            var tb = new MyTabPage();
+            int count = 1;
+            tb.Text = Name;
+            foreach (TabPage tab in Files.TabPages)
+            {
+                if (tab.Text == Name)
+                {
+                    tb.Text = Name + $"{count}";
+                    count++;
+                }
+            }
+            tb.Tag = tag;
+
+            VScrollBar vscrol = new()
+            {
+                Dock = DockStyle.Right,
+                Width = 20,
+                Maximum = 100,
+                Minimum = 0,
+                Value = 0
+            };
+            MyPanel pan = new()
+            {
+                Dock = DockStyle.Fill,
+                Height = Height - 20,
+                Width = 1300 - 50,
+            };
+            HScrollBar hScroll = new()
+            {
+                Dock = DockStyle.Bottom,
+                Height = 20,
+                Maximum = pan.Width,
+                Minimum = 0,
+            };
+            ContextMenuStrip contextMenu = new ContextMenuStrip();
+            var close = new ToolStripMenuItem("Закрыть");
+            contextMenu.Items.Add(close);
+            tb.ContextMenuStrip = contextMenu;
+            contextMenu = null;
+            close.Click += Close_Click;
+
+            pan.MouseDoubleClick += SelectRang_DuobleClik;
+            pan.MouseMove += Pan_MouseMove;
+            pan.Click += Pan_Click;
+            vscrol.Scroll += Vscrol_Scroll;
+
+            pan.Controls.Add(vscrol);
+            pan.Controls.Add(hScroll);
+            tb.Controls.Add(pan);
+            Files.TabPages.Add(tb);
+            Files.SelectTab(Files.TabCount - 1);
+            Thread t;
+            t = new Thread(() =>
+            {
+                BeginInvoke(new MethodInvoker(() =>
+                {
+                    int wh = Files.SelectedTab.Width;
+                    ClassDraw tab_to_drow;
+                    if (adr == null)
+                        tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                            ref hScroll, ref wh, Height, Width, this);
+                    else
+                    {
+                        if (teg != null)
+                            tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                            ref hScroll, ref wh, ref adr, Height, Width, teg, this);
+                        else
+                            tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
+                        ref hScroll, ref wh, ref adr, Height, Width, this);
+                    }
+
+                    tab_to_drow.StartDrow();
+
+                    mainWindows.Add(tab_to_drow);
+                    MouseWheel += tab_to_drow.This_MouseWheel;
+                }
+                ));
+            });
+            opens.Add(t);
+            t.Start();
+        }
+
+        /// <summary>
+        /// Подключение к устройству
+        /// </summary>
+        /// <param name="ip">IP адрес</param>
+        /// <param name="port">Порт</param>
+        /// <param name="simulate"></param>
+        /// <param name="slave">ID</param>
+        public void Con(string ip, string port, bool cfg, byte slave)
+        {
+            try
+            {
+                List<string> TextRangs = null;
+                if (cfg) GetInfoCFG(ip, port);
+                this.slave = slave;
+                TextRangs = new List<string>();
+                client = new TcpClient(ip, int.Parse(port));
+                master = ModbusIpMaster.CreateIp(client);
+
+                ushort[] inputs;
+
+
+                for (int j = 0; j < 100; j++)
+                {
+                    inputs = master.ReadHoldingRegisters(slave, (ushort)(j + RangAdr), 120);
+                    string g = "";
+                    int len = 0;
+                    int buf;
+
+                    for (int i = 0; i < 240; i++)
+                    {
+                        if (inputs[i] != 0)
+                        {
+                            buf = (inputs[i] & 0xff);
+                            if (buf != 0)
+                            {
+                                g += (char)((char)inputs[i] & 0xff);
+                                len++;
+                            }
+                            buf = (inputs[i] >> 8);
+                            if (buf != 0)
+                            {
+                                g += (char)((char)inputs[i] >> 8);
+                                len++;
+                            }
+                        }
+                        else break;
+                    }
+                    if (len != 0) TextRangs.Add(g);
+                    else break;
+                }
+
+                string[] adreskey = Adr.Keys.ToArray();
+                foreach (string adkey in adreskey)
+                {
+                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
+                }
+                AdresUpdate.Enabled = true;
+
+                string name = ip + ':' + port;
+                CreateWin(name, TextRangs, Adr);
+                ConnectedWindows.Add(mainWindows.Count);
+                ModBusUpdate.Enabled = true;
+                AdresUpdate.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.\n" + ex.Message);
+                ConnectedWindows.Remove(mainWindows.Count - 1);
+                new ConnectForms(this).Show();
+            }
+        }
+
+        /// <summary>
         /// Обновление значений адресов в памяти с устройтва
         /// </summary>
         /// <param name="sender"></param>
@@ -220,7 +483,7 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// 
+        /// Отклюение прокрутки в фоновых окнах
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -228,8 +491,6 @@ namespace LogixForms
         {
             if (mainWindows.Count > 0)
             {
-                //foreach (ClassDraw i in mainWindows) i.EnableScroll = false;
-                //foreach (TabPage item in Files.TabPages)
                 for(int count = 0; count < Files.TabPages.Count; count++)
                 {
                     if (Files.TabPages[count].Text == Files.TabPages[Files.SelectedIndex].Text) mainWindows[Files.SelectedIndex].EnableScroll = true;
@@ -370,136 +631,6 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// Сброс выбранного ранга
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Vscrol_Scroll(object? sender, ScrollEventArgs e)
-        {
-            (sender as VScrollBar).Focus();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Pan_MouseMove(object? sender, MouseEventArgs e)
-        {
-            mousePos = new Point(e.X, e.Y);
-        }
-
-        /// <summary>
-        /// Подключение к устройству
-        /// </summary>
-        /// <param name="ip">IP адрес</param>
-        /// <param name="port">Порт</param>
-        /// <param name="simulate"></param>
-        /// <param name="slave">ID</param>
-        public void Con(string ip, string port, bool cfg, byte slave)
-        {
-            try
-            {
-                List<string> TextRangs = null;
-                if (cfg) GetInfoCFG(ip, port);
-                this.slave = slave;
-                TextRangs = new List<string>();
-                client = new TcpClient(ip, int.Parse(port));
-                master = ModbusIpMaster.CreateIp(client);
-
-                ushort[] inputs;
-
-
-                for (int j = 0; j < 100; j++)
-                {
-                    inputs = master.ReadHoldingRegisters(slave, (ushort)(j + RangAdr), 120);
-                    string g = "";
-                    int len = 0;
-                    int buf;
-
-                    for (int i = 0; i < 240; i++)
-                    {
-                        if (inputs[i] != 0)
-                        {
-                            buf = (inputs[i] & 0xff);
-                            if (buf != 0)
-                            {
-                                g += (char)((char)inputs[i] & 0xff);
-                                len++;
-                            }
-                            buf = (inputs[i] >> 8);
-                            if (buf != 0)
-                            {
-                                g += (char)((char)inputs[i] >> 8);
-                                len++;
-                            }
-                        }
-                        else break;
-                    }
-                    if (len != 0) TextRangs.Add(g);
-                    else break;
-                }
-
-                string[] adreskey = Adr.Keys.ToArray();
-                foreach (string adkey in adreskey)
-                {
-                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
-                }
-                AdresUpdate.Enabled = true;
-
-                string name = ip + ':' + port;
-                CreateWin(name, TextRangs, Adr);
-                ConnectedWindows.Add(mainWindows.Count);
-                ModBusUpdate.Enabled = true;
-                AdresUpdate.Enabled = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.\n" + ex.Message);
-                ConnectedWindows.Remove(mainWindows.Count - 1);
-                new ConnectForms(this).Show();
-            }
-        }
-
-        /// <summary>
-        /// Получение данных конфигурации
-        /// </summary>
-        /// <param name="ip">IP адрес</param>
-        /// <param name="port">Порт</param>
-        private void GetInfoCFG(string ip, string port)
-        {
-            client = new TcpClient(ip, int.Parse(port));
-            master = ModbusIpMaster.CreateIp(client);
-
-            ushort[] inputs;
-            string name;
-            ushort mbadr;
-            ushort len;
-
-            Adr.Clear();
-            MB_adres.Clear();
-
-            for (int i = 0; i < 100; i++)
-            {
-                inputs = master.ReadHoldingRegisters(5, (ushort)(i + CfgAdr), 3);
-                if (inputs[0] == 0xffff && inputs[2] == 0)
-                {
-                    RangAdr = inputs[1];
-                    continue;
-                }
-                if (inputs[0] == 0) return;
-                name = DataType[(byte)(inputs[0] >> 8)];
-                if ((inputs[0] & 0xff) != 0) name += inputs[0] & 0xff;
-                else if (name == "T_c") name = "T4_c";
-                mbadr = inputs[1];
-                len = inputs[2];
-
-                Adr.Add(name, new ushort[len]);
-                MB_adres.Add(name, mbadr);
-            }
-        }
-
-        /// <summary>
         /// Создание пустого окна
         /// </summary>
         /// <param name="sender"></param>
@@ -507,90 +638,6 @@ namespace LogixForms
         private void NewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CreateWin("NewFile", new List<string> { "" });
-        }
-
-        private void CreateWin(string Name, List<string> Text, Dictionary<string, ushort[]> adr = null, Dictionary<string, string[]> teg = null, string tag = null)
-        {
-            var tb = new MyTabPage();
-            int count = 1;
-            tb.Text = Name;
-            foreach (TabPage tab in Files.TabPages)
-            {
-                if (tab.Text == Name)
-                {
-                    tb.Text = Name + $"{count}";
-                    count++;
-                }
-            }
-            tb.Tag = tag;
-
-            VScrollBar vscrol = new()
-            {
-                Dock = DockStyle.Right,
-                Width = 20,
-                Maximum = 100,
-                Minimum = 0,
-                Value = 0
-            };
-            MyPanel pan = new()
-            {
-                Dock = DockStyle.Fill,
-                Height = Height - 20,
-                Width = 1300 - 50,
-            };
-            HScrollBar hScroll = new()
-            {
-                Dock = DockStyle.Bottom,
-                Height = 20,
-                Maximum = pan.Width,
-                Minimum = 0,
-            };
-            ContextMenuStrip contextMenu = new ContextMenuStrip();
-            var close = new ToolStripMenuItem("Закрыть");
-            contextMenu.Items.Add(close);
-            tb.ContextMenuStrip = contextMenu;
-            contextMenu = null;
-            close.Click += Close_Click;
-
-            pan.MouseDoubleClick += SelectRang_DuobleClik;
-            pan.MouseMove += Pan_MouseMove;
-            pan.Click += Pan_Click;
-            vscrol.Scroll += Vscrol_Scroll;
-
-            pan.Controls.Add(vscrol);
-            pan.Controls.Add(hScroll);
-            tb.Controls.Add(pan);
-            Files.TabPages.Add(tb);
-            Files.SelectTab(Files.TabCount - 1);
-            Thread t;
-            t = new Thread(() =>
-            {
-                BeginInvoke(new MethodInvoker(() =>
-                {
-                    int wh = Files.SelectedTab.Width;
-                    ClassDraw tab_to_drow;
-                    if (adr == null)
-                        tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                            ref hScroll, ref wh, Height, Width, this);
-                    else
-                    {
-                        if (teg != null)
-                            tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                            ref hScroll, ref wh, ref adr, Height, Width, teg, this);
-                        else
-                            tab_to_drow = new ClassDraw(ref pan, Text, ref vscrol,
-                        ref hScroll, ref wh, ref adr, Height, Width, this);
-                    }
-
-                    tab_to_drow.StartDrow();
-
-                    mainWindows.Add(tab_to_drow);
-                    MouseWheel += tab_to_drow.This_MouseWheel;
-                }
-                ));
-            });
-            opens.Add(t);
-            t.Start();
         }
 
         /// <summary>
@@ -648,7 +695,7 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// 
+        /// Вывод на экран текста ранга по двойному щелчку мыши
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -686,7 +733,27 @@ namespace LogixForms
         }
 
         /// <summary>
+        /// Сброс выбранного ранга
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Vscrol_Scroll(object? sender, ScrollEventArgs e)
+        {
+            (sender as VScrollBar).Focus();
+        }
+
+        /// <summary>
         /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Pan_MouseMove(object? sender, MouseEventArgs e)
+        {
+            mousePos = new Point(e.X, e.Y);
+        }
+
+        /// <summary>
+        /// Закрытие окна с текстом при потери фокуса
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -700,7 +767,7 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// 
+        /// Подстройка текстового оля под содержимое
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -717,7 +784,7 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// 
+        /// Подтверждение изменений в тексте ранга; Закрытие тестового поля 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -743,58 +810,6 @@ namespace LogixForms
             {
                 textb.Dispose();
             }
-        }
-
-        private string SerchErr(string Text)
-        {
-            string[] mnimonk =
-            {
-                "XIO",
-                "XIC",
-                "OTE",
-                "OTL",
-                "OTU",
-                "ONS",
-                "TON",
-                "MOV",
-                "ADD",
-                "GEQ",
-                "GRT",
-                "EQU",
-                "NEQ",
-                "LES",
-                "LEQ",
-                "DIV",
-                "MUL",
-                "ABS",
-                "SCP",
-                "MSG",
-                "BST",
-                "NXB",
-                "BND",
-            };
-            byte branch_start_count = 0;
-            byte branch_end_count = 0;
-            byte branch_next_count = 0;
-
-            if (Text[0] != ' ' && Text[^1] != ' ') throw new Exception("Ошибка пробелов");
-            foreach (string item in Text.Trim().Split(" "))
-            {
-                if (mnimonk.Contains(item))
-                {
-                    if (item == "BST") branch_start_count++;
-                    if (item == "BND") branch_end_count++;
-                    if (item == "NXB") branch_next_count++;
-                }
-                else
-                {
-
-                }
-            }
-            if (branch_start_count != branch_end_count) throw new Exception("Ошибка ветвей(ветвь без начала или конца)");
-            if (branch_start_count > 0 && branch_next_count == 0) throw new Exception("Ошибка ветвей(ветвь без перехода)");
-
-            return Text;
         }
 
         /// <summary>

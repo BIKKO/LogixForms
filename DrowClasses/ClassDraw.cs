@@ -165,7 +165,12 @@ namespace LogixForms.DrowClasses
         public string[] GetTextRang => info_file.ToArray();
 
         /// <summary>
-        /// 
+        /// Получение тегов
+        /// </summary>
+        public Dictionary<string, string[]> GetTegs => Tegs;
+
+        /// <summary>
+        /// Установлене нового значения ранга
         /// </summary>
         /// <param name="numberOfRang">Номер ранга(с 0)</param>
         /// <param name="Text">Новый Текст</param>
@@ -173,11 +178,6 @@ namespace LogixForms.DrowClasses
         {
             info_file[numberOfRang] = Text;
         }
-
-        /// <summary>
-        /// Получение тегов
-        /// </summary>
-        public Dictionary<string, string[]> GetTegs => Tegs;
 
         /// <summary>
         /// Установление значения данныйх
@@ -194,33 +194,6 @@ namespace LogixForms.DrowClasses
         public bool EnableScroll
         {
             set { if (scroll != value) scroll = value; }
-        }
-
-        /// <summary>
-        /// Отслеживание колесика мыши
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void This_MouseWheel(object sender, MouseEventArgs e)
-        {
-            if (scroll)
-            {
-                int wheel = 0;//прокрутка вверх или вниз
-                if (e.Delta > 0)
-                {
-                    //вверх
-                    wheel = -(int)(VScroll.Maximum * 0.05);//если рангов > 10 то -1 иначе -10
-                    //MessageBox.Show("Test");
-                }
-                else
-                {
-                    //вниз
-                    wheel = (int)(VScroll.Maximum * 0.05);//если рангов > 10 то 1 иначе 10
-                }
-                if (VScroll.Maximum >= VScroll.Value + wheel && VScroll.Minimum <= VScroll.Value + wheel)
-                    VScroll.Value += wheel;//не выходим ли за приделы scrollbar
-                wheel = 0;//одиночное сробатование
-            }
         }
 
         /// <summary>
@@ -251,6 +224,35 @@ namespace LogixForms.DrowClasses
             Debug.WriteLine(out_value[0] + " " + out_value[1] + " / " + scroll_y);
 
             return out_value;
+        }
+
+        /// <summary>
+        /// Отслеживание колесика мыши
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void This_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (scroll)
+            {
+                int wheel = 0;//прокрутка вверх или вниз
+                if (e.Delta > 0)
+                {
+                    //вверх
+                    wheel = -(int)(VScroll.Maximum * 0.05);//если рангов > 10 то -1 иначе -10
+                    //MessageBox.Show("Test");
+                }
+                else
+                {
+                    //вниз
+                    wheel = (int)(VScroll.Maximum * 0.05);//если рангов > 10 то 1 иначе 10
+                }
+                if (VScroll.Maximum >= VScroll.Value + wheel && VScroll.Minimum <= VScroll.Value + wheel)
+                    VScroll.Value += wheel;//не выходим ли за приделы scrollbar
+                wheel = 0;//одиночное сробатование
+
+                panel.Focus();
+            }
         }
 
         /// <summary>

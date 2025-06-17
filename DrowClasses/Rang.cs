@@ -375,8 +375,105 @@ namespace LogixForms.DrowClasses
             }
         }
 
+        /// <summary>
+        /// Рекурсиный метод отрисовки элементов ветвей ранга
+        /// </summary>
+        /// <param name="rang_text">Массив элементов</param>
+        /// <param name="IndexStart">Старт перебора массива</param>
+        /// <param name="Start_Y">Старт отрисовки по Y</param>
+        /// <param name="Start_X">Старт отрисовки по X</param>
+        /// <param name="point">Точка старта ветви</param>
+        /// <param name="CountOfBranch">Кол-во ветвей</param>
+        /// <param name="CountInBranch">Кол-во элеменов в ветви</param>
+        /// <returns>индекс конца перебора, кол-во эл в полученной ветви, ~, точка отрисовки, кол-во ветвей - 1</returns>
+        /// <exception cref="Не найден конец ветви"></exception>
+        private int[] DrawElemInSap(int IndexStart, int Start_Y, int Start_X, Point point, int CountOfBranch, int CountInBranch)
+        {
+            int enum_el = 0;
+            int count_of_branch = CountOfBranch;
+            Point p = point;
+            bool BranchStart = false;
+            int branch = 0;
+            int x_branch = Start_X;
+            int drow_ind = Start_X;
+            int count_el_in_branch = 0;
+            int st = PointOfElemetts[drow_ind];
+            for (int index = IndexStart; index < TextRang.Length; index++)
+            {
+                string el = TextRang[index];
+                if (el == "BST")
+                {
+                    p = new Point(left_indent_rang_x + st, Start_Y);
+                    x_branch = drow_ind + 1;
+                    branch = 0;
+                    BranchStart = true;
+                    count_of_branch++;
+                }
+                else if (el == "NXB")
+                {
+
+                    p.Y += top_indent;
+                    int[] inf;
+                    if (count_of_branch < 2)
+                    {
+                        inf = DrawElemInSap(index + 1, Start_Y + top_indent, x_branch, new Point(p.X, p.Y), count_of_branch, CountInBranch);
+                        enum_el = inf[2];
+                        branch = CountInBranch;
+                        count_of_branch--;
+                        index = inf[0];
+                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
+                        BranchStart = Convert.ToBoolean(inf[2]);
+                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
+                        if (count_of_branch == inf[4]) return inf;
+                        continue;
+                    }
+                    else
+                    {
+                        inf = DrawElemInSap(index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, 1);
+                        enum_el = inf[2];
+                        p.Y -= top_indent;
+                        branch = 0;
+                        count_of_branch--;
+                        index = inf[0];
+                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
+                        BranchStart = Convert.ToBoolean(inf[2]);
+                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
+                        if (count_of_branch == inf[4]) return inf;
+                        continue;
+                    }
+                }
+                else if (el == "BND")
+                {
+                    int ind3 = drow_ind;
+                    MaxYBranch = Math.Max(MaxYBranch, Start_Y);
+                    return [index, count_el_in_branch, enum_el, ind3, count_of_branch - 1];
+                }
+                else
+                {
+                    count_el_in_branch++;
+                    if (BranchStart) branch++;
+
+
+                    Point _point = new Point(left_indent_rang_x + st + scrollX - 20, Start_Y - scrollY - 13);
+                    DrEl(ref enum_el, ref st, ref index, el, _point);
+                }
+                drow_ind++;
+            }
+            //return new int[] { rang_text.Length, count_el_in_branch, 0, drow_ind, count_of_branch - 1 };
+            throw new Exception("Not met BND");
+        }
+
+        /// <summary>
+        /// Отрисовка символа
+        /// </summary>
+        /// <param name="enumer_el">Кол-во элементов</param>
+        /// <param name="st">Шаг</param>
+        /// <param name="index">Индекс в тексте</param>
+        /// <param name="el">Мнимоника элемента</param>
+        /// <param name="point">Точка отрисовки</param>
         private void DrEl(ref int enumer_el, ref int st, ref int index, string el, Point point)
         {
+            point.X = (int)(point.X*1.02);
             switch (el)
             {
                 case "XIO":
@@ -752,94 +849,6 @@ namespace LogixForms.DrowClasses
                         break;
                     }
             }
-        }
-
-        /// <summary>
-        /// Рекурсиный метод отрисовки элементов ветвей ранга
-        /// </summary>
-        /// <param name="rang_text">Массив элементов</param>
-        /// <param name="IndexStart">Старт перебора массива</param>
-        /// <param name="Start_Y">Старт отрисовки по Y</param>
-        /// <param name="Start_X">Старт отрисовки по X</param>
-        /// <param name="point">Точка старта ветви</param>
-        /// <param name="CountOfBranch">Кол-во ветвей</param>
-        /// <param name="CountInBranch">Кол-во элеменов в ветви</param>
-        /// <returns>индекс конца перебора, кол-во эл в полученной ветви, ~, точка отрисовки, кол-во ветвей - 1</returns>
-        /// <exception cref="Не найден конец ветви"></exception>
-        private int[] DrawElemInSap(int IndexStart, int Start_Y, int Start_X, Point point, int CountOfBranch, int CountInBranch)
-        {
-            int enum_el = 0;
-            int count_of_branch = CountOfBranch;
-            Point p = point;
-            bool BranchStart = false;
-            int branch = 0;
-            int x_branch = Start_X;
-            int drow_ind = Start_X;
-            int count_el_in_branch = 0;
-            int st = PointOfElemetts[drow_ind];
-            for (int index = IndexStart; index < TextRang.Length; index++)
-            {
-                string el = TextRang[index];
-                if (el == "BST")
-                {
-                    p = new Point(left_indent_rang_x + st, Start_Y);
-                    x_branch = drow_ind + 1;
-                    branch = 0;
-                    BranchStart = true;
-                    count_of_branch++;
-                }
-                else if (el == "NXB")
-                {
-
-                    p.Y += top_indent;
-                    int[] inf;
-                    if (count_of_branch < 2)
-                    {
-                        inf = DrawElemInSap(index + 1, Start_Y + top_indent, x_branch, new Point(p.X, p.Y), count_of_branch, CountInBranch);
-                        enum_el = inf[2];
-                        branch = CountInBranch;
-                        count_of_branch--;
-                        index = inf[0];
-                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
-                        BranchStart = Convert.ToBoolean(inf[2]);
-                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
-                        if (count_of_branch == inf[4]) return inf;
-                        continue;
-                    }
-                    else
-                    {
-                        inf = DrawElemInSap(index + 1, Start_Y + top_indent, x_branch, p, count_of_branch, 1);
-                        enum_el = inf[2];
-                        p.Y -= top_indent;
-                        branch = 0;
-                        count_of_branch--;
-                        index = inf[0];
-                        if (branch < inf[1]) branch = branch - branch + Math.Max(branch, inf[1]);
-                        BranchStart = Convert.ToBoolean(inf[2]);
-                        drow_ind = Math.Max(drow_ind + 1, inf[3]);
-                        if (count_of_branch == inf[4]) return inf;
-                        continue;
-                    }
-                }
-                else if (el == "BND")
-                {
-                    int ind3 = drow_ind;
-                    MaxYBranch = Math.Max(MaxYBranch, Start_Y);
-                    return [index, count_el_in_branch, enum_el, ind3, count_of_branch - 1];
-                }
-                else
-                {
-                    count_el_in_branch++;
-                    if (BranchStart) branch++;
-
-
-                    Point _point = new Point(left_indent_rang_x + st + scrollX - 20, Start_Y - scrollY - 13);
-                    DrEl(ref enum_el, ref st, ref index, el, _point);
-                }
-                drow_ind++;
-            }
-            //return new int[] { rang_text.Length, count_el_in_branch, 0, drow_ind, count_of_branch - 1 };
-            throw new Exception("Not met BND");
         }
 
         /// <summary>
