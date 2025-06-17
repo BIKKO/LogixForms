@@ -8,8 +8,7 @@ namespace LogixForms.DrowClasses
     /// </summary>
     public class ClassDraw
     {
-        public List<RangsObl> rangsObls = new List<RangsObl>();
-        private const int left_indent_rang_x = 70;
+        public List<StructRangsObl> rangsObls = new List<StructRangsObl>();
         private List<string> info_file;
         private readonly VScrollBar VScroll;
         private readonly HScrollBar HScroll;
@@ -270,7 +269,7 @@ namespace LogixForms.DrowClasses
             g.Clear(Color.White);
             int y = 0;
 
-            RangsObl rangObl = new RangsObl { Y = y };
+            StructRangsObl rangObl = new StructRangsObl { Y = y };
 
             int[] range_drow = null;
             if(OblFill) range_drow = GetRangeRang();

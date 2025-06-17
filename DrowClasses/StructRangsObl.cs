@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogixForms.DrowClasses
 {
-    public struct RangsObl
+    public struct StructRangsObl
     {
         public const int X = 0;
         public int Y;

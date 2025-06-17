@@ -14,8 +14,8 @@ namespace LogixForms
     {
         private static Dictionary<string, ushort[]>? Adr;
         protected static Dictionary<string, ushort>? MB_adres;
-        private List<ClassDraw> mainWindows = new List<ClassDraw>();
-        private List<int> ConnectedWindows = new List<int>();
+        private List<ClassDraw> mainWindows;
+        private List<int> ConnectedWindows;
         public ModbusIpMaster? master;
         private TcpClient? client;
         private byte slave = 1;
@@ -101,6 +101,9 @@ namespace LogixForms
                     MB_adres.Add(name[i], ushort.Parse(adr[i]));
                 }
             }
+
+            mainWindows = new List<ClassDraw>();
+            ConnectedWindows = new List<int>();
         }
 
         public Color SetColorDraw
@@ -701,14 +704,14 @@ namespace LogixForms
         /// <param name="e"></param>
         private void SelectRang_DuobleClik(object sender, EventArgs e)
         {
-            List<RangsObl> obls = mainWindows[Files.SelectedIndex].rangsObls;
+            List<StructRangsObl> obls = mainWindows[Files.SelectedIndex].rangsObls;
             Point mouse = mousePos;
 
             MyPanel panel = sender as MyPanel;
             VScrollBar scrollBar = panel.Controls[0] as VScrollBar;
             TextBox textBox;
 
-            foreach (RangsObl obl in obls)
+            foreach (StructRangsObl obl in obls)
             {
                 if (obl.Y <= mouse.Y + scrollBar.Value && obl.H >= mouse.Y + scrollBar.Value)
                 {
