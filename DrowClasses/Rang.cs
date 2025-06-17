@@ -8,7 +8,7 @@ namespace LogixForms.DrowClasses
     /// </summary>
     public class Rang
     {
-
+        protected Font _Font = new Font(Properties.Settings.Default.FontStyle, Properties.Settings.Default.FontSize);
         private ElementDraw? El;
         private readonly Pen pen_line = new Pen(Brushes.Blue);
         private readonly Pen PenOfPoint = new Pen(Brushes.Yellow, 7);
@@ -235,7 +235,7 @@ namespace LogixForms.DrowClasses
                 drow_ind++;
             }
             g.DrawLine(pen_line, left_indent_rang_x + scrollX, startY - scrollY - 50, left_indent_rang_x + scrollX, Max - scrollY);
-            g.DrawString(Number.ToString(), new Font("Arial", 12), Brushes.DimGray, (int)(left_indent_rang_x * .4) + scrollX, startY + top_indent_rang - 10 - scrollY);
+            g.DrawString(Number.ToString(), _Font, Brushes.DimGray, (int)(left_indent_rang_x * .4) + scrollX, startY + top_indent_rang - 10 - scrollY);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace LogixForms.DrowClasses
 {
@@ -7,6 +8,8 @@ namespace LogixForms.DrowClasses
     /// </summary>
     public class ClassDraw
     {
+        public List<RangsObl> rangsObls = new List<RangsObl>();
+        private const int left_indent_rang_x = 70;
         private List<string> info_file;
         private readonly VScrollBar VScroll;
         private readonly HScrollBar HScroll;
@@ -22,6 +25,7 @@ namespace LogixForms.DrowClasses
         private bool Draw_flag = false;
         private MainThread owner;
         private bool Start = false;
+        private bool OblFill = false;
 
         /// <summary>
         /// Конструктор отрисовки
@@ -161,6 +165,16 @@ namespace LogixForms.DrowClasses
         public string[] GetTextRang => info_file.ToArray();
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="numberOfRang">Номер ранга(с 0)</param>
+        /// <param name="Text">Новый Текст</param>
+        public void SetNewTextRang(int numberOfRang, string Text)
+        {
+            info_file[numberOfRang] = Text;
+        }
+
+        /// <summary>
         /// Получение тегов
         /// </summary>
         public Dictionary<string, string[]> GetTegs => Tegs;
@@ -210,6 +224,36 @@ namespace LogixForms.DrowClasses
         }
 
         /// <summary>
+        /// Метод для получения интевала на три ранга в области окна
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private int[] GetRangeRang()
+        {
+            int[] out_value = new int[2];
+
+            int index_centrall_item = -1;
+
+            for (int index = 0; index < rangsObls.Count; index++)
+            {
+                if (rangsObls[index].Y <= scroll_y && rangsObls[index].H >= scroll_y)
+                {
+                    index_centrall_item = index;
+                    break;
+                }
+            }
+
+            if (index_centrall_item < 0) throw new Exception();
+
+            out_value[0] = index_centrall_item<2? 0 : index_centrall_item-2;
+            out_value[1] = index_centrall_item > rangsObls.Count? rangsObls.Count : index_centrall_item + 3;
+
+            Debug.WriteLine(out_value[0] + " " + out_value[1] + " / " + scroll_y);
+
+            return out_value;
+        }
+
+        /// <summary>
         /// Отрисовка программы
         /// </summary>
         /// <param name="e"></param>
@@ -219,20 +263,43 @@ namespace LogixForms.DrowClasses
             HScroll.Minimum = 0;
 
             scroll_y = VScroll.Value;//прокрутка
-            scroll_x = panel.Width > 1300 ? HScroll.Value = 0 : -HScroll.Value;
+            scroll_x = panel.Width >= 1300 ? HScroll.Value = 0 : -HScroll.Value; //? сомнения
             Graphics g = e.Graphics;//использование графики
+            g.Clear(Color.White);
             int y = 0;
-            ushort count_rangs = 1;
-            foreach (string str in info_file)
+
+            RangsObl rangObl = new RangsObl { Y = y };
+
+            int[] range_drow = null;
+            if(OblFill) range_drow = GetRangeRang();
+            //foreach (string str in info_file)
+            string str;
+            for (int ind = 0; ind < info_file.Count; ind++)
             {
-                rang = new Rang(g, ref scroll_y, ref scroll_x, y, count_rangs, ref Adr, Tegs);
+                if (OblFill && !(range_drow[0] <= ind && range_drow[1] >= ind))
+                    if (range_drow[1] < ind) break;
+                    else if (range_drow[0] > ind) continue;
+
+                str = info_file[ind];
+                rang = new Rang(g, ref scroll_y, ref scroll_x, y, (ushort)(ind+1), ref Adr, Tegs);
                 rang.Draw(str);
-                y = rang.Max;
-                count_rangs++;
+                if (OblFill)
+                    y = rangsObls[ind].H;
+                else 
+                    y = rang.Max;
+                //count_rangs++;
+
+                if (!OblFill)
+                {
+                    rangObl.H = y;
+                    rangsObls.Add(rangObl);
+                    rangObl.Y = y;
+                }
             }
             //rang = null;
-            VScroll.Maximum = y - panel.Height + 60 > 0 ? y - panel.Height + 160 : 0;
+            VScroll.Maximum = rangsObls[^1].H - panel.Height + 60 > 0 ? rangsObls[^1].H - panel.Height + 160 : 0;
             //g.DrawString($"scroll: {VScroll.Value} MaxScroll: {VScroll.Maximum}", RangsFont, Brushes.Red, 300, 200);
+            if (!OblFill) OblFill = true;
         }
 
         /// <summary>
@@ -246,8 +313,11 @@ namespace LogixForms.DrowClasses
             while (Start)
             {
                 await Task.Delay(60);
+
                 if (Draw_flag) owner.SetColorDraw = Color.Lime;
                 else owner.SetColorDraw = Color.White;
+                Draw_flag = !Draw_flag;
+
                 panel.Refresh();
                 panel.Height = Height - 20;
 
@@ -263,8 +333,8 @@ namespace LogixForms.DrowClasses
                     if (!HScroll.Visible)
                         HScroll.Visible = true;
                 }
+
                 Width = panel.Width;
-                Draw_flag = !Draw_flag;
             }
         }
 
