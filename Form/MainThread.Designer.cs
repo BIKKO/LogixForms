@@ -32,9 +32,18 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainThread));
+            ModBusUpdate = new System.Windows.Forms.Timer(components);
+            MouseWheelUpdate = new System.Windows.Forms.Timer(components);
+            openFileDialog2 = new OpenFileDialog();
+            saveFileDialog1 = new SaveFileDialog();
+            AdresUpdate = new System.Windows.Forms.Timer(components);
+            MemoryClear = new System.Windows.Forms.Timer(components);
+            Files = new MyTabControl();
+            panel1 = new Panel();
+            panel2 = new Panel();
+            button_upload = new Button();
+            button_accept = new Button();
             menu = new Panel();
-            XIO_el = new Button();
-            XIC_el = new Button();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             openToolStripMenuItem = new ToolStripMenuItem();
@@ -46,55 +55,114 @@
             aboutToolStripMenuItem = new ToolStripMenuItem();
             toolStripTextBox1 = new ToolStripTextBox();
             toolStripTextBox2 = new ToolStripTextBox();
-            ModBusUpdate = new System.Windows.Forms.Timer(components);
-            MouseWheelUpdate = new System.Windows.Forms.Timer(components);
-            openFileDialog2 = new OpenFileDialog();
-            saveFileDialog1 = new SaveFileDialog();
-            AdresUpdate = new System.Windows.Forms.Timer(components);
-            MemoryClear = new System.Windows.Forms.Timer(components);
-            Files = new MyTabControl();
+            panel1.SuspendLayout();
+            panel2.SuspendLayout();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
+            // ModBusUpdate
+            // 
+            ModBusUpdate.Interval = 1000;
+            ModBusUpdate.Tick += ModBusUpdate_Tick;
+            // 
+            // MouseWheelUpdate
+            // 
+            MouseWheelUpdate.Enabled = true;
+            MouseWheelUpdate.Interval = 5;
+            MouseWheelUpdate.Tick += MouseWheelUpdate_Tick;
+            // 
+            // openFileDialog2
+            // 
+            openFileDialog2.FileName = "openFileDialog1";
+            // 
+            // AdresUpdate
+            // 
+            AdresUpdate.Interval = 200;
+            AdresUpdate.Tick += AdresUpdate_Tick;
+            // 
+            // MemoryClear
+            // 
+            MemoryClear.Enabled = true;
+            MemoryClear.Interval = 10000;
+            MemoryClear.Tick += MemoryClear_Tick;
+            // 
+            // Files
+            // 
+            Files.Dock = DockStyle.Fill;
+            Files.Location = new Point(0, 34);
+            Files.Name = "Files";
+            Files.SelectedIndex = 0;
+            Files.Size = new Size(1171, 562);
+            Files.TabIndex = 2;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(panel2);
+            panel1.Dock = DockStyle.Top;
+            panel1.Location = new Point(0, 0);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(1171, 34);
+            panel1.TabIndex = 3;
+            // 
+            // panel2
+            // 
+            panel2.BackColor = SystemColors.Menu;
+            panel2.Controls.Add(button_upload);
+            panel2.Controls.Add(button_accept);
+            panel2.Controls.Add(menu);
+            panel2.Dock = DockStyle.Fill;
+            panel2.ForeColor = SystemColors.Menu;
+            panel2.Location = new Point(0, 0);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(1171, 34);
+            panel2.TabIndex = 0;
+            // 
+            // button_upload
+            // 
+            button_upload.BackColor = Color.Silver;
+            button_upload.Enabled = false;
+            button_upload.ForeColor = Color.Lime;
+            button_upload.Image = Properties.Resources.UploadArrou1;
+            button_upload.Location = new Point(297, 5);
+            button_upload.Name = "button_upload";
+            button_upload.Size = new Size(29, 29);
+            button_upload.TabIndex = 4;
+            button_upload.UseVisualStyleBackColor = false;
+            button_upload.Click += button_upload_Click;
+            // 
+            // button_accept
+            // 
+            button_accept.BackColor = Color.Silver;
+            button_accept.Enabled = false;
+            button_accept.ForeColor = Color.Lime;
+            button_accept.Image = Properties.Resources.Galochka;
+            button_accept.Location = new Point(332, 5);
+            button_accept.Name = "button_accept";
+            button_accept.Size = new Size(29, 29);
+            button_accept.TabIndex = 3;
+            button_accept.UseVisualStyleBackColor = false;
+            button_accept.Click += button_accept_Click;
+            // 
             // menu
             // 
             menu.BackColor = SystemColors.Menu;
-            menu.Controls.Add(XIO_el);
-            menu.Controls.Add(XIC_el);
             menu.Controls.Add(menuStrip1);
-            menu.Dock = DockStyle.Top;
+            menu.Dock = DockStyle.Left;
             menu.ForeColor = SystemColors.Menu;
             menu.Location = new Point(0, 0);
             menu.Name = "menu";
-            menu.Size = new Size(919, 41);
-            menu.TabIndex = 1;
-            // 
-            // XIO_el
-            // 
-            XIO_el.Image = NodEn.XIC;
-            XIO_el.Location = new Point(114, 51);
-            XIO_el.Name = "XIO_el";
-            XIO_el.Size = new Size(70, 46);
-            XIO_el.TabIndex = 2;
-            XIO_el.UseVisualStyleBackColor = true;
-            // 
-            // XIC_el
-            // 
-            XIC_el.Image = NodEn.XIO;
-            XIC_el.Location = new Point(54, 51);
-            XIC_el.Name = "XIC_el";
-            XIC_el.Size = new Size(63, 46);
-            XIC_el.TabIndex = 1;
-            XIC_el.UseVisualStyleBackColor = true;
+            menu.Size = new Size(291, 34);
+            menu.TabIndex = 2;
             // 
             // menuStrip1
             // 
+            menuStrip1.BackColor = SystemColors.Menu;
             menuStrip1.ImageScalingSize = new Size(20, 20);
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, settingsToolStripMenuItem, aboutToolStripMenuItem, toolStripTextBox1, toolStripTextBox2 });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(919, 31);
+            menuStrip1.Size = new Size(291, 31);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -166,7 +234,7 @@
             toolStripTextBox1.Enabled = false;
             toolStripTextBox1.Name = "toolStripTextBox1";
             toolStripTextBox1.ReadOnly = true;
-            toolStripTextBox1.Size = new Size(15, 27);
+            toolStripTextBox1.Size = new Size(27, 27);
             // 
             // toolStripTextBox2
             // 
@@ -174,56 +242,22 @@
             toolStripTextBox2.Enabled = false;
             toolStripTextBox2.Name = "toolStripTextBox2";
             toolStripTextBox2.ReadOnly = true;
-            toolStripTextBox2.Size = new Size(15, 27);
-            // 
-            // ModBusUpdate
-            // 
-            ModBusUpdate.Interval = 1000;
-            ModBusUpdate.Tick += ModBusUpdate_Tick;
-            // 
-            // MouseWheelUpdate
-            // 
-            MouseWheelUpdate.Enabled = true;
-            MouseWheelUpdate.Interval = 5;
-            MouseWheelUpdate.Tick += MouseWheelUpdate_Tick;
-            // 
-            // openFileDialog2
-            // 
-            openFileDialog2.FileName = "openFileDialog1";
-            // 
-            // AdresUpdate
-            // 
-            AdresUpdate.Interval = 200;
-            AdresUpdate.Tick += AdresUpdate_Tick;
-            // 
-            // MemoryClear
-            // 
-            MemoryClear.Enabled = true;
-            MemoryClear.Interval = 10000;
-            MemoryClear.Tick += MemoryClear_Tick;
-            // 
-            // Files
-            // 
-            Files.Dock = DockStyle.Fill;
-            Files.Location = new Point(0, 41);
-            Files.Name = "Files";
-            Files.SelectedIndex = 0;
-            Files.Size = new Size(919, 423);
-            Files.TabIndex = 2;
+            toolStripTextBox2.Size = new Size(27, 27);
             // 
             // MainThread
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(919, 464);
+            ClientSize = new Size(1171, 596);
             Controls.Add(Files);
-            Controls.Add(menu);
+            Controls.Add(panel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MainMenuStrip = menuStrip1;
             Name = "MainThread";
             Text = "Logix";
             FormClosing += Form1_FormClosing;
+            panel1.ResumeLayout(false);
+            panel2.ResumeLayout(false);
             menu.ResumeLayout(false);
             menu.PerformLayout();
             menuStrip1.ResumeLayout(false);
@@ -232,27 +266,29 @@
         }
 
         #endregion
-        private Panel menu;
         private System.Windows.Forms.Timer ModBusUpdate;
         private System.Windows.Forms.Timer MouseWheelUpdate;
-        private MenuStrip menuStrip1;
-        private ToolStripMenuItem fileToolStripMenuItem;
-        private ToolStripMenuItem settingsToolStripMenuItem;
-        private ToolStripMenuItem openToolStripMenuItem;
-        private ToolStripMenuItem saveToolStripMenuItem;
-        private ToolStripMenuItem connectToolStripMenuItem;
-        private ToolStripMenuItem aboutToolStripMenuItem;
         private OpenFileDialog openFileDialog2;
         private SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Timer AdresUpdate;
         private System.Windows.Forms.Timer MemoryClear;
         private MyTabControl Files;
+        private Panel panel1;
+        private Panel panel2;
+        private Panel menu;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem fileToolStripMenuItem;
+        private ToolStripMenuItem openToolStripMenuItem;
         private ToolStripMenuItem newToolStripMenuItem;
-        private Button XIO_el;
-        private Button XIC_el;
+        private ToolStripMenuItem saveToolStripMenuItem;
+        private ToolStripMenuItem connectToolStripMenuItem;
         private ToolStripMenuItem adresesValuesToolStripMenuItem;
+        private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripTextBox toolStripTextBox1;
         private ToolStripTextBox toolStripTextBox2;
+        private Button button_accept;
+        private Button button_upload;
     }
 
 }

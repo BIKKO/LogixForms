@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LogixForms
+namespace LogixForms.HelperClasses
 {
     public enum Type
     {

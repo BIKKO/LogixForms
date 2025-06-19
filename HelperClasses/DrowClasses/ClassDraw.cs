@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace LogixForms.DrowClasses
+namespace LogixForms.HelperClasses.DrowClasses
 {
     /// <summary>
     /// Отрисовка программы
@@ -14,6 +14,7 @@ namespace LogixForms.DrowClasses
         private readonly HScrollBar HScroll;
         private int scroll_y = 0;//смещение
         private int scroll_x = 0;
+        private int CountNewRangs = 0;
         private int SelectedTab;
         private Dictionary<string, ushort[]> Adr;
         private MyPanel panel;
@@ -179,6 +180,29 @@ namespace LogixForms.DrowClasses
         }
 
         /// <summary>
+        /// Установление нового значения программы
+        /// </summary>
+        /// <param name="TextRangs"></param>
+        public void SetNewAllTextRang(List<string> TextRangs)
+        {
+            info_file = TextRangs;
+            CountNewRangs = -1;
+        }
+
+        /// <summary>
+        /// Установлене нового ранга в онлайн режиме
+        /// </summary>
+        /// <param name="numberOfRang">Номер ранга(с 0)</param>
+        /// <param name="Text">Новый Текст</param>
+        public void AddNewTextRang(int numberOfRang, string Text)
+        {
+            if (info_file[numberOfRang].Split("#")[0] == Text)
+                info_file[numberOfRang] = Text;
+            else
+                info_file[numberOfRang] = info_file[numberOfRang] + "#" + Text;
+        }
+
+        /// <summary>
         /// Установление значения данныйх
         /// </summary>
         /// <param name="tab">Новые данные</param>
@@ -200,7 +224,7 @@ namespace LogixForms.DrowClasses
         /// </summary>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private int[] GetRangeRang()
+        private int[] GetRangeRange()
         {
             int[] out_value = new int[2];
 
@@ -218,7 +242,7 @@ namespace LogixForms.DrowClasses
             if (index_centrall_item < 0) throw new Exception();
 
             out_value[0] = index_centrall_item<2? 0 : index_centrall_item-2;
-            out_value[1] = index_centrall_item > rangsObls.Count? rangsObls.Count : index_centrall_item + 3;
+            out_value[1] = index_centrall_item > rangsObls.Count? rangsObls.Count : index_centrall_item + 4;
 
             Debug.WriteLine(out_value[0] + " " + out_value[1] + " / " + scroll_y);
 
@@ -260,6 +284,19 @@ namespace LogixForms.DrowClasses
         /// <param name="e"></param>
         private void Draw(object sender, PaintEventArgs e)
         {
+            int CountNewRangs_LOCAL = 0;
+            foreach (string st in info_file)
+            {
+                if (st.Contains("#")) CountNewRangs_LOCAL++;
+            }
+
+            if (CountNewRangs_LOCAL != CountNewRangs)
+            {
+                CountNewRangs = CountNewRangs_LOCAL;
+                OblFill = false;
+                rangsObls.Clear();
+            }
+
             HScroll.Maximum = panel.Width - SelectedTab + 36;
             HScroll.Minimum = 0;
 
@@ -272,7 +309,7 @@ namespace LogixForms.DrowClasses
             StructRangsObl rangObl = new StructRangsObl { Y = y };
 
             int[] range_drow = null;
-            if(OblFill) range_drow = GetRangeRang();
+            if(OblFill) range_drow = GetRangeRange();
             //foreach (string str in info_file)
             string str;
             for (int ind = 0; ind < info_file.Count; ind++)
@@ -288,7 +325,6 @@ namespace LogixForms.DrowClasses
                     y = rangsObls[ind].H;
                 else 
                     y = rang.Max;
-                //count_rangs++;
 
                 if (!OblFill)
                 {

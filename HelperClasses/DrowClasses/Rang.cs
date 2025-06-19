@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
 
-namespace LogixForms.DrowClasses
+namespace LogixForms.HelperClasses.DrowClasses
 {
     /// <summary>
     /// Отрисовка рангов
@@ -28,6 +28,7 @@ namespace LogixForms.DrowClasses
         private Dictionary<string, ushort[]> Adr;
         private Dictionary<string, string[]>? Tegs;
         private string[]? TextRang;
+        private bool FlagRedak = false;
 
         /// <summary>
         /// Инициализация конструктора ранга
@@ -115,76 +116,28 @@ namespace LogixForms.DrowClasses
         /// <param name="RangText">Текст ранга</param>
         public void Draw(string RangText)
         {
-            DrawLine(RangText);
-            DrawElem(RangText);
+            string[] text_rang = RangText.Split("#");
+            int start = startY;
+            int max = 0;
+            for(int i = 0; i < 2; i++)
+            {
+                if (i == 1)
+                {
+                    g.FillRectangle(new SolidBrush(Color.WhiteSmoke),
+                        new Rectangle(0, Max - scrollY + (int)(top_indent_rang * .5),
+                        1300 - 4, Max - start));
+                    startY = Max;
+                    max = Max;
+                    ReadyStart();
+                    FlagRedak = true;
+                }
+                DrawLine(text_rang[i]);
+                DrawElem(text_rang[i]);
+                if (!RangText.Contains("#")) return;
+            }
+            if(Max == max)
+                MaxYRangs = Max * 2;
         }
-
-        /// <summary>
-        /// Проверка активноти элемента
-        /// </summary>
-        /// <param name="st">Адрес</param>
-        /// <param name="mas">Название</param>
-        /// <returns>Активность</returns>
-        /*private bool Adres(string st)
-        {
-            try
-            {
-                string mas = new Regex(@":\w*(/(\w*)?)?").Replace(st, "");
-                string[] k = new string[2];
-                int Bitmask = 0;
-                int ind_1;
-                int adr;
-
-                if (st.Contains("N13")) k = st.Replace("N13:", "").Split('/');
-                if (st.Contains("N15")) k = st.Replace("N15:", "").Split('/');
-                if (st.Contains("N18")) k = st.Replace("N18:", "").Split('/');
-                if (st.Contains("N40")) k = st.Replace("N40:", "").Split('/');
-                if (st.Contains("B3")) k = st.Replace("B3:", "").Split('/');
-                if (st.Contains("T4")) k = st.Replace("T4:", "").Split('/');
-
-                if (k.Contains("EN"))
-                {
-                    Bitmask = 1;
-                    ind_1 = int.Parse(k[0]);
-                    adr = Timer_control[ind_1];
-
-                    if ((adr & Bitmask) == Bitmask) return true;
-                    return false;
-                }
-                else if (k.Contains("DN"))
-                {
-                    Bitmask = 2;
-                    ind_1 = int.Parse(k[0]);
-                    adr = Timer_control[ind_1];
-
-                    if ((adr & Bitmask) == Bitmask) return true;
-                    return false;
-                }
-                else if (k.Contains("TT"))
-                {
-                    Bitmask = 4;
-                    ind_1 = int.Parse(k[0]);
-                    adr = Timer_control[ind_1];
-
-                    if ((adr & Bitmask) == Bitmask) return true;
-                    return false;
-                }
-                else
-                {
-                    Bitmask = 1 << int.Parse(k[1]);
-
-                    ind_1 = int.Parse(k[0]);
-                    adr = Adr[mas][ind_1];
-
-                    if ((adr & Bitmask) == Bitmask) return true;
-                    return false;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }*/
 
         /// <summary>
         /// Отображение основной ветви ранга
@@ -196,7 +149,8 @@ namespace LogixForms.DrowClasses
             Point p = new Point();
             bool BranchStart = false;
             Branch branch = new Branch();
-            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ').Where(a => a != "" && a != "DN" && a != "EN" && a != "TT").ToArray();
+            string[] rang_text = mask.Replace(RangText, " ").Trim().Split(' ')
+                .Where(a => a != "" && a != "DN" && a != "EN" && a != "TT").ToArray();
             int x_branch = 0;
             int drow_ind = 0;
             for (int index = 0; index < rang_text.Length; index++)
@@ -212,7 +166,8 @@ namespace LogixForms.DrowClasses
                 }
                 else if (el == "NXB")
                 {
-                    int[] inf = DrowSap(rang_text, index + 1, p.Y + top_indent, x_branch, p, count_of_branch, branch.Count);
+                    int[] inf = DrowSap(rang_text, index + 1, p.Y + top_indent,
+                        x_branch, p, count_of_branch, branch.Count);
                     index = inf[0];
                     branch.ClearBranch();
                     if (branch < inf[1]) branch = branch - branch + Math.Max(branch.Count, inf[1]);
@@ -234,8 +189,11 @@ namespace LogixForms.DrowClasses
                 }
                 drow_ind++;
             }
-            g.DrawLine(pen_line, left_indent_rang_x + scrollX, startY - scrollY - 50, left_indent_rang_x + scrollX, Max - scrollY);
-            g.DrawString(Number.ToString(), _Font, Brushes.DimGray, (int)(left_indent_rang_x * .4) + scrollX, startY + top_indent_rang - 10 - scrollY);
+            g.DrawLine(pen_line, left_indent_rang_x + scrollX, startY - scrollY ,
+                left_indent_rang_x + scrollX, startY  + Max - scrollY);
+            g.DrawString(Number.ToString() + (FlagRedak ? "*": ""), _Font, 
+                Brushes.DimGray, (int)(left_indent_rang_x * .4) + scrollX, startY + top_indent_rang - 10 - scrollY);
+            if(FlagRedak) FlagRedak = false;
         }
 
         /// <summary>
@@ -308,7 +266,7 @@ namespace LogixForms.DrowClasses
                 {
                     int ind3 = drow_ind;
                     MaxYBranch = Math.Max(MaxYBranch, Start_Y);
-                    return new int[] { index, count_el_in_branch, 0, ind3, count_of_branch - 1 };
+                    return [index, count_el_in_branch, 0, ind3, count_of_branch - 1];
                 }
                 else
                 {

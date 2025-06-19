@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using LogixForms.HelperClasses;
+using System.Diagnostics;
 using System.Drawing.Text;
 using System.Windows.Forms;
 

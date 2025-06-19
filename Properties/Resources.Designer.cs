@@ -59,5 +59,35 @@ namespace LogixForms.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Galochka {
+            get {
+                object obj = ResourceManager.GetObject("Galochka", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UploadArrou {
+            get {
+                object obj = ResourceManager.GetObject("UploadArrou", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UploadArrou1 {
+            get {
+                object obj = ResourceManager.GetObject("UploadArrou1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

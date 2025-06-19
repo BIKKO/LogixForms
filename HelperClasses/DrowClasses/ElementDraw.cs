@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace LogixForms.DrowClasses
+namespace LogixForms.HelperClasses.DrowClasses
 {
     /// <summary>
     /// Родительский класс отрисовок элементов

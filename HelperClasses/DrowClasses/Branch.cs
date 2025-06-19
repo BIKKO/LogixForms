@@ -1,4 +1,4 @@
-﻿namespace LogixForms.DrowClasses
+﻿namespace LogixForms.HelperClasses.DrowClasses
 {
     /// <summary>
     /// Конструктор и отрисовка ветви

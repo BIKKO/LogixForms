@@ -1,12 +1,10 @@
-using LogixForms.DrowClasses;
-using Microsoft.VisualBasic.Devices;
+using LogixForms.HelperClasses;
+using LogixForms.HelperClasses.DrowClasses;
 using Modbus.Device;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
+using TextBox = System.Windows.Forms.TextBox;
 
 namespace LogixForms
 {
@@ -171,6 +169,7 @@ namespace LogixForms
             Adr.Clear();
             MB_adres.Clear();
 
+
             for (int i = 0; i < 100; i++)
             {
                 inputs = master.ReadHoldingRegisters(5, (ushort)(i + CfgAdr), 3);
@@ -199,54 +198,19 @@ namespace LogixForms
         /// <exception cref="Exception">Ошибки в синтаксисе текста</exception>
         private string SerchErr(string Text)
         {
-            string[] mnimonk =
-            {
-                "XIO",
-                "XIC",
-                "OTE",
-                "OTL",
-                "OTU",
-                "ONS",
-                "TON",
-                "MOV",
-                "ADD",
-                "GEQ",
-                "GRT",
-                "EQU",
-                "NEQ",
-                "LES",
-                "LEQ",
-                "DIV",
-                "MUL",
-                "ABS",
-                "SCP",
-                "MSG",
-                "BST",
-                "NXB",
-                "BND",
-            };
-            byte branch_start_count = 0;
-            byte branch_end_count = 0;
-            byte branch_next_count = 0;
+            if (Text[0] != ' ' && Text[^1] != ' ') throw new Exception("Код ошибки 20.\nОшибка пробелов");
 
-            if (Text[0] != ' ' && Text[^1] != ' ') throw new Exception("Ошибка пробелов");
-            foreach (string item in Text.Trim().Split(" "))
-            {
-                if (mnimonk.Contains(item))
-                {
-                    if (item == "BST") branch_start_count++;
-                    if (item == "BND") branch_end_count++;
-                    if (item == "NXB") branch_next_count++;
-                }
-                else
-                {
+            CheckingTheCorrectness correctness = new(100, 100, 100, CheckingType.Local);
 
-                }
+            sbyte result = correctness.CheckRangText(Text);
+
+            if(result != 0)
+            {
+                ErrorMessenger((ushort)result);
+                throw new();
             }
-            if (branch_start_count != branch_end_count) throw new Exception("Ошибка ветвей(ветвь без начала или конца)");
-            if (branch_start_count > 0 && branch_next_count == 0) throw new Exception("Ошибка ветвей(ветвь без перехода)");
-
-            return Text.ToUpper();
+            else
+                return Text.ToUpper();
         }
 
         /// <summary>
@@ -256,8 +220,10 @@ namespace LogixForms
         /// <param name="Text">Текст ранга</param>
         /// <param name="adr">Список адресов</param>
         /// <param name="teg">Теги и коментарии</param>
-        /// <param name="tag">Полный путь к файлу, сохраняемы в tabpage в поле tag</param>
-        private void CreateWin(string Name, List<string> Text, Dictionary<string, ushort[]> adr = null, Dictionary<string, string[]> teg = null, string tag = null)
+        /// <param name="tag">Полный путь к файлу, сохраняемы в tabpage в поле tag; для нлайн режима указывать "Online"</param>
+        /// <param name="tabType">Тип испольуемого источника(локально из файла или в онлайн режиме)</param>
+        private void CreateWin(string Name, List<string> Text, Dictionary<string, ushort[]> adr = null,
+            Dictionary<string, string[]> teg = null, string tag = null, TabPageType tabType = TabPageType.Local)
         {
             var tb = new MyTabPage();
             int count = 1;
@@ -270,7 +236,11 @@ namespace LogixForms
                     count++;
                 }
             }
-            tb.Tag = tag;
+
+            if (tabType == TabPageType.Online)
+                tb.Tag = "Online";
+            else
+                tb.Tag = tag;
 
             VScrollBar vscrol = new()
             {
@@ -285,6 +255,7 @@ namespace LogixForms
                 Dock = DockStyle.Fill,
                 Height = Height - 20,
                 Width = 1300 - 50,
+                Tag = tabType == TabPageType.Online ? "Online" : "",
             };
             HScrollBar hScroll = new()
             {
@@ -342,75 +313,76 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// Подключение к устройству
+        /// Создание нового окна
         /// </summary>
-        /// <param name="ip">IP адрес</param>
-        /// <param name="port">Порт</param>
-        /// <param name="simulate"></param>
-        /// <param name="slave">ID</param>
-        public void Con(string ip, string port, bool cfg, byte slave)
+        /// <param name="Name">Отображаемое имя</param>
+        /// <param name="Tag">Полное имя(для файла - путь)</param>
+        private void CreateWinWhishOpen(string Name, string Tag)
         {
-            try
+            List<string> Text;
+            if (Tag.Contains("ldf"))
             {
-                List<string> TextRangs = null;
-                if (cfg) GetInfoCFG(ip, port);
-                this.slave = slave;
-                TextRangs = new List<string>();
-                client = new TcpClient(ip, int.Parse(port));
-                master = ModbusIpMaster.CreateIp(client);
+                Dictionary<string, string[]> teg = CreateFile.GetTegs(Tag);
+                Dictionary<string, ushort[]> adr = CreateFile.GetData(Tag);
+                Text = CreateFile.Load(Tag, HelperClasses.Type.RANG).ToList();
 
-                ushort[] inputs;
+                CreateWin(Name, Text, adr, teg, Tag);
+            }
+            else
+            {
+                Text = File.ReadAllLines(Tag, Encoding.UTF8).ToList();
 
+                CreateWin(Name, Text, tag: Tag);
+            }
+        }
 
-                for (int j = 0; j < 100; j++)
+        /// <summary>
+        /// Чтение ModBus регистров: текст рангов, значение адресов
+        /// </summary>
+        /// <returns>Список строк рангов</returns>
+        private List<string> ReadMBRegisters()
+        {
+            ushort[] inputs;
+
+            List<string> TextRangs = new List<string>();
+
+            for (int j = 0; j < 100; j++)
+            {
+                inputs = master.ReadHoldingRegisters(slave, (ushort)(j + RangAdr), 120);
+                string g = "";
+                int len = 0;
+                int buf;
+
+                for (int i = 0; i < 240; i++)
                 {
-                    inputs = master.ReadHoldingRegisters(slave, (ushort)(j + RangAdr), 120);
-                    string g = "";
-                    int len = 0;
-                    int buf;
-
-                    for (int i = 0; i < 240; i++)
+                    if (inputs[i] != 0)
                     {
-                        if (inputs[i] != 0)
+                        buf = (inputs[i] & 0xff);
+                        if (buf != 0)
                         {
-                            buf = (inputs[i] & 0xff);
-                            if (buf != 0)
-                            {
-                                g += (char)((char)inputs[i] & 0xff);
-                                len++;
-                            }
-                            buf = (inputs[i] >> 8);
-                            if (buf != 0)
-                            {
-                                g += (char)((char)inputs[i] >> 8);
-                                len++;
-                            }
+                            g += (char)((char)inputs[i] & 0xff);
+                            len++;
                         }
-                        else break;
+                        buf = (inputs[i] >> 8);
+                        if (buf != 0)
+                        {
+                            g += (char)((char)inputs[i] >> 8);
+                            len++;
+                        }
                     }
-                    if (len != 0) TextRangs.Add(g);
                     else break;
                 }
-
-                string[] adreskey = Adr.Keys.ToArray();
-                foreach (string adkey in adreskey)
-                {
-                    Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
-                }
-                AdresUpdate.Enabled = true;
-
-                string name = ip + ':' + port;
-                CreateWin(name, TextRangs, Adr);
-                ConnectedWindows.Add(mainWindows.Count);
-                ModBusUpdate.Enabled = true;
-                AdresUpdate.Enabled = true;
+                if (len != 0) TextRangs.Add(g);
+                else break;
             }
-            catch (Exception ex)
+
+            string[] adreskey = Adr.Keys.ToArray();
+            foreach (string adkey in adreskey)
             {
-                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.\n" + ex.Message);
-                ConnectedWindows.Remove(mainWindows.Count - 1);
-                new ConnectForms(this).Show();
+                Adr[adkey] = master.ReadHoldingRegisters(slave, MB_adres[adkey], (ushort)Adr[adkey].Length);
             }
+
+            return TextRangs;
         }
 
         /// <summary>
@@ -494,7 +466,7 @@ namespace LogixForms
         {
             if (mainWindows.Count > 0)
             {
-                for(int count = 0; count < Files.TabPages.Count; count++)
+                for (int count = 0; count < Files.TabPages.Count; count++)
                 {
                     if (Files.TabPages[count].Text == Files.TabPages[Files.SelectedIndex].Text) mainWindows[Files.SelectedIndex].EnableScroll = true;
                     else mainWindows[count].EnableScroll = false;
@@ -510,13 +482,13 @@ namespace LogixForms
         private void Close_Click(object sender, EventArgs e)
         {
             TabPage tab = Files.SelectedTab;
-            if (tab.Text.Contains(" *"))
+            if (tab.Text.Contains("*"))
             {
-                if (MessageBox.Show("Сохранить изменения?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show("В программу были внесеы изменения.\nСохранить изменения?", "Сохаение изменений", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Debug.WriteLine("Save");
                     SaveToolStripMenuItem_Click(sender, e);
-                    if(!SaveFlag) return;
+                    if (!SaveFlag) return;
                 }
             }
             try
@@ -550,40 +522,80 @@ namespace LogixForms
         }
 
         /// <summary>
+        /// Сброс выбранного ранга
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Pan_Click(object? sender, EventArgs e)
+        {
+            (sender as MyPanel).Focus();
+        }
+
+        /// <summary>
         /// Сохранение программмы на ПК
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (Files.TabPages.Count <= 0) return;
+
+            string[] newtext = null;
+            if ((Files.SelectedTab.Tag as string) == "Online")
+            {
+                newtext = new string[mainWindows[Files.SelectedIndex].GetTextRang.Length];
+                for (int i = 0; i < mainWindows[Files.SelectedIndex].GetTextRang.Length; i++)
+                {
+                    string str = mainWindows[Files.SelectedIndex].GetTextRang[i];
+                    if (str.Contains("#"))
+                    {
+                        mainWindows[Files.SelectedIndex].SetNewTextRang(i, str.Split("#")[0]);
+                        newtext[i] = str.Split("#")[^1];
+                    }
+                    else
+                        newtext[i] = str;
+
+                }
+            }
+
             SaveFlag = false;
             saveFileDialog1.InitialDirectory = @"C:\Users\PC\Desktop\";
             saveFileDialog1.RestoreDirectory = true;
             //saveFileDialog1.DefaultExt = "RangsSave";
             saveFileDialog1.FileName = Files.SelectedTab.Text.Replace(" *", "").Split('.')[0];
             saveFileDialog1.Filter = "My files (*.ldf)|*.ldf|txt files (*.txt)|*.txt";
+            //saveFileDialog1.ShowDialog();
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                if (Files.SelectedTab.Text != saveFileDialog1.FileName.Split('\\')[^1]) Files.SelectedTab.Text = saveFileDialog1.FileName.Split('\\')[^1];
+                if (Files.SelectedTab.Text != saveFileDialog1.FileName.Split('\\')[^1] &&
+                    (Files.SelectedTab.Tag as string) != "Online") Files.SelectedTab.Text = saveFileDialog1.FileName.Split('\\')[^1];
+                else
+                    Files.SelectedTab.Text = Files.SelectedTab.Text.Replace("*", "");
                 Stream file = saveFileDialog1.OpenFile();
                 StreamWriter sw = new StreamWriter(file);
                 if (saveFileDialog1.FileName.Contains(".ldf"))
                 {
                     if (mainWindows[Files.SelectedIndex].GetTegs != null)
-                        sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl, CreateFile.CreateTEGS(mainWindows[Files.SelectedIndex].GetTegs)));
+                        sw.WriteLine(CreateFile.Create(newtext.Equals(null) ? mainWindows[Files.SelectedIndex].GetTextRang : newtext, mainWindows[Files.SelectedIndex].GetDataTabl, CreateFile.CreateTEGS(mainWindows[Files.SelectedIndex].GetTegs)));
                     else
-                        sw.WriteLine(CreateFile.Create(mainWindows[Files.SelectedIndex].GetTextRang, mainWindows[Files.SelectedIndex].GetDataTabl));
+                        sw.WriteLine(CreateFile.Create(newtext.Equals(null) ? mainWindows[Files.SelectedIndex].GetTextRang : newtext, mainWindows[Files.SelectedIndex].GetDataTabl));
                     sw.Close();
                     file.Close();
-                    return;
+                    if ((Files.SelectedTab.Tag as string) != "Online") return;
                 }
-                foreach (string rang in mainWindows[Files.SelectedIndex].GetTextRang)
-                    sw.WriteLine(rang);
-                sw.Close();
-                file.Close();
-                file.Dispose();
-                sw.Dispose();
-                SaveFlag = true;
+                else
+                {
+                    foreach (string rang in newtext.Equals(null) ? mainWindows[Files.SelectedIndex].GetTextRang : newtext)
+                        sw.WriteLine(rang);
+                    sw.Close();
+                    file.Close();
+                    file.Dispose();
+                    sw.Dispose();
+                    SaveFlag = true;
+                }
+
+                if ((Files.SelectedTab.Tag as string) == "Online")
+                    CreateWinWhishOpen(saveFileDialog1.FileName.Split('\\')[^1], saveFileDialog1.FileName);
             }
             else
             {
@@ -604,33 +616,8 @@ namespace LogixForms
                 string Name = openFileDialog2.FileName.Split('\\')[^1];
 
                 string Tag = openFileDialog2.FileName;
-
-                List<string> Text;
-                if (Tag.Contains("ldf"))
-                {
-                    Dictionary<string, string[]> teg = CreateFile.GetTegs(openFileDialog2.FileName);
-                    Dictionary<string, ushort[]> adr = CreateFile.GetData(openFileDialog2.FileName);
-                    Text = CreateFile.Load(openFileDialog2.FileName, Type.RANG).ToList();
-
-                    CreateWin(Name, Text, adr, teg, Tag);
-                }
-                else
-                {
-                    Text = File.ReadAllLines(openFileDialog2.FileName, Encoding.UTF8).ToList();
-
-                    CreateWin(Name, Text, tag: Tag);
-                }
+                CreateWinWhishOpen(Name, Tag);
             }
-        }
-
-        /// <summary>
-        /// Сброс выбранного ранга
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Pan_Click(object? sender, EventArgs e)
-        {
-            (sender as MyPanel).Focus();
         }
 
         /// <summary>
@@ -657,6 +644,39 @@ namespace LogixForms
                 {
                     new ConnectForms(this).Show();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Подключение к устройству
+        /// </summary>
+        /// <param name="ip">IP адрес</param>
+        /// <param name="port">Порт</param>
+        /// <param name="simulate"></param>
+        /// <param name="slave">ID</param>
+        public void Con(string ip, string port, bool cfg, byte slave)
+        {
+            try
+            {
+                if (cfg) GetInfoCFG(ip, port);
+                this.slave = slave;
+                client = new TcpClient(ip, int.Parse(port));
+                master = ModbusIpMaster.CreateIp(client);
+
+                List<string> TextRangs = ReadMBRegisters();
+                AdresUpdate.Enabled = true;
+
+                string name = ip + ':' + port;
+                CreateWin(name, TextRangs, Adr, tabType: TabPageType.Online);
+                ConnectedWindows.Add(mainWindows.Count);
+                ModBusUpdate.Enabled = true;
+                AdresUpdate.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка подключения. Проверте подключение и повторите попытку.\n" + ex.Message);
+                ConnectedWindows.Remove(mainWindows.Count - 1);
+                new ConnectForms(this).Show();
             }
         }
 
@@ -721,12 +741,14 @@ namespace LogixForms
                         Location = mouse,
                         Size = new Size(125, 27),
                         Name = obls.IndexOf(obl).ToString(),
+                        Tag = panel.Tag == "Online" ? panel.Tag : "",
                     };
 
                     Debug.WriteLine(obls.IndexOf(obl) + " Create");
 
                     textBox.TextChanged += TextBox_TextChanged;
-                    textBox.Text = mainWindows[Files.SelectedIndex].GetTextRang[obls.IndexOf(obl)];
+                    textBox.Text = mainWindows[Files.SelectedIndex].GetTextRang[obls.IndexOf(obl)]
+                        .Split("#")[^1];
                     textBox.KeyDown += RangTextBox_KeyDown;
                     textBox.LostFocus += TextBox_LostFocus;
                     panel.Controls.Add(textBox);
@@ -746,7 +768,7 @@ namespace LogixForms
         }
 
         /// <summary>
-        /// 
+        /// Отслеживание позиции курсора мыши
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -781,8 +803,8 @@ namespace LogixForms
             using (Graphics g = textb.CreateGraphics())
             {
                 SizeF textSize = g.MeasureString(textb.Text, textb.Font);
-                if ((int) textSize.Width >= 125)
-                textb.Width = (int)textSize.Width;
+                if ((int)textSize.Width >= 125)
+                    textb.Width = (int)textSize.Width;
             }
         }
 
@@ -799,14 +821,25 @@ namespace LogixForms
                 try
                 {
                     string Text = SerchErr(textb.Text.ToUpper());
-                    mainWindows[Files.SelectedIndex].SetNewTextRang(int.Parse(textb.Name), Text);
+                    if (textb.Tag == "Online")
+                    {
+                        mainWindows[Files.SelectedIndex].AddNewTextRang(int.Parse(textb.Name), Text);
+
+                        button_upload.Enabled = true;
+                    }
+                    else
+                        mainWindows[Files.SelectedIndex].SetNewTextRang(int.Parse(textb.Name), Text);
                     textb.Dispose();
                     TabPage tab = Files.SelectedTab;
-                    tab.Text += " *";
+                    tab.Text += (tab.Text.Contains("*") ? "" : "*");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    if (ex.Message.Contains("Код ошибки"))
+                    {
+                        MessageBox.Show(ex.Message, "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                        textb.Focus();
+                    }
                 }
             }
             if (e.KeyCode == Keys.Escape)
@@ -834,6 +867,173 @@ namespace LogixForms
             Properties.Settings.Default.AdresLen = string.Join(",", string.Join(",", buf));
 
             Properties.Settings.Default.Save();
+
+
+        }
+
+        /// <summary>
+        /// Отправка сообщения о сохранении изменений
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_accept_Click(object sender, EventArgs e)
+        {
+            master.WriteMultipleRegistersAsync(slave, 8200, [54321]);
+
+            Thread.Sleep(100);
+
+            mainWindows[Files.SelectedIndex].SetNewAllTextRang(ReadMBRegisters());
+
+            button_accept.Enabled = false;
+        }
+
+        /// <summary>
+        /// Отправка нового текста ранга на устройство
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_upload_Click(object sender, EventArgs e)
+        {
+            int first = -1;
+            int count_sharp = 0;
+            string[] rangs = mainWindows[Files.SelectedIndex].GetTextRang;
+
+            for (int i = 0; i < rangs.Length; i++)
+            {
+                if (rangs[i].Contains("#"))
+                {
+                    if (first == -1)
+                        first = i;
+                    count_sharp++;
+                }
+            }
+
+            string line = $"%{first} {rangs[first].Split("#")[^1].Trim()} ";
+            List<ushort> rang = new List<ushort>();
+            int count;
+            ushort temp;
+            count = 0;
+            temp = 0;
+            for (int i = 0; i < 240;)
+            {
+                if (line[i] != 0 && i < line.Length)
+                {
+                    temp = line[i];
+                    i++;
+                }
+                if (i < line.Length)
+                {
+                    temp |= (ushort)(line[i] << 8);
+                    i++;
+                    rang.Add(temp);
+                    count++;
+                }
+                if (i == line.Length) break;
+            }
+
+            master.WriteMultipleRegistersAsync(slave, 8400, rang.ToArray());
+
+            Thread.Sleep(25);
+            ushort result = master.ReadHoldingRegisters(slave, 8600, 1)[0];
+            if (result == 0)
+            {
+                if (count_sharp <= 1)
+                {
+                    button_upload.Enabled = false;
+                }
+                button_accept.Enabled = true;
+                count_sharp--;
+
+                return;
+            }
+            ErrorMessenger(result);
+        }
+
+        /// <summary>
+        /// Оповещение об ошибках
+        /// </summary>
+        /// <param name="ErrorCode">Код ошибки</param>
+        private static void ErrorMessenger(ushort ErrorCode)
+        {
+            switch (ErrorCode)
+            {
+                case 1:
+                    MessageBox.Show("Код ошибки 1.\nКоличество концов должно быть равным количеству начал ветвей.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 2:
+                    MessageBox.Show("Код ошибки 2.\nКоличество ONS должен быть только 1 или 0.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 3:
+                    MessageBox.Show("Код ошибки 3.\nПревышение размерности группы параметров (не правильная адресация).",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 4:
+                    MessageBox.Show("Код ошибки 4.\nКоличество битов должно быть 0-15 (не правильная адресация).",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 5:
+                    MessageBox.Show("Код ошибки 5.\nНет такой группы параметров (не правильная адресация).",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 6:
+                    MessageBox.Show("Код ошибки 6.\nРезультат не должен быть числом.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 8:
+                    MessageBox.Show("Код ошибки 8.\nНе все слова в строке прошли проверку (не правильное написание ключевых слов или адресов).",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 9:
+                    MessageBox.Show("Код ошибки 9.\nНеправильный TimeBase в таймере.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 10:
+                    MessageBox.Show("Код ошибки 10.\nPreset не может быть нулевым в таймере.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 11:
+                    MessageBox.Show("Код ошибки 11.\nПервый символ перед номером ранга должен быть \'%\'",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 12:
+                    MessageBox.Show("Код ошибки 12.\nНеправильный код операции в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 13:
+                    MessageBox.Show("Код ошибки 13.\nНеправильный второстепенные параметры в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 14:
+                    MessageBox.Show("Код ошибки 14.\nНеправильный синтакс IP адреса в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 15:
+                    MessageBox.Show("Код ошибки 15.\nНеправильный MB адрес в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 16:
+                    MessageBox.Show("Код ошибки 16.\nНеправильный колл. регистров для обмена в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 17:
+                    MessageBox.Show("Код ошибки 17.\nНеправильный TimeOut MTO  в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 18:
+                    MessageBox.Show("Код ошибки 18.\nНеправильный NOD (ID) в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                case 19:
+                    MessageBox.Show("Код ошибки 19.\nНеправильный Port в MSG.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+                default:
+                    MessageBox.Show($"Код ошибки {ErrorCode}.\nНеизвестная ошибка.",
+                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    break;
+            }
         }
     }
 }
