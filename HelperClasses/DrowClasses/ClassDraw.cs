@@ -9,6 +9,8 @@ namespace LogixForms.HelperClasses.DrowClasses
     public class ClassDraw
     {
         public List<StructRangsObl> rangsObls = new List<StructRangsObl>();
+        private Stack<string> Cansel;
+        private Stack<string> Undo;
         private List<string> info_file;
         private readonly VScrollBar VScroll;
         private readonly HScrollBar HScroll;
@@ -53,6 +55,9 @@ namespace LogixForms.HelperClasses.DrowClasses
             Width = widht;
             Tegs = _Tegs;
             owner = main;
+
+            Cansel = new Stack<string>(10);
+            Undo = new Stack<string>(10);
         }
 
         /// <summary>
@@ -89,6 +94,9 @@ namespace LogixForms.HelperClasses.DrowClasses
             Height = height;
             Width = widht;
             owner = main;
+
+            Cansel = new Stack<string>(10);
+            Undo = new Stack<string>(10);
         }
 
         /// <summary>
@@ -115,6 +123,9 @@ namespace LogixForms.HelperClasses.DrowClasses
             Height = height;
             Width = widht;
             owner = main;
+
+            Cansel = new Stack<string>(10);
+            Undo = new Stack<string>(10);
         }
 
         /// <summary>
@@ -149,7 +160,76 @@ namespace LogixForms.HelperClasses.DrowClasses
             Height = height;
             Width = widht;
             owner = main;
+
+            Cansel = new Stack<string>(10);
+            Undo = new Stack<string>(10);
         }
+
+        /// <summary>
+        /// Свойство для внесения в стек отмененных операций
+        /// </summary>
+        public string CanselPush
+        { 
+            set  
+            { 
+                if (Cansel.Count == 10)
+                {
+                    string[] buf = new string[9];
+                    for (int i = 0; i < 9; i++)
+                        buf[i] = Cansel.Pop();
+
+                    Cansel.Clear();
+
+                    for (int i = 8; i >= 0; i--)
+                        Cansel.Push(buf[i]);
+                }
+                Cansel.Push(value); 
+            } 
+        }
+
+        /// <summary>
+        /// Свойство для взятия из стека отмененных операций
+        /// </summary>
+        public string CanselPop
+            { get { return Cansel.Pop(); } }
+
+        /// <summary>
+        /// Позволяет узнать текущее количество элементов
+        /// </summary>
+        public int CanselCount => Cansel.Count();
+
+        /// <summary>
+        /// Свойство для внесения в стек изменений
+        /// </summary>
+        public string UndoPush
+        { 
+            set
+            {
+                if (Undo.Count == 10)
+                {
+                    string[] buf = new string[9];
+                    for (int i = 0; i < 9; i++)
+                        buf[i] = Undo.Pop();
+
+                    Undo.Clear();
+
+                    for (int i = 8; i >= 0; i--)
+                        Undo.Push(buf[i]);
+                }
+                Undo.Push(value);
+            }
+        }
+
+        /// <summary>
+        /// Свойство для взятия из стека изменений
+        /// </summary>
+        public string UndoPop
+            { get { return Undo.Pop(); } }
+
+        /// <summary>
+        /// Позволяет узнать текущее количество элементов
+        /// </summary>
+        public int UndoCount => Undo.Count();
 
         /// <summary>
         /// Получение адресов
@@ -194,12 +274,15 @@ namespace LogixForms.HelperClasses.DrowClasses
         /// </summary>
         /// <param name="numberOfRang">Номер ранга(с 0)</param>
         /// <param name="Text">Новый Текст</param>
-        public void AddNewTextRang(int numberOfRang, string Text)
+        public byte AddNewTextRang(int numberOfRang, string Text)
         {
             if (info_file[numberOfRang].Split("#")[0] == Text)
+            {
                 info_file[numberOfRang] = Text;
-            else
-                info_file[numberOfRang] = info_file[numberOfRang] + "#" + Text;
+                return 1;
+            }
+            info_file[numberOfRang] = info_file[numberOfRang].Split("#")[0] + "#" + Text;
+            return 2;
         }
 
         /// <summary>

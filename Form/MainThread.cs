@@ -104,11 +104,17 @@ namespace LogixForms
             ConnectedWindows = new List<int>();
         }
 
+        /// <summary>
+        /// Ёмпровезированна€ лампочка, котора€ моргает
+        /// </summary>
         public Color SetColorDraw
         {
             set { toolStripTextBox1.BackColor = value; }
         }
 
+        /// <summary>
+        /// ”становка времени опроса устройства
+        /// </summary>
         public int AdrUpdateTime
         {
             get { return AdresUpdate.Interval; }
@@ -204,7 +210,7 @@ namespace LogixForms
 
             sbyte result = correctness.CheckRangText(Text);
 
-            if(result != 0)
+            if (result != 0)
             {
                 ErrorMessenger((ushort)result);
                 throw new();
@@ -280,7 +286,6 @@ namespace LogixForms
             pan.Controls.Add(hScroll);
             tb.Controls.Add(pan);
             Files.TabPages.Add(tb);
-            Files.SelectTab(Files.TabCount - 1);
             Thread t;
             t = new Thread(() =>
             {
@@ -305,11 +310,28 @@ namespace LogixForms
 
                     mainWindows.Add(tab_to_drow);
                     MouseWheel += tab_to_drow.This_MouseWheel;
+                    Files.SelectTab(Files.TabCount - 1);
                 }
                 ));
             });
             opens.Add(t);
             t.Start();
+        }
+
+        private void TabPag_SelectedIndex(object? sender, EventArgs e)
+        {
+            if (Files.TabPages.Count < 1) return;
+            ClassDraw selectTab = mainWindows[Files.SelectedIndex];
+
+            if (selectTab.CanselCount > 0)
+                button_cansel.Enabled = true;
+            else
+                button_cansel.Enabled = false;
+
+            if (selectTab.UndoCount > 0)
+                button_undo.Enabled = true;
+            else
+                button_undo.Enabled = false;
         }
 
         /// <summary>
@@ -383,6 +405,23 @@ namespace LogixForms
             }
 
             return TextRangs;
+        }
+
+        private string FindDifferences(int NumberRung, string OldString, string NewString)
+        {
+            //формат: #номер ранга&индекс начала отличи€&отличающа€€ cтрока^&индекс начала отличи€&отличающа€€ cтрока... и т.д
+            //#12^&4&XIC N15/3:12^&14&5
+
+            string result = NumberRung.ToString() + "#";
+
+            if (OldString.Trim() == "" && NewString.Trim() != "")
+                return result + "^&0&" + NewString;
+            if (NewString.Trim() == "")
+                return result + "^&0&";
+
+            // надо придумать алгоритм по поиску различных чстй в строках
+
+            return result;
         }
 
         /// <summary>
@@ -518,6 +557,14 @@ namespace LogixForms
                 master = null;
                 Con_flag = false;
                 GC.Collect();
+
+                if (Files.TabPages.Count == 0)
+                {
+                    button_accept.Enabled = false;
+                    button_upload.Enabled = false;
+                    button_cansel.Enabled = false;
+                    button_undo.Enabled = false;
+                }
             }
         }
 
@@ -821,17 +868,29 @@ namespace LogixForms
                 try
                 {
                     string Text = SerchErr(textb.Text.ToUpper());
+
+                    ClassDraw selectTab = mainWindows[Files.SelectedIndex];
+                    string oldtext = selectTab.GetTextRang[int.Parse(textb.Name)];
+
+                    if (oldtext.Contains("#"))
+                        selectTab.CanselPush = textb.Name + "#" + oldtext.Split("#")[1];
+                    else
+                        selectTab.CanselPush = textb.Name + "#" + oldtext;
+
                     if (textb.Tag == "Online")
                     {
-                        mainWindows[Files.SelectedIndex].AddNewTextRang(int.Parse(textb.Name), Text);
+                        selectTab.AddNewTextRang(int.Parse(textb.Name), Text);
 
                         button_upload.Enabled = true;
                     }
                     else
-                        mainWindows[Files.SelectedIndex].SetNewTextRang(int.Parse(textb.Name), Text);
+                        selectTab.SetNewTextRang(int.Parse(textb.Name), Text);
+
                     textb.Dispose();
                     TabPage tab = Files.SelectedTab;
                     tab.Text += (tab.Text.Contains("*") ? "" : "*");
+
+                    button_cansel.Enabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -1034,6 +1093,137 @@ namespace LogixForms
                         "ќшибка правельноси ранга!", MessageBoxButtons.OK);
                     break;
             }
+        }
+
+        /// <summary>
+        /// ќбработка нажати€ на кнопку отмены
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_cansel_Click(object sender, EventArgs e)
+        {
+            if (Files.TabPages.Count < 1) return;
+            ClassDraw selectTab = mainWindows[Files.SelectedIndex];
+
+            if (selectTab.CanselCount == 0) return;
+
+            string buf = selectTab.CanselPop;
+
+            if (buf.Equals(string.Empty)) return;
+
+            int num_rang = int.Parse(buf.Split("#")[0]);
+            string oldrang = buf.Split("#")[1];
+
+            buf = selectTab.GetTextRang[num_rang];
+
+            if (buf.Contains("#"))
+                buf = buf.Split("#")[1];
+
+            selectTab.UndoPush = num_rang + "#" + buf;
+
+            if (Files.SelectedTab.Tag == "Online")
+            {
+                if (selectTab.AddNewTextRang(num_rang, oldrang) == 1)
+                    button_upload.Enabled = false;
+                else
+                    button_upload.Enabled = true;
+            }
+            else
+            {
+                selectTab.SetNewTextRang(num_rang, oldrang);
+            }
+
+            if (selectTab.CanselCount < 1)
+                button_cansel.Enabled = false;
+
+            if (selectTab.UndoCount >= 1)
+                button_undo.Enabled = true;
+        }
+
+        /// <summary>
+        /// ќбработка нажати€ на кнопку возврата
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_undo_Click(object sender, EventArgs e)
+        {
+            if (Files.TabPages.Count < 1) return;
+
+            ClassDraw selectTab = mainWindows[Files.SelectedIndex];
+
+            if (selectTab.UndoCount == 0) return;
+
+            string buf = selectTab.UndoPop;
+
+            if (buf.Equals(string.Empty)) return;
+
+            int num_rang = int.Parse(buf.Split("#")[0]);
+            string oldrang = buf.Split("#")[1];
+
+            buf = selectTab.GetTextRang[num_rang];
+
+            if (buf.Contains("#"))
+                buf = buf.Split("#")[1];
+
+            selectTab.CanselPush = num_rang + "#" + buf;
+
+            if (Files.SelectedTab.Tag == "Online")
+            {
+                if (selectTab.AddNewTextRang(num_rang, oldrang) == 1)
+                    button_upload.Enabled = false;
+                else
+                    button_upload.Enabled = true;
+
+            }
+            else
+            {
+                selectTab.SetNewTextRang(num_rang, oldrang);
+            }
+
+            if (selectTab.UndoCount < 1)
+                button_undo.Enabled = false;
+
+            if (selectTab.CanselCount >= 1)
+                button_cansel.Enabled = true;
+        }
+
+        /// <summary>
+        /// ќтследивание нажатий клавиш в области Files
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MyTabPage_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.U && e.Modifiers == Keys.Control)
+                button_undo_Click(sender, e);
+            else if (e.KeyCode == Keys.Z && e.Modifiers == Keys.Control)
+                button_cansel_Click(sender, e);
+        }
+
+        /// <summary>
+        /// «атимнене при выключении элемента
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_cansel_EnabledChanged(object sender, EventArgs e)
+        {
+            if (button_cansel.Enabled)
+                button_cansel.ForeColor = SystemColors.ActiveCaptionText;
+            else
+                button_cansel.ForeColor = SystemColors.AppWorkspace;
+        }
+
+        /// <summary>
+        /// ќбработка нажати€ на кнопку отмены
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_undo_EnabledChanged(object sender, EventArgs e)
+        {
+            if (button_undo.Enabled)
+                button_undo.ForeColor = SystemColors.ActiveCaptionText;
+            else
+                button_undo.ForeColor = SystemColors.AppWorkspace;
         }
     }
 }

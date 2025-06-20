@@ -15,7 +15,7 @@ namespace LogixForms
                 ApplicationConfiguration.Initialize();
                 Application.Run(new MainThread());
             }
-            catch { }
+            catch (Exception e) { MessageBox.Show(e.Message, "Critical hit"); }
         }
     }
 }

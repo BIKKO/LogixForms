@@ -41,6 +41,8 @@
             Files = new MyTabControl();
             panel1 = new Panel();
             panel2 = new Panel();
+            button_cansel = new Button();
+            button_undo = new Button();
             button_upload = new Button();
             button_accept = new Button();
             menu = new Panel();
@@ -95,6 +97,8 @@
             Files.SelectedIndex = 0;
             Files.Size = new Size(1171, 562);
             Files.TabIndex = 2;
+            Files.SelectedIndexChanged += TabPag_SelectedIndex;
+            Files.KeyDown += MyTabPage_KeyDown;
             // 
             // panel1
             // 
@@ -108,6 +112,8 @@
             // panel2
             // 
             panel2.BackColor = SystemColors.Menu;
+            panel2.Controls.Add(button_cansel);
+            panel2.Controls.Add(button_undo);
             panel2.Controls.Add(button_upload);
             panel2.Controls.Add(button_accept);
             panel2.Controls.Add(menu);
@@ -117,6 +123,36 @@
             panel2.Name = "panel2";
             panel2.Size = new Size(1171, 34);
             panel2.TabIndex = 0;
+            // 
+            // button_cansel
+            // 
+            button_cansel.BackColor = SystemColors.Menu;
+            button_cansel.Enabled = false;
+            button_cansel.Font = new Font("Segoe UI Black", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            button_cansel.ForeColor = SystemColors.AppWorkspace;
+            button_cansel.Location = new Point(383, 5);
+            button_cansel.Name = "button_cansel";
+            button_cansel.Size = new Size(29, 29);
+            button_cansel.TabIndex = 6;
+            button_cansel.Text = "↩";
+            button_cansel.UseVisualStyleBackColor = false;
+            button_cansel.EnabledChanged += button_cansel_EnabledChanged;
+            button_cansel.Click += button_cansel_Click;
+            // 
+            // button_undo
+            // 
+            button_undo.BackColor = SystemColors.Menu;
+            button_undo.Enabled = false;
+            button_undo.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            button_undo.ForeColor = SystemColors.AppWorkspace;
+            button_undo.Location = new Point(418, 5);
+            button_undo.Name = "button_undo";
+            button_undo.Size = new Size(29, 29);
+            button_undo.TabIndex = 5;
+            button_undo.Text = "↪";
+            button_undo.UseVisualStyleBackColor = false;
+            button_undo.EnabledChanged += button_undo_EnabledChanged;
+            button_undo.Click += button_undo_Click;
             // 
             // button_upload
             // 
@@ -289,6 +325,8 @@
         private ToolStripTextBox toolStripTextBox2;
         private Button button_accept;
         private Button button_upload;
+        private Button button_cansel;
+        private Button button_undo;
     }
 
 }
