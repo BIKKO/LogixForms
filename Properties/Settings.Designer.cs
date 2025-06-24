@@ -152,5 +152,29 @@ namespace LogixForms.Properties {
                 this["CollorCom"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
+        public int ConsoleH {
+            get {
+                return ((int)(this["ConsoleH"]));
+            }
+            set {
+                this["ConsoleH"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ConsoleCollapsed {
+            get {
+                return ((bool)(this["ConsoleCollapsed"]));
+            }
+            set {
+                this["ConsoleCollapsed"] = value;
+            }
+        }
     }
 }

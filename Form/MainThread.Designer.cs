@@ -53,6 +53,7 @@
             saveToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
             adresesValuesToolStripMenuItem = new ToolStripMenuItem();
+            openConsoleToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             toolStripTextBox1 = new ToolStripTextBox();
@@ -63,7 +64,6 @@
             Console_textBox = new TextBox();
             label1 = new Label();
             panel3 = new Panel();
-            progressBar1 = new ProgressBar();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             menu.SuspendLayout();
@@ -73,7 +73,6 @@
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
             panel4.SuspendLayout();
-            panel3.SuspendLayout();
             SuspendLayout();
             // 
             // ModBusUpdate
@@ -217,7 +216,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, newToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem, adresesValuesToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, newToolStripMenuItem, saveToolStripMenuItem, connectToolStripMenuItem, adresesValuesToolStripMenuItem, openConsoleToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(46, 27);
             fileToolStripMenuItem.Text = "File";
@@ -262,6 +261,13 @@
             adresesValuesToolStripMenuItem.Size = new Size(242, 26);
             adresesValuesToolStripMenuItem.Text = "Adreses values";
             adresesValuesToolStripMenuItem.Click += AdresesValuesToolStripMenuItem_Click;
+            // 
+            // openConsoleToolStripMenuItem
+            // 
+            openConsoleToolStripMenuItem.Name = "openConsoleToolStripMenuItem";
+            openConsoleToolStripMenuItem.Size = new Size(242, 26);
+            openConsoleToolStripMenuItem.Text = "Console";
+            openConsoleToolStripMenuItem.Click += openConsoleToolStripMenuItem_Click;
             // 
             // settingsToolStripMenuItem
             // 
@@ -359,21 +365,11 @@
             // panel3
             // 
             panel3.BackColor = SystemColors.Menu;
-            panel3.Controls.Add(progressBar1);
             panel3.Dock = DockStyle.Bottom;
             panel3.Location = new Point(0, 570);
             panel3.Name = "panel3";
             panel3.Size = new Size(1171, 26);
             panel3.TabIndex = 7;
-            // 
-            // progressBar1
-            // 
-            progressBar1.Dock = DockStyle.Right;
-            progressBar1.Enabled = false;
-            progressBar1.Location = new Point(1034, 0);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(137, 26);
-            progressBar1.TabIndex = 0;
             // 
             // MainThread
             // 
@@ -401,7 +397,6 @@
             splitContainer1.ResumeLayout(false);
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            panel3.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -433,11 +428,11 @@
         private Button button_undo;
         private SplitContainer splitContainer1;
         private Panel panel3;
-        private ProgressBar progressBar1;
         private TextBox Console_textBox;
         private Panel panel4;
         private Label label1;
         private TextBox textBox1;
+        private ToolStripMenuItem openConsoleToolStripMenuItem;
     }
 
 }

@@ -4,6 +4,7 @@ using Modbus.Device;
 using Modbus.Extensions.Enron;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
@@ -98,6 +99,8 @@ namespace LogixForms
             string[] adr = Properties.Settings.Default.AdresValue.Split(",");
             RangAdr = Properties.Settings.Default.RangAdr;
             CfgAdr = Properties.Settings.Default.CfgAdr;
+            splitContainer1.SplitterDistance = Properties.Settings.Default.ConsoleH;
+            splitContainer1.Panel2Collapsed = Properties.Settings.Default.ConsoleCollapsed;
 
             if (name.Length > 1 && adr.Length > 1 && len.Length > 1)
             {
@@ -911,7 +914,7 @@ namespace LogixForms
                     {
                         MessageBox.Show(ex.Message, "Ошибка правельноси ранга!", MessageBoxButtons.OK);
                         textb.Focus();
-    
+
                     }
                 }
             }
@@ -938,6 +941,9 @@ namespace LogixForms
             int[] buf = new int[Adr.Count];
             for (int i = 0; i < Adr.Count; i++) buf[i] = Adr[Adr.Keys.ToArray()[i]].Length;
             Properties.Settings.Default.AdresLen = string.Join(",", string.Join(",", buf));
+
+            Properties.Settings.Default.ConsoleH = splitContainer1.SplitterDistance;
+            Properties.Settings.Default.ConsoleCollapsed = splitContainer1.Panel2Collapsed;
 
             Properties.Settings.Default.Save();
 
@@ -1059,44 +1065,44 @@ namespace LogixForms
                     error_coment = "Код ошибки 10.\nPreset не может быть нулевым в таймере.";
                     break;
                 case 11:
-                    error_coment = "Код ошибки 11.\nПервый символ перед номером ранга должен быть \'%\'"; 
+                    error_coment = "Код ошибки 11.\nПервый символ перед номером ранга должен быть \'%\'";
 
                     break;
                 case 12:
                     error_coment = "Код ошибки 12.\nНеправильный код операции в MSG.";
-                        
+
                     break;
                 case 13:
                     error_coment = "Код ошибки 13.\nНеправильный второстепенные параметры в MSG.";
-                        
+
                     break;
                 case 14:
                     error_coment = "Код ошибки 14.\nНеправильный синтакс IP адреса в MSG.";
-                       ;
+                    ;
                     break;
                 case 15:
                     error_coment = "Код ошибки 15.\nНеправильный MB адрес в MSG.";
-                        
+
                     break;
                 case 16:
                     error_coment = "Код ошибки 16.\nНеправильный колл. регистров для обмена в MSG.";
-                        
+
                     break;
                 case 17:
                     error_coment = "Код ошибки 17.\nНеправильный TimeOut MTO  в MSG.";
-                        
+
                     break;
                 case 18:
                     error_coment = "Код ошибки 18.\nНеправильный NOD (ID) в MSG.";
-                        
+
                     break;
                 case 19:
                     error_coment = "Код ошибки 19.\nНеправильный Port в MSG.";
-                        
+
                     break;
                 default:
                     error_coment = $"Код ошибки {ErrorCode}.\nНеизвестная ошибка.";
-                        
+
                     break;
             }
 
@@ -1170,7 +1176,7 @@ namespace LogixForms
                     selectTab.AddNewTextRang(oldrang, num_rang);
                 }
             }
-            else if(buf.Split("#")[^1] == "add")
+            else if (buf.Split("#")[^1] == "add")
             {
                 if (buf.Contains("#"))
                     buf = buf.Split("#")[1];
@@ -1232,7 +1238,7 @@ namespace LogixForms
             }
             else if (buf.Split("#")[^1] == "deleted")
             {
-                if(num_rang >= selectTab.GetTextRang.Length)
+                if (num_rang >= selectTab.GetTextRang.Length)
                     buf = " ";
                 else
                     buf = selectTab.GetTextRang[num_rang];
@@ -1254,7 +1260,7 @@ namespace LogixForms
                     selectTab.DeleteRang(num_rang);
                 }
             }
-            else if(buf.Split("#")[^1] == "add")
+            else if (buf.Split("#")[^1] == "add")
             {
                 if (buf.Contains("#"))
                     buf = buf.Split("#")[1];
@@ -1320,6 +1326,11 @@ namespace LogixForms
                 button_undo.ForeColor = SystemColors.AppWorkspace;
         }
 
+        /// <summary>
+        /// Отслеживание нажатия клавишь в консоли
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Console_textBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -1334,7 +1345,7 @@ namespace LogixForms
                     ConsoleFunction(Console_textBox.Text);
 
 
-                    Console_textBox.Text = "";
+                Console_textBox.Text = "";
             }
             else if (e.KeyCode == Keys.Up)
             {
@@ -1348,7 +1359,7 @@ namespace LogixForms
             }
             else if (e.KeyCode == Keys.Down)
             {
-                if (number_com < commands.Count-1)
+                if (number_com < commands.Count - 1)
                 {
                     //Up.Push(Console_textBox.Text);
                     number_com++;
@@ -1358,7 +1369,11 @@ namespace LogixForms
             }
         }
 
-        private void ConsoleComand(string Comand)
+        /// <summary>
+        /// Спосок и действия комманд
+        /// </summary>
+        /// <param name="Comand">Строка, содержащая комманду</param>
+        private async void ConsoleComand(string Comand)
         {
             string[] args = Comand.Split(" ");
             ClassDraw selectTab = null;
@@ -1366,6 +1381,31 @@ namespace LogixForms
                 selectTab = mainWindows[Files.SelectedIndex]; // НАДО ДОДЕЛАТЬ ClassDraw, ПОСКОЛЬКУ НЕ ВСЕ РЕШЕНИЯ ЕСТЬ ДЛЯ ОНЛАЙН РЕЖИМА
             switch (args[0])
             {
+                case "/getconf":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+                    if (Files.SelectedTab.Tag != "Online")
+                    {
+                        textBox1.AppendText("Ошибка! Данная команда работает только в онлайн режиме.\r\n");
+                        break;
+                    }
+
+                    try
+                    {
+                        HttpClient httpClient = new HttpClient();
+                        HttpResponseMessage httpResponse = await httpClient.GetAsync($"http://{Files.SelectedTab.Text.Split(":")[0]}:80/");
+
+                        textBox1.AppendText($"{httpResponse.Content.ReadAsStringAsync().Result}\r\n");
+                    }
+                    catch
+                    {
+                        textBox1.AppendText("Ошибка подключения. Убедитесь, что устройство поддерживает HTTP протокол по 80 порту.\r\n");
+                    }
+
+                    break;//done
                 case "/getrang":
                     byte num_rang;
                     if (!byte.TryParse(args[1], out num_rang))
@@ -1381,7 +1421,7 @@ namespace LogixForms
                     }
                     else
                         textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
-                    
+
                     break;//done
                 case "/setbit":
                     if (Files.TabPages.Count <= 0)
@@ -1424,7 +1464,7 @@ namespace LogixForms
                         break;
                     }
 
-                    if(adres > 15 || adres < 0)
+                    if (adres > 15 || adres < 0)
                     {
                         textBox1.AppendText("Неверно указан бит.\r\n");
                         break;
@@ -1593,7 +1633,7 @@ namespace LogixForms
                         break;
                     }
 
-                    selectTab.CanselPush = num + "#" +selectTab.GetTextRang[num] + "#deleted";
+                    selectTab.CanselPush = num + "#" + selectTab.GetTextRang[num] + "#deleted";
 
                     selectTab.DeleteRang(num);
 
@@ -1629,7 +1669,7 @@ namespace LogixForms
                         break;
                     }
 
-                    if(!string.IsNullOrEmpty(CopyCutBuffer))
+                    if (!string.IsNullOrEmpty(CopyCutBuffer))
                         ConsoleComand($"/addrang {num} \"{CopyCutBuffer}\"");
                     textBox1.AppendText($"Вставлено: {CopyCutBuffer}\r\n");
 
@@ -1685,7 +1725,7 @@ namespace LogixForms
 
                     break;//done
                 case "/open":
-                    if(args.Length > 1)
+                    if (args.Length > 1)
                     {
                         try
                         {
@@ -1783,7 +1823,7 @@ namespace LogixForms
                         textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
                         break;
                     }
-                    if(button_cansel.Enabled)
+                    if (button_cansel.Enabled)
                         button_cansel_Click(new(), new EventArgs());
                     break;//done
                 case "/undo":
@@ -1792,7 +1832,7 @@ namespace LogixForms
                         textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
                         break;
                     }
-                    if(button_undo.Enabled)
+                    if (button_undo.Enabled)
                         button_undo_Click(new(), new EventArgs());
                     break;//done
                 case "/close":
@@ -1808,12 +1848,13 @@ namespace LogixForms
                     break;//done
                 case "/help":
                     textBox1.AppendText("Список доступных команд:\r\n");
-                    textBox1.AppendText("\t/getrang [номер ранга от 0] - вывод текста указанного ранга.\r\n" );
+                    textBox1.AppendText("\t/getrang [номер ранга от 0] - вывод текста указанного ранга.\r\n");
+                    textBox1.AppendText("\t/getconf - отправляет HTTP GET запрос по текущему адресу подключения на 80 порт и выводит результат.\r\n");
                     textBox1.AppendText("\t/setbit [адрес] <0|1> - установление значение бита.\r\n");
                     textBox1.AppendText("\t/setrang [номер ранга от 0] \"<Текст ранга>\" - установление значение бита.\r\n");
-                        textBox1.AppendText("\t/addrang - оlбавление пустого ранга в конец.\r\n");
-                        textBox1.AppendText("\t/addrang \"<Текст ранга>\" - lобавление ранга в конец.\r\n");
-                        textBox1.AppendText("\t/addrang [номер ранга с 0] \"<Текст ранга>\" - lобавление ранга на указанную позицию.\r\n");
+                    textBox1.AppendText("\t/addrang - оlбавление пустого ранга в конец.\r\n");
+                    textBox1.AppendText("\t/addrang \"<Текст ранга>\" - lобавление ранга в конец.\r\n");
+                    textBox1.AppendText("\t/addrang [номер ранга с 0] \"<Текст ранга>\" - lобавление ранга на указанную позицию.\r\n");
                     textBox1.AppendText("\t/copy [номер ранга с 0] - копирование ранга из указанной позиции.\r\n");
                     textBox1.AppendText("\t/cut [номер ранга с 0] - вырезать ранг из указанной позиции.\r\n");
                     textBox1.AppendText("\t/paste [номер ранга с 0] - вставка ранга на указанную позицию.\r\n");
@@ -1831,7 +1872,7 @@ namespace LogixForms
                     textBox1.AppendText("\t/close - закрытие текущей вкладки.\r\n");
                     textBox1.AppendText("\t/exit - выход из приложения.\r\n");
 
-                    textBox1.AppendText("\t/help - информация.\r\n" );
+                    textBox1.AppendText("\t/help - информация.\r\n");
                     break;
                 default:
                     textBox1.AppendText("Неизвесная команда. Используте /help для справки.\r\n");
@@ -1839,9 +1880,23 @@ namespace LogixForms
             }
         }
 
+        /// <summary>
+        /// Добавочные функции консоли
+        /// </summary>
+        /// <param name="Actions">Дествие, которое должна сделать консоль</param>
         private void ConsoleFunction(string Actions)
         {
 
+        }
+
+        /// <summary>
+        /// Открытие/закрытие консоли
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void openConsoleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            splitContainer1.Panel2Collapsed = !splitContainer1.Panel2Collapsed;
         }
     }
 }
