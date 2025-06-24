@@ -256,7 +256,41 @@ namespace LogixForms.HelperClasses.DrowClasses
         /// <param name="Text">Новый Текст</param>
         public void SetNewTextRang(int numberOfRang, string Text)
         {
+            if (info_file.Count <= numberOfRang)
+            {
+                AddNewTextRang(Text);
+                return;
+            }
+
             info_file[numberOfRang] = Text;
+        }
+
+        public void AddNewTextRang(string Text, int NumberRung = -1)
+        {
+            if (NumberRung == -1 || NumberRung >= info_file.Count)
+            {
+                info_file.Add(Text);
+                CountNewRangs = -1;
+                return;
+            }
+
+            string buf = string.Empty;
+
+            for (int i = NumberRung; i < info_file.Count; i++)
+            {
+                buf = info_file[i];
+                info_file[i] = Text;
+                Text = buf;
+            }
+            info_file.Add(Text);
+
+            CountNewRangs = -1;
+        }
+
+        public void DeleteRang(int Number)
+        {
+            info_file.Remove(info_file[Number]);
+            CountNewRangs = -1;
         }
 
         /// <summary>
@@ -274,8 +308,14 @@ namespace LogixForms.HelperClasses.DrowClasses
         /// </summary>
         /// <param name="numberOfRang">Номер ранга(с 0)</param>
         /// <param name="Text">Новый Текст</param>
-        public byte AddNewTextRang(int numberOfRang, string Text)
+        public byte SetNewTextRangInOnlineMode(int numberOfRang, string Text)
         {
+            if (info_file.Count <= numberOfRang)
+            {
+                AddNewTextRang(Text);
+                return 2;
+            }
+
             if (info_file[numberOfRang].Split("#")[0] == Text)
             {
                 info_file[numberOfRang] = Text;
@@ -283,6 +323,11 @@ namespace LogixForms.HelperClasses.DrowClasses
             }
             info_file[numberOfRang] = info_file[numberOfRang].Split("#")[0] + "#" + Text;
             return 2;
+        }
+
+        public byte AddNewTextRangInOnlineMode(string Text, int NumberRung = -1)
+        {
+            return 0;
         }
 
         /// <summary>

@@ -57,10 +57,23 @@
             aboutToolStripMenuItem = new ToolStripMenuItem();
             toolStripTextBox1 = new ToolStripTextBox();
             toolStripTextBox2 = new ToolStripTextBox();
+            splitContainer1 = new SplitContainer();
+            textBox1 = new TextBox();
+            panel4 = new Panel();
+            Console_textBox = new TextBox();
+            label1 = new Label();
+            panel3 = new Panel();
+            progressBar1 = new ProgressBar();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             menu.SuspendLayout();
             menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
+            panel4.SuspendLayout();
+            panel3.SuspendLayout();
             SuspendLayout();
             // 
             // ModBusUpdate
@@ -92,10 +105,10 @@
             // Files
             // 
             Files.Dock = DockStyle.Fill;
-            Files.Location = new Point(0, 34);
+            Files.Location = new Point(0, 0);
             Files.Name = "Files";
             Files.SelectedIndex = 0;
-            Files.Size = new Size(1171, 562);
+            Files.Size = new Size(1171, 328);
             Files.TabIndex = 2;
             Files.SelectedIndexChanged += TabPag_SelectedIndex;
             Files.KeyDown += MyTabPage_KeyDown;
@@ -237,7 +250,7 @@
             // connectToolStripMenuItem
             // 
             connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            connectToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.C;
+            connectToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Shift | Keys.C;
             connectToolStripMenuItem.Size = new Size(242, 26);
             connectToolStripMenuItem.Text = "Connect";
             connectToolStripMenuItem.Click += ConnectToolStripMenuItem_Click;
@@ -280,14 +293,97 @@
             toolStripTextBox2.ReadOnly = true;
             toolStripTextBox2.Size = new Size(27, 27);
             // 
+            // splitContainer1
+            // 
+            splitContainer1.Dock = DockStyle.Fill;
+            splitContainer1.Location = new Point(0, 34);
+            splitContainer1.Name = "splitContainer1";
+            splitContainer1.Orientation = Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(Files);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.BackColor = SystemColors.ControlLight;
+            splitContainer1.Panel2.Controls.Add(textBox1);
+            splitContainer1.Panel2.Controls.Add(panel4);
+            splitContainer1.Size = new Size(1171, 536);
+            splitContainer1.SplitterDistance = 328;
+            splitContainer1.TabIndex = 6;
+            // 
+            // textBox1
+            // 
+            textBox1.Dock = DockStyle.Fill;
+            textBox1.Location = new Point(0, 0);
+            textBox1.Multiline = true;
+            textBox1.Name = "textBox1";
+            textBox1.ReadOnly = true;
+            textBox1.Size = new Size(1171, 181);
+            textBox1.TabIndex = 3;
+            // 
+            // panel4
+            // 
+            panel4.BackColor = SystemColors.ControlLightLight;
+            panel4.Controls.Add(Console_textBox);
+            panel4.Controls.Add(label1);
+            panel4.Dock = DockStyle.Bottom;
+            panel4.Location = new Point(0, 181);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(1171, 23);
+            panel4.TabIndex = 2;
+            // 
+            // Console_textBox
+            // 
+            Console_textBox.BackColor = SystemColors.ControlLightLight;
+            Console_textBox.BorderStyle = BorderStyle.None;
+            Console_textBox.Dock = DockStyle.Fill;
+            Console_textBox.Font = new Font("Segoe UI", 10F);
+            Console_textBox.Location = new Point(19, 0);
+            Console_textBox.Name = "Console_textBox";
+            Console_textBox.Size = new Size(1152, 23);
+            Console_textBox.TabIndex = 0;
+            Console_textBox.KeyDown += Console_textBox_KeyDown;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Dock = DockStyle.Left;
+            label1.Location = new Point(0, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(19, 20);
+            label1.TabIndex = 1;
+            label1.Text = ">";
+            // 
+            // panel3
+            // 
+            panel3.BackColor = SystemColors.Menu;
+            panel3.Controls.Add(progressBar1);
+            panel3.Dock = DockStyle.Bottom;
+            panel3.Location = new Point(0, 570);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(1171, 26);
+            panel3.TabIndex = 7;
+            // 
+            // progressBar1
+            // 
+            progressBar1.Dock = DockStyle.Right;
+            progressBar1.Enabled = false;
+            progressBar1.Location = new Point(1034, 0);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(137, 26);
+            progressBar1.TabIndex = 0;
+            // 
             // MainThread
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Window;
             ClientSize = new Size(1171, 596);
-            Controls.Add(Files);
+            Controls.Add(splitContainer1);
             Controls.Add(panel1);
+            Controls.Add(panel3);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainThread";
             Text = "Logix";
@@ -298,6 +394,14 @@
             menu.PerformLayout();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
+            splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
+            panel4.ResumeLayout(false);
+            panel4.PerformLayout();
+            panel3.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -327,6 +431,13 @@
         private Button button_upload;
         private Button button_cansel;
         private Button button_undo;
+        private SplitContainer splitContainer1;
+        private Panel panel3;
+        private ProgressBar progressBar1;
+        private TextBox Console_textBox;
+        private Panel panel4;
+        private Label label1;
+        private TextBox textBox1;
     }
 
 }

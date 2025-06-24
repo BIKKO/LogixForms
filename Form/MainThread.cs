@@ -1,8 +1,11 @@
 using LogixForms.HelperClasses;
 using LogixForms.HelperClasses.DrowClasses;
 using Modbus.Device;
+using Modbus.Extensions.Enron;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.Net.Sockets;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using TextBox = System.Windows.Forms.TextBox;
 
@@ -12,6 +15,8 @@ namespace LogixForms
     {
         private static Dictionary<string, ushort[]>? Adr;
         protected static Dictionary<string, ushort>? MB_adres;
+        private List<string> commands = [""];
+        private byte number_com = 0;
         private List<ClassDraw> mainWindows;
         private List<int> ConnectedWindows;
         public ModbusIpMaster? master;
@@ -24,6 +29,9 @@ namespace LogixForms
         private List<Thread> opens;
         private Point mousePos;
         private bool SaveFlag;
+        private CheckingTheCorrectness correctness;
+        private string CopyCutBuffer;
+
 #if DEBUG
         bool DebugFlag = false;
 #endif
@@ -35,6 +43,8 @@ namespace LogixForms
         {
             InitializeComponent();//инициализация формы
 
+            correctness = new(100, 100, 100, CheckingType.Local);
+            CopyCutBuffer = string.Empty;
             AdresUpdate.Enabled = false;
             mousePos = new Point();
             AdresUpdate.Interval = 350;
@@ -204,15 +214,18 @@ namespace LogixForms
         /// <exception cref="Exception">Ошибки в синтаксисе текста</exception>
         private string SerchErr(string Text)
         {
-            if (Text[0] != ' ' && Text[^1] != ' ') throw new Exception("Код ошибки 20.\nОшибка пробелов");
-
-            CheckingTheCorrectness correctness = new(100, 100, 100, CheckingType.Local);
+            if (Text[0] != ' ' && Text[^1] != ' ')
+            {
+                MessageBox.Show("Код ошибки 20.\nОшибка пробелов", "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                throw new();
+            }
 
             sbyte result = correctness.CheckRangText(Text);
 
             if (result != 0)
             {
-                ErrorMessenger((ushort)result);
+                string mess = ErrorMessenger((ushort)result);
+                MessageBox.Show(mess, "Ошибка правельноси ранга!", MessageBoxButtons.OK);
                 throw new();
             }
             else
@@ -760,7 +773,7 @@ namespace LogixForms
             if (Files.TabCount > 0 && Application.OpenForms[Files.SelectedTab.Text] == null)
             {
                 bool flag = ConnectedWindows.Contains(Files.SelectedIndex);
-                new ValueAdres(ref mainWindows[Files.SelectedIndex].GetDataTabl, Files.SelectedTab.Text, master, ref MB_adres, ref flag).Show();
+                new ValueAdres(ref mainWindows[Files.SelectedIndex].GetDataTabl, Files.SelectedTab.Text, master, ref MB_adres, ref flag, slave).Show();
             }
         }
 
@@ -879,7 +892,7 @@ namespace LogixForms
 
                     if (textb.Tag == "Online")
                     {
-                        selectTab.AddNewTextRang(int.Parse(textb.Name), Text);
+                        selectTab.SetNewTextRangInOnlineMode(int.Parse(textb.Name), Text);
 
                         button_upload.Enabled = true;
                     }
@@ -898,6 +911,7 @@ namespace LogixForms
                     {
                         MessageBox.Show(ex.Message, "Ошибка правельноси ранга!", MessageBoxButtons.OK);
                         textb.Focus();
+    
                     }
                 }
             }
@@ -1012,87 +1026,81 @@ namespace LogixForms
         /// Оповещение об ошибках
         /// </summary>
         /// <param name="ErrorCode">Код ошибки</param>
-        private static void ErrorMessenger(ushort ErrorCode)
+        private static string ErrorMessenger(ushort ErrorCode)
         {
+            string error_coment = string.Empty;
             switch (ErrorCode)
             {
                 case 1:
-                    MessageBox.Show("Код ошибки 1.\nКоличество концов должно быть равным количеству начал ветвей.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 1.\nКоличество концов должно быть равным количеству начал ветвей.";
                     break;
                 case 2:
-                    MessageBox.Show("Код ошибки 2.\nКоличество ONS должен быть только 1 или 0.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 2.\nКоличество ONS должен быть только 1 или 0.";
                     break;
                 case 3:
-                    MessageBox.Show("Код ошибки 3.\nПревышение размерности группы параметров (не правильная адресация).",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 3.\nПревышение размерности группы параметров (не правильная адресация).";
                     break;
                 case 4:
-                    MessageBox.Show("Код ошибки 4.\nКоличество битов должно быть 0-15 (не правильная адресация).",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 4.\nКоличество битов должно быть 0-15 (не правильная адресация).";
                     break;
                 case 5:
-                    MessageBox.Show("Код ошибки 5.\nНет такой группы параметров (не правильная адресация).",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 5.\nНет такой группы параметров (не правильная адресация).";
                     break;
                 case 6:
-                    MessageBox.Show("Код ошибки 6.\nРезультат не должен быть числом.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 6.\nРезультат не должен быть числом.";
                     break;
                 case 8:
-                    MessageBox.Show("Код ошибки 8.\nНе все слова в строке прошли проверку (не правильное написание ключевых слов или адресов).",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 8.\nНе все слова в строке прошли проверку (не правильное написание ключевых слов или адресов).";
                     break;
                 case 9:
-                    MessageBox.Show("Код ошибки 9.\nНеправильный TimeBase в таймере.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 9.\nНеправильный TimeBase в таймере.";
                     break;
                 case 10:
-                    MessageBox.Show("Код ошибки 10.\nPreset не может быть нулевым в таймере.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 10.\nPreset не может быть нулевым в таймере.";
                     break;
                 case 11:
-                    MessageBox.Show("Код ошибки 11.\nПервый символ перед номером ранга должен быть \'%\'",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 11.\nПервый символ перед номером ранга должен быть \'%\'"; 
+
                     break;
                 case 12:
-                    MessageBox.Show("Код ошибки 12.\nНеправильный код операции в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 12.\nНеправильный код операции в MSG.";
+                        
                     break;
                 case 13:
-                    MessageBox.Show("Код ошибки 13.\nНеправильный второстепенные параметры в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 13.\nНеправильный второстепенные параметры в MSG.";
+                        
                     break;
                 case 14:
-                    MessageBox.Show("Код ошибки 14.\nНеправильный синтакс IP адреса в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 14.\nНеправильный синтакс IP адреса в MSG.";
+                       ;
                     break;
                 case 15:
-                    MessageBox.Show("Код ошибки 15.\nНеправильный MB адрес в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 15.\nНеправильный MB адрес в MSG.";
+                        
                     break;
                 case 16:
-                    MessageBox.Show("Код ошибки 16.\nНеправильный колл. регистров для обмена в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 16.\nНеправильный колл. регистров для обмена в MSG.";
+                        
                     break;
                 case 17:
-                    MessageBox.Show("Код ошибки 17.\nНеправильный TimeOut MTO  в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 17.\nНеправильный TimeOut MTO  в MSG.";
+                        
                     break;
                 case 18:
-                    MessageBox.Show("Код ошибки 18.\nНеправильный NOD (ID) в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 18.\nНеправильный NOD (ID) в MSG.";
+                        
                     break;
                 case 19:
-                    MessageBox.Show("Код ошибки 19.\nНеправильный Port в MSG.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = "Код ошибки 19.\nНеправильный Port в MSG.";
+                        
                     break;
                 default:
-                    MessageBox.Show($"Код ошибки {ErrorCode}.\nНеизвестная ошибка.",
-                        "Ошибка правельноси ранга!", MessageBoxButtons.OK);
+                    error_coment = $"Код ошибки {ErrorCode}.\nНеизвестная ошибка.";
+                        
                     break;
             }
+
+            return error_coment;
         }
 
         /// <summary>
@@ -1114,23 +1122,61 @@ namespace LogixForms
             int num_rang = int.Parse(buf.Split("#")[0]);
             string oldrang = buf.Split("#")[1];
 
-            buf = selectTab.GetTextRang[num_rang];
-
-            if (buf.Contains("#"))
-                buf = buf.Split("#")[1];
-
-            selectTab.UndoPush = num_rang + "#" + buf;
-
-            if (Files.SelectedTab.Tag == "Online")
+            if (buf.Split("#").Length != 3)
             {
-                if (selectTab.AddNewTextRang(num_rang, oldrang) == 1)
-                    button_upload.Enabled = false;
+                if (num_rang >= selectTab.GetTextRang.Length)
+                    buf = " ";
                 else
-                    button_upload.Enabled = true;
+                    buf = selectTab.GetTextRang[num_rang];
+
+                if (buf.Contains("#"))
+                    buf = buf.Split("#")[1];
+
+                selectTab.UndoPush = num_rang + "#" + buf;
+
+                if (Files.SelectedTab.Tag == "Online")
+                {
+                    if (selectTab.SetNewTextRangInOnlineMode(num_rang, oldrang) == 1)
+                        button_upload.Enabled = false;
+                    else
+                        button_upload.Enabled = true;
+                }
+                else
+                {
+                    selectTab.SetNewTextRang(num_rang, oldrang);
+                }
             }
-            else
+            else if (buf.Split("#")[^1] == "deleted")
             {
-                selectTab.SetNewTextRang(num_rang, oldrang);
+                if (num_rang >= selectTab.GetTextRang.Length)
+                    buf = " ";
+                else
+                    buf = selectTab.GetTextRang[num_rang];
+
+                if (buf.Contains("#"))
+                    buf = buf.Split("#")[1];
+
+                selectTab.UndoPush = num_rang + "#" + buf + "#deleted";
+
+                if (Files.SelectedTab.Tag == "Online")
+                {
+                    if (selectTab.AddNewTextRangInOnlineMode(oldrang, num_rang) == 1)
+                        button_upload.Enabled = false;
+                    else
+                        button_upload.Enabled = true;
+                }
+                else
+                {
+                    selectTab.AddNewTextRang(oldrang, num_rang);
+                }
+            }
+            else if(buf.Split("#")[^1] == "add")
+            {
+                if (buf.Contains("#"))
+                    buf = buf.Split("#")[1];
+
+                selectTab.UndoPush = num_rang + "#" + buf + "#add";
+                selectTab.DeleteRang(num_rang);
             }
 
             if (selectTab.CanselCount < 1)
@@ -1159,25 +1205,73 @@ namespace LogixForms
 
             int num_rang = int.Parse(buf.Split("#")[0]);
             string oldrang = buf.Split("#")[1];
-
-            buf = selectTab.GetTextRang[num_rang];
-
-            if (buf.Contains("#"))
-                buf = buf.Split("#")[1];
-
-            selectTab.CanselPush = num_rang + "#" + buf;
-
-            if (Files.SelectedTab.Tag == "Online")
+            //ffffffff
+            if (buf.Split("#").Length != 3)
             {
-                if (selectTab.AddNewTextRang(num_rang, oldrang) == 1)
-                    button_upload.Enabled = false;
+                if (num_rang >= selectTab.GetTextRang.Length)
+                    buf = " ";
                 else
-                    button_upload.Enabled = true;
+                    buf = selectTab.GetTextRang[num_rang];
 
+                if (buf.Contains("#"))
+                    buf = buf.Split("#")[1];
+
+                selectTab.CanselPush = num_rang + "#" + buf + "#deleted";
+
+                if (Files.SelectedTab.Tag == "Online")
+                {
+                    if (selectTab.SetNewTextRangInOnlineMode(num_rang, oldrang) == 1)
+                        button_upload.Enabled = false;
+                    else
+                        button_upload.Enabled = true;
+                }
+                else
+                {
+                    selectTab.SetNewTextRang(num_rang, oldrang);
+                }
             }
-            else
+            else if (buf.Split("#")[^1] == "deleted")
             {
-                selectTab.SetNewTextRang(num_rang, oldrang);
+                if(num_rang >= selectTab.GetTextRang.Length)
+                    buf = " ";
+                else
+                    buf = selectTab.GetTextRang[num_rang];
+
+                if (buf.Contains("#"))
+                    buf = buf.Split("#")[1];
+
+                selectTab.CanselPush = num_rang + "#" + buf + "#deleted";
+
+                if (Files.SelectedTab.Tag == "Online")
+                {
+                    if (selectTab.AddNewTextRangInOnlineMode(oldrang, num_rang) == 1)  //replace to delete
+                        button_upload.Enabled = false;
+                    else
+                        button_upload.Enabled = true;
+                }
+                else
+                {
+                    selectTab.DeleteRang(num_rang);
+                }
+            }
+            else if(buf.Split("#")[^1] == "add")
+            {
+                if (buf.Contains("#"))
+                    buf = buf.Split("#")[1];
+
+                selectTab.CanselPush = num_rang + "#" + buf + "#add";
+
+                if (Files.SelectedTab.Tag == "Online")
+                {
+                    if (selectTab.AddNewTextRangInOnlineMode(oldrang, num_rang) == 1)
+                        button_upload.Enabled = false;
+                    else
+                        button_upload.Enabled = true;
+                }
+                else
+                {
+                    selectTab.AddNewTextRang(oldrang, num_rang);
+                }
             }
 
             if (selectTab.UndoCount < 1)
@@ -1224,6 +1318,530 @@ namespace LogixForms
                 button_undo.ForeColor = SystemColors.ActiveCaptionText;
             else
                 button_undo.ForeColor = SystemColors.AppWorkspace;
+        }
+
+        private void Console_textBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                //textBox1.AppendText(Console_textBox.Text);
+                textBox1.AppendText(Console_textBox.Text + "\r\n");
+                commands.Add(Console_textBox.Text);
+
+                if (Console_textBox.Text[0] == '/')
+                    ConsoleComand(Console_textBox.Text);
+                else
+                    ConsoleFunction(Console_textBox.Text);
+
+
+                    Console_textBox.Text = "";
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+                if (number_com >= 1)
+                {
+                    //Down.Push(Console_textBox.Text);
+                    number_com--;
+                    Console_textBox.Text = commands[number_com];
+                    Console_textBox.SelectionStart = commands[number_com].Length;
+                }
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                if (number_com < commands.Count-1)
+                {
+                    //Up.Push(Console_textBox.Text);
+                    number_com++;
+                    Console_textBox.Text = commands[number_com];
+                    Console_textBox.SelectionStart = commands[number_com].Length;
+                }
+            }
+        }
+
+        private void ConsoleComand(string Comand)
+        {
+            string[] args = Comand.Split(" ");
+            ClassDraw selectTab = null;
+            if (Files.TabPages.Count > 0)
+                selectTab = mainWindows[Files.SelectedIndex]; // НАДО ДОДЕЛАТЬ ClassDraw, ПОСКОЛЬКУ НЕ ВСЕ РЕШЕНИЯ ЕСТЬ ДЛЯ ОНЛАЙН РЕЖИМА
+            switch (args[0])
+            {
+                case "/getrang":
+                    byte num_rang;
+                    if (!byte.TryParse(args[1], out num_rang))
+                    {
+                        textBox1.AppendText("Ошибка аргумента.\r\n");
+                        break;
+                    }
+
+                    if (mainWindows.Count > 0 && Files.TabPages.Count > 0)
+                    {
+                        if (num_rang < mainWindows[Files.SelectedIndex].GetTextRang.Length)
+                            textBox1.AppendText(args[1] + ": " + mainWindows[Files.SelectedIndex].GetTextRang[num_rang] + "\r\n");
+                    }
+                    else
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                    
+                    break;//done
+                case "/setbit":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    string[] adr_key = mainWindows[Files.SelectedIndex].GetDataTabl.Keys.ToArray();
+                    if (!adr_key.Contains(args[1].Split(":")[0]))
+                    {
+                        textBox1.AppendText("Неверно указан адрес.\r\n");
+                        break;
+                    }
+                    byte bit;
+                    if (!byte.TryParse(args[2], out bit))
+                    {
+                        textBox1.AppendText("Неверно указан бит.\r\n");
+                        break;
+                    }
+                    if (bit > 1 && bit < 0)
+                    {
+                        textBox1.AppendText("Неверно указан бит.\r\n");
+                        break;
+                    }
+
+                    string[] mas_bit = args[1].Split(":")[1].Split('/');
+
+                    byte adres;
+                    if (!byte.TryParse(mas_bit[0], out adres))
+                    {
+                        textBox1.AppendText("Неверно указан адрес.\r\n");
+                        break;
+                    }
+                    ushort adr = mainWindows[Files.SelectedIndex].GetDataTabl[args[1].Split(":")[0]][adres];
+
+                    if (!byte.TryParse(mas_bit[1], out adres))
+                    {
+                        textBox1.AppendText("Неверно указан адрес.\r\n");
+                        break;
+                    }
+
+                    if(adres > 15 || adres < 0)
+                    {
+                        textBox1.AppendText("Неверно указан бит.\r\n");
+                        break;
+                    }
+
+                    if ((adr & 1 << adres) == 1 << adres)
+                    {
+                        if (bit == 0)
+                            adr = (ushort)(adr ^ (1 << adres));
+                    }
+                    else
+                    {
+                        if (bit == 1)
+                            adr = (ushort)(adr | (1 << adres));
+                    }
+
+                    adres = byte.Parse(mas_bit[0]);
+                    mainWindows[Files.SelectedIndex].GetDataTabl[args[1].Split(":")[0]][adres] = adr;
+
+                    if (Files.SelectedTab.Tag == "Online")
+                    {
+                        master.WriteSingleRegister(slave, (ushort)(MB_adres[args[1].Split(":")[0]] + adres), mainWindows[Files.SelectedIndex].GetDataTabl[args[1].Split(":")[0]][adres]);
+                    }
+
+                    break;//done
+                case "/setrang":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    byte num;
+                    if (!byte.TryParse(args[1], out num))
+                    {
+                        textBox1.AppendText("Ошибка аргумента.\r\n");
+                        break;
+                    }
+
+                    if (num > mainWindows[Files.SelectedIndex].GetTextRang.Length)
+                    {
+                        textBox1.AppendText("Ошибка аргумента.\r\n");
+                        break;
+                    }
+
+                    try
+                    {
+                        string Text = SerchErr(Comand.Split("\"")[1].ToUpper());
+
+                        string oldtext = selectTab.GetTextRang[num];
+
+                        if (oldtext.Contains("#"))
+                            selectTab.CanselPush = num + "#" + oldtext.Split("#")[1];
+                        else
+                            selectTab.CanselPush = num + "#" + oldtext;
+
+                        if (Files.SelectedTab.Tag == "Online")
+                        {
+                            selectTab.SetNewTextRangInOnlineMode(num, Text);
+
+                            button_upload.Enabled = true;
+                        }
+                        else
+                            selectTab.SetNewTextRang(num, Text);
+
+                        TabPage tab = Files.SelectedTab;
+                        tab.Text += (tab.Text.Contains("*") ? "" : "*");
+
+                        button_cansel.Enabled = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("Код ошибки"))
+                        {
+                            textBox1.AppendText(ex.Message + "\r\nОшибка правельноси ранга!\r\n");
+                        }
+                    }
+
+                    break;//done
+                case "/addrang":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    try
+                    {
+                        if (Comand != "/addrang")
+                        {
+                            string Text = SerchErr(Comand.Split("\"")[1].ToUpper());
+
+                            if (sbyte.TryParse(args[1], out sbyte snum))
+                            {
+                                if (snum < 0)
+                                {
+                                    textBox1.AppendText("Ошибка аргумента.\r\n");
+                                    break;
+                                }
+
+                                selectTab.CanselPush = snum + "#" + Text + "#add";
+                                if (Files.SelectedTab.Tag == "Online")
+                                {
+                                    selectTab.AddNewTextRangInOnlineMode(Text, snum);
+
+                                    button_upload.Enabled = true;
+                                }
+                                else
+                                    selectTab.AddNewTextRang(Text, snum);
+
+                                break;
+                            }
+
+                            selectTab.CanselPush = selectTab.GetTextRang.Length + "#" + Text + "#add";
+                            if (Files.SelectedTab.Tag == "Online")
+                            {
+                                selectTab.AddNewTextRangInOnlineMode(Text);
+
+                                button_upload.Enabled = true;
+                            }
+                            else
+                                selectTab.AddNewTextRang(Text);
+                        }
+                        else
+                        {
+                            selectTab.CanselPush = selectTab.GetTextRang.Length + "##add";
+                            if (Files.SelectedTab.Tag == "Online")
+                            {
+                                selectTab.AddNewTextRangInOnlineMode("");
+
+                                button_upload.Enabled = true;
+                            }
+                            else
+                                selectTab.AddNewTextRang("");
+                        }
+
+                        TabPage tab = Files.SelectedTab;
+                        tab.Text += (tab.Text.Contains("*") ? "" : "*");
+
+                        button_cansel.Enabled = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("Код ошибки"))
+                        {
+                            textBox1.AppendText(ex.Message + "\r\nОшибка правельноси ранга!\r\n");
+                        }
+                    }
+                    break;//done
+                case "/deleterang":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    if (!byte.TryParse(args[1], out num))
+                    {
+                        textBox1.AppendText("Неверно указан бит.\r\n");
+                        break;
+                    }
+
+                    if (num > selectTab.GetTextRang.Length)
+                    {
+                        textBox1.AppendText("Неверно указан бит.\r\n");
+                        break;
+                    }
+
+                    selectTab.CanselPush = num + "#" +selectTab.GetTextRang[num] + "#deleted";
+
+                    selectTab.DeleteRang(num);
+
+                    button_cansel.Enabled = true;
+                    break;//done
+                case "/copy":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    if (!byte.TryParse(args[1], out num))
+                    {
+                        textBox1.AppendText("Ошибка аргумента.\r\n");
+                        break;
+                    }
+
+                    CopyCutBuffer = selectTab.GetTextRang[num];
+                    textBox1.AppendText($"Скопированно: {CopyCutBuffer}\r\n");
+
+                    break;//done
+                case "/paste":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    if (!byte.TryParse(args[1], out num))
+                    {
+                        textBox1.AppendText("Ошибка аргумента.\r\n");
+                        break;
+                    }
+
+                    if(!string.IsNullOrEmpty(CopyCutBuffer))
+                        ConsoleComand($"/addrang {num} \"{CopyCutBuffer}\"");
+                    textBox1.AppendText($"Вставлено: {CopyCutBuffer}\r\n");
+
+                    break;//done
+                case "/cut":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    if (!byte.TryParse(args[1], out num))
+                    {
+                        textBox1.AppendText("Ошибка аргумента.\r\n");
+                        break;
+                    }
+
+                    CopyCutBuffer = selectTab.GetTextRang[num];
+                    ConsoleComand($"/deleterang {num}");
+                    textBox1.AppendText($"Вырезано: {CopyCutBuffer}\r\n");
+
+                    break;//done
+                case "/push":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+                    if (Files.SelectedTab.Tag != "Online")
+                    {
+                        textBox1.AppendText("Ошибка! Данная команда работает только в онлайн режиме.\r\n");
+                        break;
+                    }
+
+                    if (button_upload.Enabled)
+                        button_upload_Click(new(), new EventArgs());
+
+                    break;//done
+                case "/sendsave":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+                    if (Files.SelectedTab.Tag != "Online")
+                    {
+                        textBox1.AppendText("Ошибка! Данная команда работает только в онлайн режиме.\r\n");
+                        break;
+                    }
+
+                    if (button_accept.Enabled)
+                        button_accept_Click(new(), new EventArgs());
+
+                    break;//done
+                case "/open":
+                    if(args.Length > 1)
+                    {
+                        try
+                        {
+                            string path = Comand.Replace("/open ", "");
+
+                            if (path.Contains("\""))
+                                path = path.Split("\"")[1];
+
+                            string Name = path.Split('\\')[^1];
+
+                            string Tag = path;
+                            CreateWinWhishOpen(Name, Tag);
+                        }
+                        catch
+                        {
+                            textBox1.AppendText("Ошибка пути. Проверьте правильность пути или наличие файла.\r\n");
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        OpenToolStripMenuItem_Click(new(), new EventArgs());
+                    }
+                    break;//done
+                case "/save":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+
+                    SaveToolStripMenuItem_Click(new(), new EventArgs());
+
+                    break;//done
+                case "/new":
+                    NewToolStripMenuItem_Click(new(), new EventArgs());
+                    break;//done
+                case "/connect":
+                    if (ConnectedWindows.Count >= 1) break;
+
+                    if (args.Length > 1)
+                    {
+                        string ip_and_port = args[1].Split(":")[0];
+                        byte s;
+                        try
+                        {
+                            string[] ip_buf = { };
+                            ip_buf = ip_and_port.Split('.');
+                            if (ip_buf.Length == 4 && byte.TryParse(args[2], out s))
+                            {
+                                foreach (string ip in ip_buf)
+                                {
+                                    if (!int.TryParse(ip, out _)) continue;
+                                }
+
+                            }
+                            else
+                            {
+                                if (ip_buf.Length != 4)
+                                {
+                                    textBox1.AppendText("Не верно указан IP адрес: 255.255.255.255");
+                                }
+                                else
+                                {
+                                    textBox1.AppendText("Не верно указан SlaveID");
+                                }
+                                break;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            textBox1.AppendText("Не верно указан IP адрес: встречено не число");
+                            break;
+                        }
+                        if (s != null && s != 0)
+                        {
+                            Con(ip_and_port, args[1].Split(":")[1], false, s);
+                        }
+                        else
+                        {
+                            textBox1.AppendText("Не вышло!");
+                            break;
+                        }
+                    }
+                    else
+                        ConnectToolStripMenuItem_Click(new(), new EventArgs());
+
+                    break;//done
+                case "/clear":
+                    textBox1.Text = "";
+                    break;//done
+                case "/cansel":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+                    if(button_cansel.Enabled)
+                        button_cansel_Click(new(), new EventArgs());
+                    break;//done
+                case "/undo":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+                    if(button_undo.Enabled)
+                        button_undo_Click(new(), new EventArgs());
+                    break;//done
+                case "/close":
+                    if (Files.TabPages.Count <= 0)
+                    {
+                        textBox1.AppendText("Ошибка! Нет открытых источников.\r\n");
+                        break;
+                    }
+                    Close_Click(new(), new EventArgs());
+                    break;//done
+                case "/exit":
+                    Application.Exit();
+                    break;//done
+                case "/help":
+                    textBox1.AppendText("Список доступных команд:\r\n");
+                    textBox1.AppendText("\t/getrang [номер ранга от 0] - вывод текста указанного ранга.\r\n" );
+                    textBox1.AppendText("\t/setbit [адрес] <0|1> - установление значение бита.\r\n");
+                    textBox1.AppendText("\t/setrang [номер ранга от 0] \"<Текст ранга>\" - установление значение бита.\r\n");
+                        textBox1.AppendText("\t/addrang - оlбавление пустого ранга в конец.\r\n");
+                        textBox1.AppendText("\t/addrang \"<Текст ранга>\" - lобавление ранга в конец.\r\n");
+                        textBox1.AppendText("\t/addrang [номер ранга с 0] \"<Текст ранга>\" - lобавление ранга на указанную позицию.\r\n");
+                    textBox1.AppendText("\t/copy [номер ранга с 0] - копирование ранга из указанной позиции.\r\n");
+                    textBox1.AppendText("\t/cut [номер ранга с 0] - вырезать ранг из указанной позиции.\r\n");
+                    textBox1.AppendText("\t/paste [номер ранга с 0] - вставка ранга на указанную позицию.\r\n");
+
+                    textBox1.AppendText("\t/open {полный путь к файлу} - открытие файла программы.\r\n");
+                    textBox1.AppendText("\t/connect {<ip:port> <slaveID>} - подключение к устройству.\r\n");
+                    textBox1.AppendText("\t/push - отправка первого найденного изменения на устройство.\r\n");
+                    textBox1.AppendText("\t/sendsave - записть изменения на устройстве.\r\n");
+                    textBox1.AppendText("\t/save - сохранение программы в файл.\r\n");
+                    textBox1.AppendText("\t/new - создание новой программы.\r\n");
+
+                    textBox1.AppendText("\t/clear - очистка консоли.\r\n");
+                    textBox1.AppendText("\t/cansel - отмена поледнего изменения.\r\n");
+                    textBox1.AppendText("\t/undo - возврат последнего изменения.\r\n");
+                    textBox1.AppendText("\t/close - закрытие текущей вкладки.\r\n");
+                    textBox1.AppendText("\t/exit - выход из приложения.\r\n");
+
+                    textBox1.AppendText("\t/help - информация.\r\n" );
+                    break;
+                default:
+                    textBox1.AppendText("Неизвесная команда. Используте /help для справки.\r\n");
+                    break;
+            }
+        }
+
+        private void ConsoleFunction(string Actions)
+        {
+
         }
     }
 }
